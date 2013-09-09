@@ -1,1 +1,14 @@
 <!DOCTYPE HTML>
+<head>
+    <body>
+      <script src="lib/JSMIDIparser.js"></script>
+      <script src="src/main.js"></script>
+
+      <p>Upload MIDI here!</p>
+      <input type="file" id='filereader'>
+
+      <script>
+        JSMIDIParser.IO('filereader', fingeringAlgorithm);
+      </script>
+  </body>
+</head>
