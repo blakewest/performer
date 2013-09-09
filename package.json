@@ -1,0 +1,22 @@
+{
+  "name": "performer",
+  "version": "0.0.0",
+  "description": "A way to visualize the performance of a piano piece based on midi input",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bwest87/performer.git"
+  },
+  "keywords": [
+    "music",
+    "midi"
+  ],
+  "author": "Blake West",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/bwest87/performer/issues"
+  }
+}
