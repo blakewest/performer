@@ -1,5 +1,4 @@
 var fingeringAlgorithm = function(midiData) {
-  console.log(midiData);
   var notes = {
     0: 'C',
     1: 'Db',
@@ -14,22 +13,21 @@ var fingeringAlgorithm = function(midiData) {
     10: 'Bb',
     11: 'B'
   };
-  var notesArray = midiData.track[0].event;
-  var justNotes = [];
   var RHnotes = [];
   var LHnotes = [];
-  for (var i = 0; i < notesArray.length; i++) {
-    if (notesArray[i].type === 9 && notesArray[i].data[1] !== 0) {
-      justNotes.push(notesArray[i].data);
+
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    if (eventData.subtype === 'noteOn') {
+      var note = notes[eventData.noteNumber%12];
+      if (eventData.noteNumber >= 60) {
+        RHnotes.push(note);
+      }else {
+        LHnotes.push(note);
+      }
     }
   }
-  for (var j = 0; j < justNotes.length; j++) {
-    if (justNotes[j][0] >= 60) {
-      RHnotes.push(notes[(justNotes[j][0]%12)]);
-    }else {
-      LHnotes.push(notes[(justNotes[j][0]%12)]);  
-    }
-  }
+
   console.log('Right Hand: ', RHnotes);
   console.log('Left Hand: ', LHnotes);
 };
@@ -44,6 +42,7 @@ var IO = function(file) {
     MIDI.Player.loadFile(midiFile);
     var midiObj = MIDI.Player.data;
     console.log('MIDI Object = ', midiObj);
+    fingeringAlgorithm(midiObj);
   };
 };
 
