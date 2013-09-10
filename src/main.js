@@ -20,7 +20,7 @@ var fingeringAlgorithm = function(midiData) {
     var eventData = midiData[pair][0].event;
     if (eventData.subtype === 'noteOn') {
       var note = notes[eventData.noteNumber%12];
-      if (eventData.noteNumber >= 60) {
+      if (eventData.noteNumber >= 62) {
         RHnotes.push(note);
       }else {
         LHnotes.push(note);
