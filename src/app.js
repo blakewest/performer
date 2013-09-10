@@ -51,7 +51,38 @@ App.prototype.loadMidiFile = function(midiFile, callback) {
   });
 };
 
+App.prototype.start = function() {
+  this.player.start();
+  this.playing = true;
+};
 
+App.prototype.resume = function() {
+  this.player.currentTime += 1e-6;
+  this.player.resume();
+  this.playing = true;
+};
+
+App.prototype.stop = function() {
+  this.player.stop();
+  this.playing = false;
+};
+
+App.prototype.pause = function() {
+  this.player.pause();
+  this.playing = false;
+};
+
+App.prototype.getEndTime = function() {
+  return this.player.endTime;
+};
+
+App.prototype.setCurrentTIme = function(currentTime) {
+  this.player.pause();
+  this.player.currentTime = currentTime;
+  if (this.playing) {
+    this.player.resume();
+  }
+};
 
 
 
