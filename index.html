@@ -1,14 +1,18 @@
 <!DOCTYPE HTML>
 <head>
+    <link rel="stylesheet" href="styles/style.css">
     <body>
       <script src="lib/MIDI.js/inc/jasmid/midifile.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/stream.js"></script>
       <script src="lib/MIDI.js/js/MIDI/Player.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/replayer.js"></script>
+      <script src="lib/MIDI.js/three.min.js"></script>
       <script src="src/main.js"></script>
       <script src="src/app.js"></script>
 
       <p>Upload MIDI here!</p>
       <input type="file" id='filereader' onchange='IO(this.files[0])'>
+
+      <div id="canvas"></div>
   </body>
 </head>
