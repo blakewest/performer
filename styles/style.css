@@ -1,5 +1,7 @@
 #canvas {
-  background: #000;
-  width: 1000px;
-  height: 800px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
 }

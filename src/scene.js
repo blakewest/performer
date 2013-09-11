@@ -1,4 +1,5 @@
 var Scene = function(container) {
+  console.log('scene builder called');
   var $container = $(container);
   var width = $container.width();
   var height = $container.height();
@@ -8,29 +9,35 @@ var Scene = function(container) {
   var scene = new THREE.Scene();
 
   //create camera
-  var view_angle = 45;
+  var view_angle = 60;
   var aspect = width/height;
-  var near = 0.1;
-  var far = 10000;
+  var near = 0.001;
+  var far = 100000;
   var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
-  camera.position.z = 300;
+  camera.lookAt(new THREE.Vector3());
+  camera.position.z = 20;
 
 
-  //create renderer
-  var renderer = new THREE.WebGLRenderer();
+  //create and append renderer
+  var renderer = new THREE.WebGLRenderer({antialias: true});
   renderer.setSize(width, height);
-  //append rendered scene to the dom
+  renderer.setClearColor(0x000000, 1);
+  renderer.autoClear = false;
   $container.append(renderer.domElement);
 
   //create lights
-  var pointLight = new THREE.PointLight(0xFFFFFF);
-  //set it's position
-  pointLight.position.x = 10;
-  pointLight.position.y = 50;
-  pointLight.position.z = 130;
+  var ambientLight = new THREE.AmbientLight(0x222222);
 
-  //add it to scene
-  scene.add(pointLight);
+  var mainLight = new THREE.DirectionalLight(0xffffff, 0.8)
+  mainLight.position.set(1,2,4).normalize();
+
+  var auxLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  auxLight.position.set(-4,-1,-2).normalize;
+
+  //add everything to the scene
+  scene.add(ambientLight);
+  scene.add(mainLight);
+  scene.add(auxLight);
   scene.add(camera);
 
   //set props for return object

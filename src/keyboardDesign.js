@@ -1,4 +1,5 @@
 var KeyboardDesign = function() {
+  console.log('keyboard design builder called');
   this.KeyType = {
     WhiteC:  0,
     WhiteD: 1,
@@ -29,6 +30,89 @@ var KeyboardDesign = function() {
   this.keyUpSpeed                     = 0.03;
   this.keyInfo                            = [] ;// an array holding each key's type and position
 
+  var _this = this;
+  //essentially an initialization function
+  var createBoardInfo = function() {
+    makeNoteObjects();
+    initKeyType();
+    initKeyPos();
+  };
 
+  var makeNoteObjects = function() {
+    for (var i = 0; i < 128; i++) {
+      var noteObj = {};
+      _this.keyInfo.push(noteObj);
+    }
+  };
 
+  var initKeyType = function() {
+    var KeyType = _this.KeyType;
+    for (var i = 0; i< _this.keyInfo.length; i++) {
+      var note = _this.keyInfo[i];
+      note.keyType = KeyType.WhiteC;
+    }
+  };
+
+  var initKeyPos = function() {
+    //setting up convenience vars
+    var keyInfo         = _this.keyInfo;
+    var KeyType        = _this.KeyType;
+    var prevKeyType = KeyType.WhiteB;
+    var noteNo         = 0;
+    var posX             = 0.0;
+    var shift             = 0.0;
+    var Black            = KeyType.Black;
+
+    //setting position of first note;
+    keyInfo[noteNo].keyCenterPosX = posX;
+    prevKeyType = keyInfo[noteNo].keyType;
+
+    //set position of all the rest of the notes.
+
+    for ( noteNo = 1; noteNo< keyInfo.length; noteNo++) {
+      if (prevKeyType === Black) {
+        posX += _this.whiteKeyStep / 2.0;
+      }else {
+        if (keyInfo[noteNo].keyType === Black) {
+          posX += _this.whiteKeyStep / 2.0;
+        }else {
+          posX += _this.whiteKeyStep;
+        }
+      }
+      keyInfo[noteNo].keyCenterPosX = posX;
+      prevKeyType = keyInfo[noteNo].keyType;
+    }
+
+  };
+
+  //calling initialization function
+  createBoardInfo();
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
