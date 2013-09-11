@@ -54,91 +54,92 @@ var App = function() {
     reader.readAsDataURL(file);
   };
 
-};
-
-App.prototype.initScene = function() {
-  var _this = this;
-  var scene = new Scene('#canvas');
-  // scene.add(this.test.sphere);
-  scene.add(this.keyboard.model);
-  // scene.add(this.rightHand);
-  // scene.animate(function() {
-  //   _this.keyboard.update();
-  //   _this.rightHand.update();
-  // });
-  scene.animate();
-};
-
-
-
-App.prototype.start = function() {
-  this.player.start();
-  this.playing = true;
-};
-
-App.prototype.resume = function() {
-  this.player.currentTime += 1e-6;
-  this.player.resume();
-  this.playing = true;
-};
-
-App.prototype.stop = function() {
-  this.player.stop();
-  this.playing = false;
-};
-
-App.prototype.pause = function() {
-  this.player.pause();
-  this.playing = false;
-};
-
-App.prototype.getEndTime = function() {
-  return this.player.endTime;
-};
-
-App.prototype.setCurrentTIme = function(currentTime) {
-  this.player.pause();
-  this.player.currentTime = currentTime;
-  if (this.playing) {
-    this.player.resume();
-  }
-};
-
-
-
-App.prototype.fingeringAlgorithm = function(midiData) {
-  var notes = {
-    0: 'C',
-    1: 'Db',
-    2: 'D',
-    3: 'Eb',
-    4: 'E',
-    5: 'F',
-    6: 'Gb',
-    7: 'G',
-    8: 'Ab',
-    9: 'A',
-    10: 'Bb',
-    11: 'B'
+  this.initScene = function() {
+    var _this = this;
+    var scene = new Scene('#canvas');
+    // scene.add(this.test.sphere);
+    scene.add(this.keyboard.model);
+    // scene.add(this.rightHand);
+    // scene.animate(function() {
+    //   _this.keyboard.update();
+    //   _this.rightHand.update();
+    // });
+    scene.animate();
   };
-  var RHnotes = [];
-  var LHnotes = [];
 
-  for (var pair = 0; pair < midiData.length; pair++) {
-    var eventData = midiData[pair][0].event;
-    if (eventData.subtype === 'noteOn') {
-      var note = notes[eventData.noteNumber%12];
-      if (eventData.noteNumber >= 62) {
-        RHnotes.push(note);
-      }else {
-        LHnotes.push(note);
+  this.start = function() {
+    this.player.start();
+    this.playing = true;
+  };
+
+  this.resume = function() {
+    this.player.currentTime += 1e-6;
+    this.player.resume();
+    this.playing = true;
+  };
+
+  this.stop = function() {
+    this.player.stop();
+    this.playing = false;
+  };
+
+  this.pause = function() {
+    this.player.pause();
+    this.playing = false;
+  };
+
+  this.getEndTime = function() {
+    return this.player.endTime;
+  };
+
+  this.setCurrentTIme = function(currentTime) {
+    this.player.pause();
+    this.player.currentTime = currentTime;
+    if (this.playing) {
+      this.player.resume();
+    }
+  };
+
+  this.fingeringAlgorithm = function(midiData) {
+    var notes = {
+      0: 'C',
+      1: 'Db',
+      2: 'D',
+      3: 'Eb',
+      4: 'E',
+      5: 'F',
+      6: 'Gb',
+      7: 'G',
+      8: 'Ab',
+      9: 'A',
+      10: 'Bb',
+      11: 'B'
+    };
+    var RHnotes = [];
+    var LHnotes = [];
+
+    for (var pair = 0; pair < midiData.length; pair++) {
+      var eventData = midiData[pair][0].event;
+      if (eventData.subtype === 'noteOn') {
+        var note = notes[eventData.noteNumber%12];
+        if (eventData.noteNumber >= 62) {
+          RHnotes.push(note);
+        }else {
+          LHnotes.push(note);
+        }
       }
     }
-  }
 
-  console.log('Right Hand: ', RHnotes);
-  console.log('Left Hand: ', LHnotes);
+    console.log('Right Hand: ', RHnotes);
+    console.log('Left Hand: ', LHnotes);
+  };
+
 };
+
+
+
+
+
 
 
 
