@@ -38,6 +38,7 @@ var App = function() {
     //we also use the callback of the loadFile function to set the MIDI data of our right hand model, so we can animate it properly.
     this.player.loadFile(midiFile, function() {
       _this.fingeringAlgorithm(_this.player.data);
+      _this.player.resume();
       // _this.rightHand.setMidiData(_this.player.data, callback);
     });
   };
@@ -65,6 +66,16 @@ var App = function() {
     //   _this.rightHand.update();
     // });
     scene.animate();
+  };
+
+  this.initMIDI = function(callback) {
+    console.log('theoretically initializing midi plugin');
+    MIDI.loadPlugin(function() {
+      MIDI.channels[9].mute = true;
+    });
+    if (typeof callback === 'function') {
+      callback();
+    }
   };
 
   this.start = function() {
