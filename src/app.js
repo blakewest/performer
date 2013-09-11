@@ -5,7 +5,8 @@ var App = function() {
   // this.rightHand = new RightHand();
   this.test = new Test();
 
-  // this.player = MIDI.player;
+  this.player = MIDI.Player;
+  console.log(this.player);
 
   //maintains proper binding if later function gets called outside this scope
   var _this = this;
@@ -30,6 +31,32 @@ var App = function() {
   //     this.rightHand.update();
   //   }
   // });
+
+  this.loadMidiFile = function(midiFile, callback) {
+    var _this = this;
+    //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
+    //we also use the callback of the loadFile function to set the MIDI data of our right hand model, so we can animate it properly.
+    this.player.loadFile(midiFile, function() {
+      _this.fingeringAlgorithm(_this.player.data);
+      // _this.rightHand.setMidiData(_this.player.data, callback);
+    });
+  };
+
+  this.upload = function(file) {
+    // var uploadedFile = files[0];
+    var _this = this;
+    console.log(file);
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var midiFile = e.target.result;
+      _this.loadMidiFile(midiFile);
+      // var midiObj = _this.player.data;
+      // console.log('MIDI Object = ', midiObj);
+      // _this.fingeringAlgorithm(midiObj);
+    };
+    reader.readAsDataURL(file);
+  };
+
 };
 
 App.prototype.initScene = function() {
@@ -45,14 +72,7 @@ App.prototype.initScene = function() {
   scene.animate();
 };
 
-App.prototype.loadMidiFile = function(midiFile, callback) {
-  var _this = this;
-  //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
-  //we also use the callback of the loadFile function to set the MIDI data of our right hand model, so we can animate it properly.
-  _this.player.loadFile(midiFile, function() {
-    _this.rightHand.setMidiData(_this.player.data, callback);
-  });
-};
+
 
 App.prototype.start = function() {
   this.player.start();
@@ -85,6 +105,42 @@ App.prototype.setCurrentTIme = function(currentTime) {
   if (this.playing) {
     this.player.resume();
   }
+};
+
+
+
+App.prototype.fingeringAlgorithm = function(midiData) {
+  var notes = {
+    0: 'C',
+    1: 'Db',
+    2: 'D',
+    3: 'Eb',
+    4: 'E',
+    5: 'F',
+    6: 'Gb',
+    7: 'G',
+    8: 'Ab',
+    9: 'A',
+    10: 'Bb',
+    11: 'B'
+  };
+  var RHnotes = [];
+  var LHnotes = [];
+
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    if (eventData.subtype === 'noteOn') {
+      var note = notes[eventData.noteNumber%12];
+      if (eventData.noteNumber >= 62) {
+        RHnotes.push(note);
+      }else {
+        LHnotes.push(note);
+      }
+    }
+  }
+
+  console.log('Right Hand: ', RHnotes);
+  console.log('Left Hand: ', LHnotes);
 };
 
 

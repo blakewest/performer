@@ -4,8 +4,8 @@
     <body>
       <script src="lib/MIDI.js/inc/jasmid/midifile.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/stream.js"></script>
-      <script src="lib/MIDI.js/js/MIDI/Player.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/replayer.js"></script>
+      <script src="lib/MIDI.js/build/MIDI.min.js"></script>
       <script src="lib/three.min.js"></script>
       <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
@@ -14,13 +14,12 @@
       <script src="src/KeyboardDesign.js"></script>
       <script src="src/Keyboard.js"></script>
       <script src="src/PianoKey.js"></script>
-
-      <script src="src/Main.js"></script>
       <script src="src/App.js"></script>
+      <script src="src/Main.js"></script>
 
 
       <p>Upload MIDI here!</p>
-      <input type="file" id='filereader' onchange='IO(this.files[0])'>
+      <input type="file" id='filereader' onchange='sendToUpload(this.files[0])'>
 
       <div id="canvas"></div>
   </body>
