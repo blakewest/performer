@@ -1,6 +1,4 @@
 var Keyboard = function(keyboardDesign) {
-  console.log('keyboard builder called');
-  console.log(keyboardDesign);
   //keyboard design is a completed object where we've filled it out with note types and parameters. See keyboardDesign.js file for more.
   this.model = new THREE.Object3D();
   this.keys = [];

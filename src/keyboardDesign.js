@@ -1,5 +1,4 @@
 var KeyboardDesign = function() {
-  console.log('keyboard design builder called');
   this.KeyType = {
     WhiteC:  0,
     WhiteD: 1,

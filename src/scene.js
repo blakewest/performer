@@ -1,5 +1,4 @@
 var Scene = function(container) {
-  console.log('scene builder called');
   var $container = $(container);
   var width = $container.width();
   var height = $container.height();
