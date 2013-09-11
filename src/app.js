@@ -1,45 +1,47 @@
 var App = function() {
   //instantiate piano and hand
-  this.keyboardDesign = new KeyboardDesign;
-  this.keyboard = new Keyboard(this.keyboardDesign);
-  this.rightHand = new RightHand();
+  // this.keyboardDesign = new KeyboardDesign;
+  // this.keyboard = new Keyboard(this.keyboardDesign);
+  // this.rightHand = new RightHand();
+  this.test = new Test();
 
-  this.player = MIDI.player;
+  // this.player = MIDI.player;
 
   //maintains proper binding if later function gets called outside this scope
   var _this = this;
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
-  this.player.addListener(function(data) {
-    var NOTE_ON = 144;
-    var NOTE_OFF = 128;
-    var note = data.note;
-    var message = data.message;
-    if (message === NOTE_ON) {
-      _this.keyboard.press(note);
-    }else if(message === NOTE_OFF) {
-      _this.keyboard.release(note);
-    }
-  });
+  // this.player.addListener(function(data) {
+  //   var NOTE_ON = 144;
+  //   var NOTE_OFF = 128;
+  //   var note = data.note;
+  //   var message = data.message;
+  //   if (message === NOTE_ON) {
+  //     _this.keyboard.press(note);
+  //   }else if(message === NOTE_OFF) {
+  //     _this.keyboard.release(note);
+  //   }
+  // });
 
-  this.player.setAnimation({
-    delay: 20,
-    callback: function(data) {
-      //data has 'now' and 'end' events that may be useful for update function.
-      this.rightHand.update();
-    }
-  });
+  // this.player.setAnimation({
+  //   delay: 20,
+  //   callback: function(data) {
+  //     //data has 'now' and 'end' events that may be useful for update function.
+  //     this.rightHand.update();
+  //   }
+  // });
 };
 
 App.prototype.initScene = function() {
   var _this = this;
   var scene = new Scene('#canvas');
-  scene.add(this.keyboard);
-  scene.add(this.rightHand);
-  scene.animate(function() {
-    _this.keyboard.update();
-    _this.rightHand.update();
-  });
+  scene.add(this.test);
+  // scene.add(this.keyboard);
+  // scene.add(this.rightHand);
+  // scene.animate(function() {
+  //   _this.keyboard.update();
+  //   _this.rightHand.update();
+  // });
 }
 
 App.prototype.loadMidiFile = function(midiFile, callback) {

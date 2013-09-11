@@ -1,3 +1,19 @@
+$(document).on('ready', function() {
+  var app = window.app = new App();
+  app.initScene();
+});
+
+
+
+
+
+
+
+
+
+
+
+
 var fingeringAlgorithm = function(midiData) {
   var notes = {
     0: 'C',
