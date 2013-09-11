@@ -35,7 +35,8 @@ var App = function() {
 App.prototype.initScene = function() {
   var _this = this;
   var scene = new Scene('#canvas');
-  scene.add(this.test);
+  scene.add(this.test.sphere);
+  scene.animate();
   // scene.add(this.keyboard);
   // scene.add(this.rightHand);
   // scene.animate(function() {
