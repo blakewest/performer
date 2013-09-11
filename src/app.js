@@ -1,9 +1,10 @@
 var App = function() {
   //instantiate piano and hand
-  this.keyboardDesign = new KeyboardDesign;
+  this.keyboardDesign = new KeyboardDesign();
+  this.handDesign = new HandDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
-  // this.rightHand = new RightHand();
-  this.test = new Test();
+  console.log(this.keyboardDesign);
+  this.rightHand = new RightHand(this.handDesign);
 
   this.player = MIDI.Player;
 
@@ -60,6 +61,7 @@ var App = function() {
     this.scene = new Scene('#canvas');
     // scene.add(this.test.sphere);
     this.scene.add(this.keyboard.model);
+    this.scene.add(this.rightHand.model);
     // scene.add(this.rightHand);
     // scene.animate(function() {
     //   _this.keyboard.update();
