@@ -7,7 +7,7 @@ var Keyboard = function(keyboardDesign) {
   //build the actual keyboard
   for (var note = 0; note < keyboardDesign.keyInfo.length; note++) {
     var key = new PianoKey(keyboardDesign, note);
-    this.keys.push(key);
+    _this.keys.push(key);
     if (note > 20 && note < 109) {
       this.model.add(key.model);
     }
@@ -23,6 +23,7 @@ var Keyboard = function(keyboardDesign) {
   };
 
   this.update = function() {
+    var _this = this;
     var allKeys = _this.keys;
     for (var i = 0; i < allKeys.length; i++) {
       allKeys[i].update();

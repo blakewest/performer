@@ -6,31 +6,31 @@ var App = function() {
   this.test = new Test();
 
   this.player = MIDI.Player;
-  console.log(this.player);
 
   //maintains proper binding if later function gets called outside this scope
   var _this = this;
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
-  // this.player.addListener(function(data) {
-  //   var NOTE_ON = 144;
-  //   var NOTE_OFF = 128;
-  //   var note = data.note;
-  //   var message = data.message;
-  //   if (message === NOTE_ON) {
-  //     _this.keyboard.press(note);
-  //   }else if(message === NOTE_OFF) {
-  //     _this.keyboard.release(note);
-  //   }
-  // });
+  this.player.addListener(function(data) {
+    var NOTE_ON = 144;
+    var NOTE_OFF = 128;
+    var note = data.note;
+    var message = data.message;
+    if (message === NOTE_ON) {
+      _this.keyboard.press(note);
+    }else if(message === NOTE_OFF) {
+      _this.keyboard.release(note);
+    }
+  });
 
-  // this.player.setAnimation({
-  //   delay: 20,
-  //   callback: function(data) {
-  //     //data has 'now' and 'end' events that may be useful for update function.
-  //     this.rightHand.update();
-  //   }
-  // });
+  this.player.setAnimation({
+    delay: 20,
+    callback: function(data) {
+      //data has 'now' and 'end' events that may be useful for update function.
+      // this.rightHand.update();
+      // _this.keyboard.update();
+    }
+  });
 
   this.loadMidiFile = function(midiFile, callback) {
     var _this = this;
@@ -57,15 +57,17 @@ var App = function() {
 
   this.initScene = function() {
     var _this = this;
-    var scene = new Scene('#canvas');
+    this.scene = new Scene('#canvas');
     // scene.add(this.test.sphere);
-    scene.add(this.keyboard.model);
+    this.scene.add(this.keyboard.model);
     // scene.add(this.rightHand);
     // scene.animate(function() {
     //   _this.keyboard.update();
     //   _this.rightHand.update();
     // });
-    scene.animate();
+    this.scene.animate(function() {
+      _this.keyboard.update();
+    });
   };
 
   this.initMIDI = function(callback) {

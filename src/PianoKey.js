@@ -26,7 +26,7 @@ var PianoKey = function(boardInfo, note) {
   this.originalY = position.y;
   this.pressedY = this.originalY - boardInfo.keyDip;
 
-  this.pressed = function() {
+  this.press = function() {
     this.model.position.y = this.pressedY;
     this.isPressed = true;
   };
@@ -37,7 +37,7 @@ var PianoKey = function(boardInfo, note) {
 
   this.update = function() {
     //this is really about making released notes edge up slowly, rather than quickly
-    if (this.model.position.y < this.originalY && this.pressed === false) {
+    if (this.model.position.y < this.originalY && this.isPressed === false) {
       //offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
       var offset = this.originalY - this.model.position.y;
       this.model.position.y += Math.min(offset, keyUpSpeed);
