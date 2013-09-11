@@ -1,5 +1,4 @@
 var PianoKey = function(boardInfo, note) {
-  console.log('piano key builder called');
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
   var keyType               = boardInfo.keyInfo[note].keyType;
