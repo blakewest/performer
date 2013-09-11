@@ -50,9 +50,6 @@ var App = function() {
     reader.onload = function(e) {
       var midiFile = e.target.result;
       _this.loadMidiFile(midiFile);
-      // var midiObj = _this.player.data;
-      // console.log('MIDI Object = ', midiObj);
-      // _this.fingeringAlgorithm(midiObj);
     };
     reader.readAsDataURL(file);
   };
