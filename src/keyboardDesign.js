@@ -1,5 +1,5 @@
 var KeyboardDesign = function() {
-  var keyType = {
+  this.KeyType = {
     WhiteC:  0,
     WhiteD: 1,
     WhiteE:  2,
@@ -10,26 +10,25 @@ var KeyboardDesign = function() {
     Black:   7
   };
 
-  var specs = {
-    whiteKeyStep:       0.236,
-    whiteKeyWidth:     0.226,
-    whiteKeyHeight:    0.22,
-    whiteKeyLength:    1.50,
-    blackKeyWidth:      0.10,
-    blackKeyHeight        : 0.24,
-    blackKeyLength        : 1.00,
-    blackKeyShiftCDE      : 0.0216,
-    blackKeyShiftFGAB     : 0.0340,
-    blackKeyPosY          : 0.10,
-    blackKeyPosZ          : -0.24,
-    noteDropPosZ4WhiteKey : 0.25,
-    noteDropPosZ4BlackKey : 0.75,
-    whiteKeyColor         : 0xffffff,
-    blackKeyColor         : 0x111111,
-    keyDip                : 0.08,
-    keyUpSpeed            : 0.03,
-    keyInfo               : [] // an array holding each key's type and position
-  };
+  this.whiteKeyStep                  = 0.236;
+  this.whiteKeyWidth                = 0.226;
+  this.whiteKeyHeight               = 0.22;
+  this.whiteKeyLength               = 1.50;
+  this.blackKeyWidth                 =0.10;
+  this.blackKeyHeight               = 0.24;
+  this.blackKeyLength               = 1.00;
+  this.blackKeyShiftCDE            = 0.0216;
+  this.blackKeyShiftFGAB           = 0.0340;
+  this.blackKeyPosY                   = 0.10;
+  this.blackKeyPosZ                   = -0.24;
+  this.noteDropPosZ4WhiteKey  = 0.25;
+  this.noteDropPosZ4BlackKey  = 0.75;
+  this.whiteKeyColor                  = 0xffffff;
+  this.blackKeyColor                  = 0x111111;
+  this.keyDip                             = 0.08;
+  this.keyUpSpeed                     = 0.03;
+  this.keyInfo                            = [] ;// an array holding each key's type and position
 
-  
+
+
 };

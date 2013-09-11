@@ -13,7 +13,7 @@ var PianoKey = function(boardInfo, note) {
     position   = new THREE.Vector3(keyCenterPosX, boardInfo.blackKeyPosY, boardInfo.blackKeyPosZ);
   }else {
     geometry = new THREE.CubeGeometry(boardInfo.whiteKeyWidth, boardInfo.whiteKeyHeight, boardInfo.whiteKeyLength);
-    material   = new THREE.MeshPhongMaterial(boardInfo.whiteKeyColor, emissive: 0x111111);
+    material   = new THREE.MeshPhongMaterial( {color: boardInfo.whiteKeyColor, emissive: 0x111111} );
     position   = new THREE.Vector3(keyCenterPosX, boardInfo.whiteKeyPosY, boardInfo.whiteKeyPosZ);
   }
 
