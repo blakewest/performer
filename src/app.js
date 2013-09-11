@@ -36,14 +36,14 @@ App.prototype.initScene = function() {
   var _this = this;
   var scene = new Scene('#canvas');
   scene.add(this.test.sphere);
-  scene.animate();
   // scene.add(this.keyboard);
   // scene.add(this.rightHand);
   // scene.animate(function() {
   //   _this.keyboard.update();
   //   _this.rightHand.update();
   // });
-}
+  scene.animate();
+};
 
 App.prototype.loadMidiFile = function(midiFile, callback) {
   var _this = this;
