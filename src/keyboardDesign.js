@@ -39,7 +39,7 @@ var KeyboardDesign = function() {
   };
 
   var makeNoteObjects = function() {
-    for (var i = 0; i < 128; i++) {
+    for (var i = 0; i < 120; i++) {
       var noteObj = {};
       _this.keyInfo.push(noteObj);
     }
@@ -47,9 +47,21 @@ var KeyboardDesign = function() {
 
   var initKeyType = function() {
     var KeyType = _this.KeyType;
-    for (var i = 0; i< _this.keyInfo.length; i++) {
-      var note = _this.keyInfo[i];
-      note.keyType = KeyType.WhiteC;
+    var keyInfo = _this.keyInfo;
+    for (var i = 0; i< 10; i++) {
+      var noteNo = 12*i;
+      keyInfo[noteNo + 0].keyType = KeyType.WhiteC;
+      keyInfo[noteNo + 1].keyType = KeyType.Black;
+      keyInfo[noteNo + 2].keyType = KeyType.WhiteD;
+      keyInfo[noteNo + 3].keyType = KeyType.Black;
+      keyInfo[noteNo + 4].keyType = KeyType.WhiteE;
+      keyInfo[noteNo + 5].keyType = KeyType.WhiteF;
+      keyInfo[noteNo + 6].keyType = KeyType.Black;
+      keyInfo[noteNo + 7].keyType = KeyType.WhiteG;
+      keyInfo[noteNo + 8].keyType = KeyType.Black;
+      keyInfo[noteNo + 9].keyType = KeyType.WhiteA;
+      keyInfo[noteNo + 10].keyType = KeyType.Black;
+      keyInfo[noteNo + 11].keyType = KeyType.WhiteD;
     }
   };
 

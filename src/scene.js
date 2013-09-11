@@ -9,13 +9,18 @@ var Scene = function(container) {
   var scene = new THREE.Scene();
 
   //create camera
-  var view_angle = 60;
+  var view_angle = 90;
   var aspect = width/height;
   var near = 0.001;
   var far = 100000;
   var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
-  camera.lookAt(new THREE.Vector3());
-  camera.position.z = 20;
+  // camera.lookAt(new THREE.Vector3());
+  camera.position.set(7, 7, 6);
+  camera.rotation.y = 0 * Math.PI / 180;
+  camera.rotation.x = -30 * Math.PI / 180;
+  // camera.rotation.z = 0 * Math.PI / 180;
+
+
 
 
   //create and append renderer
