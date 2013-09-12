@@ -3,9 +3,13 @@ var App = function() {
   this.keyboardDesign = new KeyboardDesign();
   this.handDesign = new HandDesign();
   this.pinky = new Pinky(this.handDesign);
+  this.ringFinger = new RingFinger(this.handDesign);
+  this.middleFinger = new MiddleFinger(this.handDesign);
+  this.indexFinger = new IndexFinger(this.handDesign);
+  this.thumb = new Thumb(this.handDesign);
   this.keyboard = new Keyboard(this.keyboardDesign);
   console.log(this.keyboardDesign);
-  this.rightHand = new RightHand(this.pinky);
+  this.rightHand = new RightHand(this.pinky, this.ringFinger, this.middleFinger, this.indexFinger, this.thumb);
 
   this.player = MIDI.Player;
 
@@ -140,21 +144,28 @@ var App = function() {
     };
     var RHnotes = [];
     var LHnotes = [];
+    // ["E", "E", "E", "E", "F", "G", "F", "G", "G", "F", "G", "E", "F", "D", "E", "C", "D", "C", "C", "D", "C", "E", "D", "E", "E", "D", "E", "D", "D", "E", "D", "E", "E", "F",
+    //  "E", "G", "F", "G", "G", "F", "G", "E", "F", "D", "E", "C", "D", "C", "C", "D", "C", "E", "D", "D", "E", "C", "D", "C", "C", "C"]
 
+    var fakeFingeringData = [
+      3,3,3,3,4,5,4,5,5,4,5,3,4,2,3,1,2,1,1,2,1,3,2,3,3,2,3,2,2,3,2,3,3,4,3,5,4,5,5,4,5,3,4,2,3,1,2,1,1,2,1,3,2,2,3,1,2,1,1,1
+    ];
+    var counter = 0;
     for (var pair = 0; pair < midiData.length; pair++) {
       var eventData = midiData[pair][0].event;
-      if (eventData.subtype === 'noteOn') {
-        eventData.finger = 0;
-        // var note = notes[eventData.noteNumber%12];
-        if (eventData.noteNumber >= 62) {
-          // RHnotes.push(note);
+      if (eventData.subtype === 'noteOn' || 'noteOff') {
+        eventData.finger = fakeFingeringData[counter];
+        var note = notes[eventData.noteNumber%12];
+        if (eventData.noteNumber >= 60) {
+          RHnotes.push(note);
         }else {
           // LHnotes.push(note);
         }
+        counter++;
       }
-      if (eventData.subtype === 'noteOff') {
-        eventData.finger = 0;
-      }
+      // if (eventData.subtype === 'noteOff') {
+      //   eventData.finger = 0;
+      // }
     }
 
     console.log(midiData);
