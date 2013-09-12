@@ -2,9 +2,10 @@ var App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.handDesign = new HandDesign();
+  this.pinky = new Pinky(this.handDesign);
   this.keyboard = new Keyboard(this.keyboardDesign);
   console.log(this.keyboardDesign);
-  this.rightHand = new RightHand(this.handDesign);
+  this.rightHand = new RightHand(this.pinky);
 
   this.player = MIDI.Player;
 
@@ -13,14 +14,21 @@ var App = function() {
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
   this.player.addListener(function(data) {
+    var rightHand = _this.rightHand;
     var NOTE_ON = 144;
     var NOTE_OFF = 128;
     var note = data.note;
     var message = data.message;
     if (message === NOTE_ON) {
       _this.keyboard.press(note);
+      if (note === 67) {
+        rightHand.press(0);
+      }
     }else if(message === NOTE_OFF) {
       _this.keyboard.release(note);
+      if (note === 67) {
+        rightHand.release(0);
+      }
     }
   });
 
@@ -69,6 +77,7 @@ var App = function() {
     // });
     this.scene.animate(function() {
       _this.keyboard.update();
+      _this.rightHand.update();
     });
   };
 
