@@ -19,16 +19,14 @@ var App = function() {
     var NOTE_OFF = 128;
     var note = data.note;
     var message = data.message;
+    var finger = data.finger;
+
     if (message === NOTE_ON) {
       _this.keyboard.press(note);
-      if (note === 67) {
-        rightHand.press(0);
-      }
+      rightHand.press(finger);
     }else if(message === NOTE_OFF) {
       _this.keyboard.release(note);
-      if (note === 67) {
-        rightHand.release(0);
-      }
+      rightHand.release(finger);
     }
   });
 
@@ -46,7 +44,7 @@ var App = function() {
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
     //we also use the callback of the loadFile function to set the MIDI data of our right hand model, so we can animate it properly.
     this.player.loadFile(midiFile, function() {
-      _this.fingeringAlgorithm(_this.player.data);
+      _this.fingeringAlgorithm();
       _this.player.resume();
       // _this.rightHand.setMidiData(_this.player.data, callback);
     });
@@ -124,7 +122,8 @@ var App = function() {
     }
   };
 
-  this.fingeringAlgorithm = function(midiData) {
+  this.fingeringAlgorithm = function() {
+    var midiData = _this.player.data;
     var notes = {
       0: 'C',
       1: 'Db',
@@ -145,15 +144,20 @@ var App = function() {
     for (var pair = 0; pair < midiData.length; pair++) {
       var eventData = midiData[pair][0].event;
       if (eventData.subtype === 'noteOn') {
-        var note = notes[eventData.noteNumber%12];
+        eventData.finger = 0;
+        // var note = notes[eventData.noteNumber%12];
         if (eventData.noteNumber >= 62) {
-          RHnotes.push(note);
+          // RHnotes.push(note);
         }else {
-          LHnotes.push(note);
+          // LHnotes.push(note);
         }
+      }
+      if (eventData.subtype === 'noteOff') {
+        eventData.finger = 0;
       }
     }
 
+    console.log(midiData);
     console.log('Right Hand: ', RHnotes);
     console.log('Left Hand: ', LHnotes);
   };
