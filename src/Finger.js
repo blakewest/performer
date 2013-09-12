@@ -5,7 +5,6 @@ var Finger = function() {
   this.releaseSpeed = 0.03;
 
   this.press = function() {
-    console.log('finger press is getting called');
     this.model.position.y = this.pressedY;
     this.isPressed = true;
   };
