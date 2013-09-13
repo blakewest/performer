@@ -11,6 +11,8 @@ var App = function() {
   console.log(this.keyboardDesign);
   this.rightHand = new RightHand(this.pinky, this.ringFinger, this.middleFinger, this.indexFinger, this.thumb);
 
+  walker();
+
   this.player = MIDI.Player;
 
   //maintains proper binding if later function gets called outside this scope
