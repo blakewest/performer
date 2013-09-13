@@ -90,25 +90,40 @@ var ascendingThumbStretch = function(f1,f2) {
 var fingerStretch = function(f1,f2) {
   var key = f1.toString() + ',' + f2.toString();
   return fingStretch[key];
-}''
+};
+
+var ThumbCrossCostFunc = function(x) {
+  return -0.0003112526902*Math.pow(x,7)+0.01885042991*Math.pow(x,6)-
+0.4641792923*Math.pow(x,5)+6.02919054*Math.pow(x,4)-44.66602087*Math.pow(x,3)+
+189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
+};
 
 var nonThumbCost = function(n1,n2,f1,f2) {
   var noteD = Math.abs(n2-n1);
   var fingD = fingerDistance(f1,f2);
   var stretch = fingerStretch(f1,f2);
 
-  var x = (noteD-fingD) / stretch;
+  var x = Math.abs(noteD-fingD) / stretch;
 
-  //THIS GETS WACK AFTER YOUR X VALUE IS ABOVE 6.8!!! It starts going negative fast. 
-  //EITHER GET A NEW FUNCTION, OR DO A CIELING WHERE ANYTHING ABOVE 6.8 GETS A VALUE OF 16;
-
-  var y =-0.0000006589793725*Math.pow(x,10) -0.000002336381414*Math.pow(x,9) +0.00009925769823*Math.pow(x,8)+
+  var costFunc = function(x) {
+    return  -0.0000006589793725*Math.pow(x,10) -0.000002336381414*Math.pow(x,9) +0.00009925769823*Math.pow(x,8)+
   0.0001763353131*Math.pow(x,7)-0.004660305277*Math.pow(x,6)-0.004290746384*Math.pow(x,5)+0.06855725903*Math.pow(x,4)+
   0.03719817227*Math.pow(x,3)+0.4554696705*Math.pow(x,2)-0.08305450359*x+0.3020594956;
+  };
 
+  //if x is too high, it means it's not possible to do while in the same position, so you need to use move formula
+  //if it's above 6.8, but below the Move formula cut off (10 right now), then we have to use an additional formula because the current one
+  //has a weird property where it goes sharply negative after 6.8 
+  //I know this appears janky, but after messing with other potential regression formulas, I can't get any single one
+  //to match both the overall shape, and certainly specific Y values I want close enough. So this seems like best option.
+  if (x > 10) {
+    return moveFormula(noteD, fingD)
+  }else if (x > 6.8 && x < 10) {
+    return costFunc(6.8) + ((x-6.8) *3 ); 
+  }else{
+    return costFunc(x);
+  }
 
-
-  return y;
 };
 
 var ascendingThumbCost = function(n1,n2,f1,f2) {
@@ -116,16 +131,20 @@ var ascendingThumbCost = function(n1,n2,f1,f2) {
   var fingD = fingerDistance(f1,f2);
   var stretch = ascendingThumbStretch(f1,f2);
 
-  var x = (noteD - fingD) / stretch;
+  var x = (noteD + fingD) / stretch;
 
-  var y =-0.0003112526902*Math.pow(x,7)+0.01885042991*Math.pow(x,6)-
-  0.4641792923*Math.pow(x,5)+6.02919054*Math.pow(x,4)-44.66602087*Math.pow(x,3)+
-  189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
 
-  if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
-    y += 8;
+
+  //if it's over 10, again use the move formula
+  if (x > 10) {
+    return moveFormula(noteD, fingD);
+  }else {
+    var y = ThumbCrossCostFunc(x);
+    if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
+      y += 8;
+    }
+    return y;
   }
-  return y;
 };
 
 var descendingThumbCost = function(n1,n2,f1,f2) {
@@ -133,13 +152,13 @@ var descendingThumbCost = function(n1,n2,f1,f2) {
   var fingD = fingerDistance(f1,f2);
   var stretch = descendingThumbStretch(f1,f2);
 
-  var x = (noteD - fingD) / stretch;
+  var x = (noteD + fingD) / stretch;
 
-  var y =-0.0003112526902*Math.pow(x,7)+0.01885042991*Math.pow(x,6)-
-  0.4641792923*Math.pow(x,5)+6.02919054*Math.pow(x,4)-44.66602087*Math.pow(x,3)+
-  189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
-
-  return y;
+  if (x > 10) {
+    return moveFormula(noteD, fingD);
+  }else {
+    return ThumbCrossCostFunc(x);
+  }
 
 };
 
@@ -157,10 +176,8 @@ var walker = function() {
   console.log(costDatabase);
 };
 
-var moveFormula = function(n1,n2,f1,f2) {
+var moveFormula = function(noteD, fingD) {
   //add some fixed cost + a logarithmic function based on total distance between n1,n2, and f1,f2
-  var noteD = Math.abs(n2-n1);
-  var fingD = fingerDistance(f1,f2);
   var totalD = noteD + fingD;
   var fixedCost = 3;
 
