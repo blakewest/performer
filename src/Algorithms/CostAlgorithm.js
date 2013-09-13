@@ -22,7 +22,7 @@ var fingDistance = {
   '2,1': 2,
   '2,2': 0,
   '2,3': 2,
-  '2,4': 3.5,  // making an allowance since this seriously is either or 4 about half the time.
+  '2,4': 3.5,  // making an allowance since this seriously is either 3 or 4 about half the time.
   '2,5': 5,
   '3,1': 3.5, // same thing
   '3,2': 2,
@@ -103,20 +103,30 @@ var aThumbStretch = {
 
 var fingStretch = {
   '1,1' : 0.8,
-  '2,2' : 0.5,
-  '3,3' : 0.5,
-  '4,4' : 0.6,
-  '5,5' : 0.7,
-  '2,3' : 0.9,
-  '3,4' : 0.9,
-  '4,5' : 0.8,
-  '2,4' : 1.15,
-  '3,5' : 1.15,
-  '2,5' : 1.3,
   '1,2' : 1.15,
   '1,3' : 1.3,
   '1,4' : 1.45,
-  '1,5' : 1.6
+  '1,5' : 1.6,
+  '2,1' : 1.15,
+  '2,2' : 0.6,
+  '2,3' : 0.9,
+  '2,4' : 1.15,
+  '2,5' : 1.3,
+  '3,1' : 1.3,
+  '3,2' : 0.9,
+  '3,3' : 0.6,
+  '3,4' : 0.9,
+  '3,5' : 1.15,
+  '4,1' : 1.45,
+  '4,2' : 1.15,
+  '4,3' : 0.9,
+  '4,4' : 0.7,
+  '4,5' : 0.8,
+  '5,1' : 1.6,
+  '5,2' : 1.3,
+  '5,3' : 1.15,
+  '5,4' : 0.8,
+  '5,5' : 0.7
 };
 
 var descendingThumbStretch = function(f1,f2) {
@@ -167,7 +177,7 @@ var nonThumbCost = function(noteD,fingD,f1,f2) {
 
 };
 
-var ascendingThumbCost = function(noteD,fingD,f1,f2) {
+var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   var stretch = ascendingThumbStretch(f1,f2);
 
   var x = (noteD + fingD) / stretch;
@@ -211,6 +221,9 @@ var moveFormula = function(noteD, fingD) {
   }
 };
 
+var notCaught = [];
+
+
 var costAlgorithmRouter = function(n1,n2,f1,f2) {
   var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
   var noteD = Math.abs(n2-n1);
@@ -218,12 +231,12 @@ var costAlgorithmRouter = function(n1,n2,f1,f2) {
 
 
   //handles cases where the note is changing and you're using the same finger. That's move formula
-  if (Math.abs(n2 - n1 > 0) && f2-f1 === 0) {
+  if (Math.abs(n2 - n1) > 0 && f2-f1 === 0) {
     costDatabase[key] = moveFormula(noteD,fingD);
   }
   //handles ascending notes and descending fingers, but f2 isn't thumb
   //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
-  else if (n2 - n1 > 0 && f2-f1 < 0 && f2 !== 1) {
+  else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 !== 1) {
     costDatabase[key] = moveFormula(noteD,fingD);
   }
   //this handles descending notes with ascending fingers where f1 isn't thumb
@@ -243,26 +256,29 @@ var costAlgorithmRouter = function(n1,n2,f1,f2) {
 
   //this handles ascending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
   //Thus bringing your thumb under. 
-  else if (n2 - n1 > 0 && f2-f1 > 0 && f2 === 1) {
-    costDatabase[key] = ascendingThumbCost(noteD,fingD,f1,f2);
+  else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 === 1) {
+    costDatabase[key] = ascendingThumbCost(noteD,fingD,n1,n2,f1,f2);
   }
-
-  else if (n2 - n1 < 0 && f1 === 1) {
+  //this handles descending notes, where you start on your thumb. Thus your crossing over your thumb.
+  else if (n2 - n1 <= 0 && f1 === 1) {
     costDatabase[key] = descendingThumbCost(noteD,fingD, f1,f2);
+  }
+  else{
+    notCaught.push(key);
   }
 };
 
 var walker = function() {
-  for (var finger1 = 1; finger1 <=3; finger1++) {
-    for (var note1 = 20; note1 < 25; note1++) {
-      for (var finger2 = 1; finger2 <= 3; finger2++) {
-        for (var note2 = 50; note2 < 55; note2++) {
+  for (var finger1 = 1; finger1 <=5; finger1++) {
+    for (var note1 = 21; note1 < 109; note1++) {
+      for (var finger2 = 1; finger2 <= 5; finger2++) {
+        for (var note2 = 21; note2 < 109; note2++) {
           costAlgorithmRouter(note1, note2, finger1, finger2);
         }
       }
     }
   }
-  console.log(costDatabase);
+  // console.log(costDatabase);
 };
 
 
