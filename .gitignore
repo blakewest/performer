@@ -1,1 +1,11 @@
 node_modules/
+lib/MIDI.js/css
+lib/MIDI.js/demo-Basic.html
+lib/MIDI.js/demo-MIDIPlayer.html
+lib/MIDI.js/demo-MultipleInstruments.html
+lib/MIDI.js/demo-WhitneyMusicBox.html
+lib/MIDI.js/Gruntfile.js
+lib/MIDI.js/LICENSE-MIT.txt
+lib/MIDI.js/package.json
+lib/MIDI.js/JSMIDIparser.js
+lib/MIDI.js/three.min.js
