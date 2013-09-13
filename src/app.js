@@ -11,6 +11,7 @@ var App = function() {
   console.log(this.keyboardDesign);
   this.rightHand = new RightHand(this.pinky, this.ringFinger, this.middleFinger, this.indexFinger, this.thumb);
 
+  //this is just here to run the function that kicks off getting the cost database;
   walker();
 
   this.player = MIDI.Player;
