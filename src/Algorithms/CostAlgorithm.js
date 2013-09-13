@@ -14,8 +14,8 @@ var color = {
 };
 
 var fingDistance = {
-  '1,1': 0
-  '1,2': 2,    
+  '1,1': 0,
+  '1,2': 2,
   '1,3': 4,
   '1,4': 5,
   '1,5': 7,
@@ -23,13 +23,22 @@ var fingDistance = {
   '2,2': 0,
   '2,3': 2,
   '2,4': 3.5,  // making an allowance since this seriously is either or 4 about half the time.
-  '2,5': 5, 
-  '3,1': 3.5 // same thing
+  '2,5': 5,
+  '3,1': 3.5, // same thing
   '3,2': 2,
   '3,3': 0,
   '3,4': 2,
   '3,5': 3.5,
-  '4,1': 5
+  '4,1': 5,
+  '4,2': 3.5,
+  '4,3': 2,
+  '4,4': 0,
+  '4,5': 2,
+  '5,1': 7,
+  '5,2': 5,
+  '5,3': 3.5,
+  '5,4': 2,
+  '5,5': 0
 };
 
 //this is fairly naive way of defining natural distance between two fingers.
@@ -81,7 +90,7 @@ var ascendingThumbStretch = function(f1,f2) {
 var fingerStretch = function(f1,f2) {
   var key = f1.toString() + ',' + f2.toString();
   return fingStretch[key];
-}
+}''
 
 var nonThumbCost = function(n1,n2,f1,f2) {
   var noteD = Math.abs(n2-n1);
@@ -90,9 +99,14 @@ var nonThumbCost = function(n1,n2,f1,f2) {
 
   var x = (noteD-fingD) / stretch;
 
+  //THIS GETS WACK AFTER YOUR X VALUE IS ABOVE 6.8!!! It starts going negative fast. 
+  //EITHER GET A NEW FUNCTION, OR DO A CIELING WHERE ANYTHING ABOVE 6.8 GETS A VALUE OF 16;
+
   var y =-0.0000006589793725*Math.pow(x,10) -0.000002336381414*Math.pow(x,9) +0.00009925769823*Math.pow(x,8)+
   0.0001763353131*Math.pow(x,7)-0.004660305277*Math.pow(x,6)-0.004290746384*Math.pow(x,5)+0.06855725903*Math.pow(x,4)+
   0.03719817227*Math.pow(x,3)+0.4554696705*Math.pow(x,2)-0.08305450359*x+0.3020594956;
+
+
 
   return y;
 };
@@ -144,7 +158,20 @@ var walker = function() {
 };
 
 var moveFormula = function(n1,n2,f1,f2) {
-  //add some fixed cost + a logarithmic function
+  //add some fixed cost + a logarithmic function based on total distance between n1,n2, and f1,f2
+  var noteD = Math.abs(n2-n1);
+  var fingD = fingerDistance(f1,f2);
+  var totalD = noteD + fingD;
+  var fixedCost = 3;
+
+  /*something around log(x) / log(1.5) + fixed cost is sorta getting there. 
+  Here's some boundaries to thinka bout...
+    -For small values, say moving thumb up a whole step (playing both C & D with thumb), it should be more expensive than 
+      nonThumbCost
+    -For larger values, like say moving thumb an octave, it should be lower cost than moving something like 3-5 an octave.
+    -Which reminds me... got to do something about the nonThumbCost function, cuz after x=6.8, it gets real weird.
+  */
+
 };
 
 var costAlgorithmRouter = function(n1,n2,f1,f2) {
