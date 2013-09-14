@@ -10,14 +10,16 @@ describe('cost database', function() {
     });
     it('should have numbers for every value', function() {
       var anyNonNumbers = false;
-      var whichNonNumbers = [];
+      var NotaNumbers = [];
       for (var each in costDb) {
-        if (typeof costDb[each] !== 'number') {
+        if (typeof costDb[each] !== 'number' || isNaN(costDb[each])) {
           anyNonNumbers = true;
-          whichNonNumbers.push(each);
+          if (isNaN(costDb[each])) {
+            NotaNumbers.push(each);
+          }
         }
       }
-      console.log(whichNonNumbers);
+      console.log(NotaNumbers);
       anyNonNumbers.should.equal(false);
     });
   });
@@ -25,9 +27,12 @@ describe('cost database', function() {
     it('E,G with 3,5 should have lower cost than E,G with 3,2', function() {
       costDb['64,67,3,5'].should.be.below(costDb['64,67,3,2']);
     });
-    // it('E,F,G,A with 3,1,2,3 should have lower cost than using 3,4,5,5', function() {
-
-    // });
+    it('E,F,G,A with 3,1,2,3 should have lower cost than using 3,4,5,5', function() {
+      var wrongPath = costDb['64,65,3,4'] + costDb['65,67,4,5'] + costDb['67,69,5,5'];
+      var correctPath = costDb['64,65,3,1'] + costDb['65,67,1,2'] + costDb['67,69,2,3'];
+      console.log(costDb['64,65,3,1']);
+      correctPath.should.be.below(wrongPath);
+    });
     // it('E,G,A with 2,4,5 should have lower cost than using 2,3,4', function() {
 
     // });
