@@ -16,7 +16,7 @@ var color = {
 var fingDistance = {
   '1,1': 0,
   '1,2': 2,
-  '1,3': 4,
+  '1,3': 3.5,
   '1,4': 5,
   '1,5': 7,
   '2,1': 2,
@@ -86,7 +86,7 @@ var fingerDistance = function(f1,f2) {
 };
 
 var dThumbStretch = {
-  '1,2' : 1.1,
+  '1,2' : 1,
   '1,3' : 1,
   '1,4' : 0.9,
   '1,5' : 0.8
@@ -127,6 +127,37 @@ var fingStretch = {
   '5,5' : 0.7
 };
 
+var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
+  var stretch = ascendingThumbStretch(f1,f2);
+
+  var x = (noteD + fingD) / stretch;
+
+  //if it's over 10, again use the move formula
+  if (x > 10) {
+    return ascMoveFormula(noteD, fingD);
+  }else {
+
+     var y = ThumbCrossCostFunc(x);
+    if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
+      y += 8;
+    }
+    return y;
+  }
+};
+
+var descendingThumbCost = function(noteD,fingD,f1,f2) {
+  var stretch = descendingThumbStretch(f1,f2);
+
+  var x = (noteD + fingD) / stretch;
+
+  if (x > 10) {
+    return ascMoveFormula(noteD, fingD);
+  }else {
+    return ThumbCrossCostFunc(x);
+  }
+
+};
+
 var descendingThumbStretch = function(f1,f2) {
   var key = f1.toString() + ',' + f2.toString();
   return dThumbStretch[key];
@@ -145,11 +176,13 @@ var fingerStretch = function(f1,f2) {
 var ThumbCrossCostFunc = function(x) {
   //this effectively shifts our graph over so that it centers over zero, instead of 4. This allows us to use
   //absolute value, which is what we want, since the shape of our graph below zero is wack. 
-  x = Math.abs(x-4);
-  x = x+4;
-  return -0.0003112526902*Math.pow(x,7)+0.01885042991*Math.pow(x,6)-
-0.4641792923*Math.pow(x,5)+6.02919054*Math.pow(x,4)-44.66602087*Math.pow(x,3)+
-189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
+  // x = Math.abs(x-3);
+  
+//   return -0.0003112526902*Math.pow(x,7)+0.01885042991*Math.pow(x,6)-
+// 0.4641792923*Math.pow(x,5)+6.02919054*Math.pow(x,4)-44.66602087*Math.pow(x,3)+
+// 189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
+ return 0.0002185873295*Math.pow(x,7) - 0.008611946279*Math.pow(x,6) + 0.1323250066*Math.pow(x,5) - 1.002729677*Math.pow(x,4)+
+ 3.884106308*Math.pow(x,3) - 6.723075747*Math.pow(x,2) + 1.581196785*x + 7.711241722;
 };
 
 var nonThumbCost = function(noteD,fingD,x) {
@@ -200,36 +233,7 @@ var descMoveFormula = function(noteD,fingD) {
   }
 };
 
-var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
-  var stretch = ascendingThumbStretch(f1,f2);
 
-  var x = (noteD + fingD) / stretch;
-
-  //if it's over 10, again use the move formula
-  if (x > 10) {
-    return ascMoveFormula(noteD, fingD);
-  }else {
-
-     var y = ThumbCrossCostFunc(x);
-    if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
-      y += 8;
-    }
-    return y;
-  }
-};
-
-var descendingThumbCost = function(noteD,fingD,f1,f2) {
-  var stretch = descendingThumbStretch(f1,f2);
-
-  var x = (noteD + fingD) / stretch;
-
-  if (x > 10) {
-    return ascMoveFormula(noteD, fingD);
-  }else {
-    return ThumbCrossCostFunc(x);
-  }
-
-};
 
 
 
