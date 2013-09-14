@@ -143,6 +143,10 @@ var fingerStretch = function(f1,f2) {
 };
 
 var ThumbCrossCostFunc = function(x) {
+  //this effectively shifts our graph over so that it centers over zero, instead of 4. This allows us to use
+  //absolute value, which is what we want, since the shape of our graph below zero is wack. 
+  x = Math.abs(x-4);
+  x = x+4;
   return -0.0003112526902*Math.pow(x,7)+0.01885042991*Math.pow(x,6)-
 0.4641792923*Math.pow(x,5)+6.02919054*Math.pow(x,4)-44.66602087*Math.pow(x,3)+
 189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
@@ -205,7 +209,8 @@ var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-    var y = ThumbCrossCostFunc(x);
+
+     var y = ThumbCrossCostFunc(x);
     if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
       y += 8;
     }
