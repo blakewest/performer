@@ -166,7 +166,7 @@ describe('cost database', function() {
 
       correctPath.should.be.below(wrongPath);
     });
-    it('C,B,A with 1,3,2 should have lower cost than using 1,2,1', function() {
+    xit('C,B,A with 1,3,2 should have lower cost than using 1,2,1', function() {
       var correctStep1= costDb['60,59,1,3'];
       var correctStep2 = costDb['59,57,3,2'];
       var wrongStep1 = costDb['60,59,1,2'];
@@ -181,6 +181,77 @@ describe('cost database', function() {
 
       console.log('wrong path = ', wrongPath);
       console.log('correctPath = ', correctPath);
+
+      correctPath.should.be.below(wrongPath);
+    });
+  });
+  describe('ascending and descending notes, not involving thumb', function() {
+    it ('E up A down G with 2,5,4 should have lower cost than using 2,5,3', function() {
+      var correctStep1= costDb['64,69,2,5'];
+      var correctStep2 = costDb['69,67,5,4'];
+      var wrongStep1 = costDb['64,69,2,5'];
+      var wrongStep2 = costDb['69,67,5,3'];
+      var wrongPath = wrongStep1 + wrongStep2;
+      var correctPath = correctStep1 + correctStep2;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it ('E up high E down D with 2,5,4 should have lower cost than using 2,4,3', function() {
+      var correctStep1= costDb['64,76,2,5'];
+      var correctStep2 = costDb['76,74,5,4'];
+      var wrongStep1 = costDb['64,76,2,4'];
+      var wrongStep2 = costDb['69,67,4,3'];
+      var wrongPath = wrongStep1 + wrongStep2;
+      var correctPath = correctStep1 + correctStep2;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it ('F down D up F with 3,2,4 should have lower cost than using 3,2,5', function() {
+      var correctStep1= costDb['65,62,3,2'];
+      var correctStep2 = costDb['62,65,2,4'];
+      var wrongStep1 = costDb['65,62,3,2'];
+      var wrongStep2 = costDb['62,65,2,5'];
+      var wrongPath = wrongStep1 + wrongStep2;
+      var correctPath = correctStep1 + correctStep2;
+
+      correctPath.should.be.below(wrongPath);
+    });
+  });
+  describe('ascending and descending with thumb', function() {
+    it ('D down C down B up C with 2,1,2,1 should have lower cost than using 2,1,1,1', function() {
+      var correctStep1= costDb['62,60,2,1'];
+      var correctStep2 = costDb['60,59,1,2'];
+      var correctStep3 = costDb['59,60,2,1'];
+      var wrongStep1 = costDb['62,60,2,1'];
+      var wrongStep2 = costDb['60,59,1,1'];
+      var wrongStep3 = costDb['59,60,1,1'];
+
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3;
+      var correctPath = correctStep1 + correctStep2 + correctStep3;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it ('C major ascending scale with 1,2,3,1,2,3,4,5 should be lower cost than 1,2,3,4,1,2,3', function() {
+      var correctStep1= costDb['60,62,1,2'];
+      var correctStep2 = costDb['62,64,2,3'];
+      var correctStep3 = costDb['64,65,3,1'];
+      var correctStep4 = costDb['65,67,1,2'];
+      var correctStep5 = costDb['67,69,2,3'];
+      var correctStep6 = costDb['69,71,3,4'];
+      var correctStep7 = costDb['71,72,4,5'];
+
+      var wrongStep1 = costDb['60,62,1,2'];
+      var wrongStep2 = costDb['62,64,2,3'];
+      var wrongStep3 = costDb['64,65,3,4'];
+      var wrongStep4 = costDb['65,67,4,1'];
+      var wrongStep5 = costDb['67,69,1,2'];
+      var wrongStep6 = costDb['69,71,2,3'];
+      var wrongStep7 = costDb['71,72,3,4'];
+
+
+
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5 + wrongStep6 + wrongStep7;
+      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + correctStep7;
 
       correctPath.should.be.below(wrongPath);
     });
