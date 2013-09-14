@@ -2,7 +2,7 @@ var should = require('should');
 var db = require('../src/Algorithms/CostAlgorithm.js');
 var _ = require('underscore');
 
-describe('cost database itself', function() {
+describe('cost database', function() {
   var costDb = db.createCostDatabase();
   describe('Database itself', function() {
     it('has a length of 193600', function() {
@@ -75,8 +75,6 @@ describe('cost database itself', function() {
         var wrongPath = wrongStep1 + wrongStep2 + wrongStep3;
         var correctPath = correctStep1 + correctStep2 + correctStep3;
 
-        console.log('correctStep1 = ', correctStep1)
-
         correctPath.should.be.below(wrongPath);
       });
      it('E,F,G,A with 3,1,2,3 should have lower cost than using 3,1,3,4', function() {
@@ -130,7 +128,39 @@ describe('cost database itself', function() {
   describe('descending notes involving crossing over thumb', function() {
     it('C down to B with 1,2 should have lower cost than using 1,3', function() {
       var correctStep1= costDb['60,59,1,2'];
-      var wrongStep1 = costDb['60,72,1,3'];
+      var wrongStep1 = costDb['60,59,1,3'];
+      var wrongPath = wrongStep1;
+      var correctPath = correctStep1;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it('C down to B with 1,2 should have lower cost than using 1,4', function() {
+      var correctStep1= costDb['60,59,1,2'];
+      var wrongStep1 = costDb['60,59,1,4'];
+      var wrongPath = wrongStep1;
+      var correctPath = correctStep1;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it('C down to B with 1,2 should have lower cost than using 1,5', function() {
+      var correctStep1= costDb['60,59,1,2'];
+      var wrongStep1 = costDb['60,59,1,5'];
+      var wrongPath = wrongStep1;
+      var correctPath = correctStep1;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it('C down to B with 1,3 should have lower cost than using 1,4', function() {
+      var correctStep1= costDb['60,59,1,3'];
+      var wrongStep1 = costDb['60,59,1,4'];
+      var wrongPath = wrongStep1;
+      var correctPath = correctStep1;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it('C down to B with 1,3 should have lower cost than using 1,5', function() {
+      var correctStep1= costDb['60,59,1,3'];
+      var wrongStep1 = costDb['60,59,1,5'];
       var wrongPath = wrongStep1;
       var correctPath = correctStep1;
 
@@ -146,6 +176,9 @@ describe('cost database itself', function() {
 
       console.log('wrongStep1 = ', wrongStep1);
       console.log('wrongStep2 = ', wrongStep2);
+      console.log('correctStep1 = ', correctStep1);
+      console.log('correctStep2 = ', correctStep2);
+
       console.log('wrong path = ', wrongPath);
       console.log('correctPath = ', correctPath);
 
