@@ -148,10 +148,7 @@ var ThumbCrossCostFunc = function(x) {
 189.4583817*Math.pow(x,2)-427.7666473*x+400.1590843;
 };
 
-var nonThumbCost = function(noteD,fingD,f1,f2) {
-  var stretch = fingerStretch(f1,f2);
-
-  var x = Math.abs(noteD-fingD) / stretch;
+var nonThumbCost = function(noteD,fingD,x) {
 
   var costFunc = function(x) {
     return  -0.0000006589793725*Math.pow(x,10) -0.000002336381414*Math.pow(x,9) +0.00009925769823*Math.pow(x,8)+
@@ -159,15 +156,12 @@ var nonThumbCost = function(noteD,fingD,f1,f2) {
   0.03719817227*Math.pow(x,3)+0.4554696705*Math.pow(x,2)-0.08305450359*x+0.3020594956;
   };
 
-  /*if x is too high, it means it's not possible to do while in the same position, so you need to use move formula
-  //if it's above 6.8, but below the Move formula cut off (10 right now), then we have to use an additional formula because the current one
+  /*if it's above 6.8, but below the Move formula cut off (10 right now), then we have to use an additional formula because the current one
   //has a weird property where it goes sharply negative after 6.8 
   //I know this appears janky, but after messing with other potential regression formulas, I can't get any single one
   to match both the overall shape, and certainly specific Y values I want close enough. So this seems like best option.
   */
-  if (x > 10) {
-    return moveFormula(noteD, fingD);
-  }else if (x > 6.8 && x < 10) {
+  if (x > 6.8 && x < 10) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     return costFunc(x);
@@ -184,7 +178,7 @@ var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
 
   //if it's over 10, again use the move formula
   if (x > 10) {
-    return moveFormula(noteD, fingD);
+    return ascMoveFormula(noteD, fingD);
   }else {
     var y = ThumbCrossCostFunc(x);
     if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
@@ -200,16 +194,31 @@ var descendingThumbCost = function(noteD,fingD,f1,f2) {
   var x = (noteD + fingD) / stretch;
 
   if (x > 10) {
-    return moveFormula(noteD, fingD);
+    return ascMoveFormula(noteD, fingD);
   }else {
     return ThumbCrossCostFunc(x);
   }
 
 };
 
-var moveFormula = function(noteD, fingD) {
-  //add some fixed cost + a logarithmic function based on total distance between n1,n2, and f1,f2
-  var totalD = noteD + fingD;
+var ascMoveFormula = function(noteD,fingD) {
+  //this isn't necessarily just for ascending situations. It's really where the direction of notes and direction of fingers are opposite.
+  //in either case, you want to add the distance between the fingers.
+
+  //the Math.ceil part is for the somewhat janky nature of my moveHash, which only has integers right now. I could add in .5 spaces, and that should handle it
+  var totalD = Math.ceil(noteD + fingD);
+
+  //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
+  if (totalD > 24) {
+    return moveHash[24] + ( (totalD - 24) / 5);
+  }else {
+    return moveHash[totalD];
+  }
+};
+
+var descMoveFormula = function(noteD,fingD) {
+  //this is for situations where direction of notes and fingers is the same. You want to subtract finger distance in that case.
+  var totalD = Math.ceil(noteD - fingD);
 
   //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
   if (totalD > 24) {
@@ -225,30 +234,22 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   var fingD = fingerDistance(f1,f2);
 
 
-  //handles cases where the note is changing and you're using the same finger. That's move formula
+
+  //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
   if (Math.abs(n2 - n1) > 0 && f2-f1 === 0) {
-    costDatabase[key] = moveFormula(noteD,fingD);
+    costDatabase[key] = ascMoveFormula(noteD,fingD);
   }
   //handles ascending notes and descending fingers, but f2 isn't thumb
   //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
   else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 !== 1) {
-    costDatabase[key] = moveFormula(noteD,fingD);
+    costDatabase[key] = ascMoveFormula(noteD,fingD);
   }
   //this handles descending notes with ascending fingers where f1 isn't thumb
   //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
   else if (n2 - n1 < 0 && f2-f1 > 0 && f1 !== 1){
-    costDatabase[key] = moveFormula(noteD,fingD);
+    costDatabase[key] = ascMoveFormula(noteD,fingD);
   }
-
-  //this handles ascending or same note, with ascending or same finger
-  else if (n2 - n1 >= 0 && f2 - f1 >= 0) {
-    costDatabase[key] = nonThumbCost(noteD,fingD,f1,f2);
-  }
-  //this handles descending notes, with descending fingers
-  else if(n2 - n1 < 0 && f2 - f1 < 0) {
-    costDatabase[key] = nonThumbCost(noteD,fingD,f1,f2);
-  }
-
   //this handles ascending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
   //Thus bringing your thumb under. 
   else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 === 1) {
@@ -258,6 +259,18 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   else if (n2 - n1 <= 0 && f1 === 1) {
     costDatabase[key] = descendingThumbCost(noteD,fingD, f1,f2);
   }
+  //this handles ascending or same note, with ascending or same finger
+  //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 > 0 || n2-n1 <= 0 && f2-f1 < 0)
+  else {
+    var stretch = fingerStretch(f1,f2);
+    var x = Math.abs(noteD - fingD) / stretch;
+    if (x > 10) {
+      costDatabase[key] = descMoveFormula(noteD, fingD);
+    }else{
+      costDatabase[key] = nonThumbCost(noteD,fingD,x);
+    }
+  }
+
 };
 
 var createCostDatabase;
