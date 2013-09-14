@@ -69,6 +69,7 @@ var makeMoveHash = function(fixedCost) {
     23 : 14.9,
     24 : 15.2,
   };
+
   for (var each in moveHash) {
     moveHash[each] += fixedCost;
   }
@@ -76,7 +77,6 @@ var makeMoveHash = function(fixedCost) {
 };
 
 var moveHash = makeMoveHash();
-
 
 //this is fairly naive way of defining natural distance between two fingers.
 //It assumes your on Middle C. Could potentially take into account n1 as a way to know how to handle the irregularities. Such as E-F being 1 half step, but G-A being 2.
