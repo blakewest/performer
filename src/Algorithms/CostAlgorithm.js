@@ -93,10 +93,10 @@ var dThumbStretch = {
 };
 
 var aThumbStretch = {
-  '1,2' : 0.95,
-  '1,3' : 1,
-  '1,4' : 0.95,
-  '1,5' : 0.8
+  '2,1' : 0.95,
+  '3,1' : 1,
+  '4,1' : 0.95,
+  '5,1' : 0.8
 };
 
 var fingStretch = {
@@ -169,38 +169,6 @@ var nonThumbCost = function(noteD,fingD,x) {
 
 };
 
-var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
-  var stretch = ascendingThumbStretch(f1,f2);
-
-  var x = (noteD + fingD) / stretch;
-
-
-
-  //if it's over 10, again use the move formula
-  if (x > 10) {
-    return ascMoveFormula(noteD, fingD);
-  }else {
-    var y = ThumbCrossCostFunc(x);
-    if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
-      y += 8;
-    }
-    return y;
-  }
-};
-
-var descendingThumbCost = function(noteD,fingD,f1,f2) {
-  var stretch = descendingThumbStretch(f1,f2);
-
-  var x = (noteD + fingD) / stretch;
-
-  if (x > 10) {
-    return ascMoveFormula(noteD, fingD);
-  }else {
-    return ThumbCrossCostFunc(x);
-  }
-
-};
-
 var ascMoveFormula = function(noteD,fingD) {
   //this isn't necessarily just for ascending situations. It's really where the direction of notes and direction of fingers are opposite.
   //in either case, you want to add the distance between the fingers.
@@ -227,6 +195,38 @@ var descMoveFormula = function(noteD,fingD) {
     return moveHash[totalD];
   }
 };
+
+var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
+  var stretch = ascendingThumbStretch(f1,f2);
+
+  var x = (noteD + fingD) / stretch;
+
+  //if it's over 10, again use the move formula
+  if (x > 10) {
+    return ascMoveFormula(noteD, fingD);
+  }else {
+    var y = ThumbCrossCostFunc(x);
+    if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
+      y += 8;
+    }
+    return y;
+  }
+};
+
+var descendingThumbCost = function(noteD,fingD,f1,f2) {
+  var stretch = descendingThumbStretch(f1,f2);
+
+  var x = (noteD + fingD) / stretch;
+
+  if (x > 10) {
+    return ascMoveFormula(noteD, fingD);
+  }else {
+    return ThumbCrossCostFunc(x);
+  }
+
+};
+
+
 
 var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
@@ -255,8 +255,8 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 === 1) {
     costDatabase[key] = ascendingThumbCost(noteD,fingD,n1,n2,f1,f2);
   }
-  //this handles descending notes, where you start on your thumb. Thus your crossing over your thumb.
-  else if (n2 - n1 <= 0 && f1 === 1) {
+  //this handles descending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  else if (n2 - n1 < 0 && f1 === 1 && f2 !== 1) {
     costDatabase[key] = descendingThumbCost(noteD,fingD, f1,f2);
   }
   //this handles ascending or same note, with ascending or same finger
