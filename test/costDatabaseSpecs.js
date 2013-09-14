@@ -75,6 +75,8 @@ describe('cost database itself', function() {
         var wrongPath = wrongStep1 + wrongStep2 + wrongStep3;
         var correctPath = correctStep1 + correctStep2 + correctStep3;
 
+        console.log('correctStep1 = ', correctStep1)
+
         correctPath.should.be.below(wrongPath);
       });
      it('E,F,G,A with 3,1,2,3 should have lower cost than using 3,1,3,4', function() {
@@ -131,6 +133,21 @@ describe('cost database itself', function() {
       var wrongStep1 = costDb['60,72,1,3'];
       var wrongPath = wrongStep1;
       var correctPath = correctStep1;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it('C,B,A with 1,3,2 should have lower cost than using 1,2,1', function() {
+      var correctStep1= costDb['60,59,1,3'];
+      var correctStep2 = costDb['59,57,3,2'];
+      var wrongStep1 = costDb['60,59,1,2'];
+      var wrongStep2 = costDb['59,57,2,1'];
+      var wrongPath = wrongStep1 + wrongStep2;
+      var correctPath = correctStep1 + correctStep2;
+
+      console.log('wrongStep1 = ', wrongStep1);
+      console.log('wrongStep2 = ', wrongStep2);
+      console.log('wrong path = ', wrongPath);
+      console.log('correctPath = ', correctPath);
 
       correctPath.should.be.below(wrongPath);
     });
