@@ -85,8 +85,6 @@ var fingerDistance = function(f1,f2) {
   return fingDistance[key];
 };
 
-var costDatabase = {};
-
 var dThumbStretch = {
   '1,2' : 1.1,
   '1,3' : 1,
@@ -221,10 +219,7 @@ var moveFormula = function(noteD, fingD) {
   }
 };
 
-var notCaught = [];
-
-
-var costAlgorithmRouter = function(n1,n2,f1,f2) {
+var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
   var noteD = Math.abs(n2-n1);
   var fingD = fingerDistance(f1,f2);
@@ -263,22 +258,22 @@ var costAlgorithmRouter = function(n1,n2,f1,f2) {
   else if (n2 - n1 <= 0 && f1 === 1) {
     costDatabase[key] = descendingThumbCost(noteD,fingD, f1,f2);
   }
-  else{
-    notCaught.push(key);
-  }
 };
 
-var walker = function() {
+var createCostDatabase;
+module.exports.createCostDatabase = createCostDatabase = function() {
+var costDatabase = {};
   for (var finger1 = 1; finger1 <=5; finger1++) {
     for (var note1 = 21; note1 < 109; note1++) {
       for (var finger2 = 1; finger2 <= 5; finger2++) {
         for (var note2 = 21; note2 < 109; note2++) {
-          costAlgorithmRouter(note1, note2, finger1, finger2);
+          costAlgorithmRouter(note1, note2, finger1, finger2, costDatabase);
         }
       }
     }
   }
   // console.log(costDatabase);
+  return costDatabase;
 };
 
 
