@@ -12,7 +12,7 @@ var App = function() {
   this.rightHand = new RightHand(this.pinky, this.ringFinger, this.middleFinger, this.indexFinger, this.thumb);
 
   //this is just here to run the function that kicks off getting the cost database;
-  createCostDatabase();
+  // createCostDatabase();
 
   this.player = MIDI.Player;
 
