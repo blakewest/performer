@@ -136,8 +136,7 @@ var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-
-     var y = ThumbCrossCostFunc(x);
+    var y = ThumbCrossCostFunc(x);
     if (color[n1%12] === 'White' && color[n2%12] === 'Black') {
       y += 8;
     }
@@ -145,7 +144,7 @@ var ascendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   }
 };
 
-var descendingThumbCost = function(noteD,fingD,f1,f2) {
+var descendingThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   var stretch = descendingThumbStretch(f1,f2);
 
   var x = (noteD + fingD) / stretch;
@@ -153,7 +152,11 @@ var descendingThumbCost = function(noteD,fingD,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-    return ThumbCrossCostFunc(x);
+    var y = ThumbCrossCostFunc(x);
+    if (color[n1%12] === 'Black' && color[n2%12] === 'White') {
+      y += 8;
+    }
+    return y;
   }
 
 };
@@ -266,7 +269,7 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   }
   //this handles descending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
   else if (n2 - n1 < 0 && f1 === 1 && f2 !== 1) {
-    costDatabase[key] = descendingThumbCost(noteD,fingD, f1,f2);
+    costDatabase[key] = descendingThumbCost(noteD,fingD,n1,n2,f1,f2);
   }
   //this handles ascending or same note, with ascending or same finger
   //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 > 0 || n2-n1 <= 0 && f2-f1 < 0)
