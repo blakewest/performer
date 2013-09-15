@@ -248,7 +248,71 @@ describe('cost database', function() {
       var wrongStep6 = costDb['69,71,2,3'];
       var wrongStep7 = costDb['71,72,3,4'];
 
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5 + wrongStep6 + wrongStep7;
+      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + correctStep7;
 
+      correctPath.should.be.below(wrongPath);
+    });
+    it ('C major descending scale with 5,4,3,2,1,3,2,1 should be lower cost than 5,4,3,2,1,4,3,2', function() {
+      var correctStep1= costDb['72,71,5,4'];
+      var correctStep2 = costDb['71,69,4,3'];
+      var correctStep3 = costDb['69,67,3,2'];
+      var correctStep4 = costDb['67,65,2,1'];
+      var correctStep5 = costDb['65,64,1,3'];
+      var correctStep6 = costDb['64,62,3,2'];
+      var correctStep7 = costDb['62,60,2,1'];
+
+      var wrongStep1= costDb['72,71,5,4'];
+      var wrongStep2 = costDb['71,69,4,3'];
+      var wrongStep3 = costDb['69,67,3,2'];
+      var wrongStep4 = costDb['67,65,2,1'];
+      var wrongStep5 = costDb['65,64,1,4'];
+      var wrongStep6 = costDb['64,62,4,3'];
+      var wrongStep7 = costDb['62,60,3,2'];
+
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5 + wrongStep6 + wrongStep7;
+      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + correctStep7;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it ('F major ascending scale with 1,2,3,4,1,2,3,4 should be lower cost than 1,2,3,1,2,3,4', function() {
+      var correctStep1= costDb['65,67,1,2'];
+      var correctStep2 = costDb['67,69,2,3'];
+      var correctStep3 = costDb['69,70,3,4'];
+      var correctStep4 = costDb['70,72,4,1'];
+      var correctStep5 = costDb['72,74,1,2'];
+      var correctStep6 = costDb['74,76,2,3'];
+      var correctStep7 = costDb['76,77,3,4'];
+
+      var wrongStep1= costDb['65,67,1,2'];
+      var wrongStep2 = costDb['67,69,2,3'];
+      var wrongStep3 = costDb['69,70,3,1'];
+      var wrongStep4 = costDb['70,72,1,2'];
+      var wrongStep5 = costDb['72,74,2,3'];
+      var wrongStep6 = costDb['74,76,3,4'];
+      var wrongStep7 = costDb['76,77,4,5'];
+
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5 + wrongStep6 + wrongStep7;
+      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + correctStep7;
+
+      correctPath.should.be.below(wrongPath);
+    });
+    it ('F major descending scale with 4,3,2,1,4,3,2,1 should be lower cost than 5,4,3,2,1,3,2,1', function() {
+      var correctStep1= costDb['77,76,4,3'];
+      var correctStep2 = costDb['76,74,3,2'];
+      var correctStep3 = costDb['74,72,2,1'];
+      var correctStep4 = costDb['72,70,1,4'];
+      var correctStep5 = costDb['70,69,4,3'];
+      var correctStep6 = costDb['69,67,3,2'];
+      var correctStep7 = costDb['67,65,2,1'];
+
+      var wrongStep1= costDb['77,76,5,4'];
+      var wrongStep2 = costDb['76,74,4,3'];
+      var wrongStep3 = costDb['74,72,3,2'];
+      var wrongStep4 = costDb['72,70,2,1'];
+      var wrongStep5 = costDb['70,69,1,3'];
+      var wrongStep6 = costDb['69,67,3,2'];
+      var wrongStep7 = costDb['67,65,2,1'];
 
       var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5 + wrongStep6 + wrongStep7;
       var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + correctStep7;
