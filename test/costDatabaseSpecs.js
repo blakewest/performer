@@ -231,6 +231,19 @@ describe('cost database', function() {
 
       correctPath.should.be.below(wrongPath);
     });
+    it ('C down A up C with 1,2,1 should be lower cost than 1,1,1', function() {
+      var correctStep1= costDb['60,57,1,2'];
+      var correctStep2 = costDb['57,60,2,1'];
+      var wrongStep1= costDb['60,57,1,1'];
+      var wrongStep2 = costDb['57,60,1,1'];
+
+      var wrongPath = wrongStep1 + wrongStep2;
+      var correctPath = correctStep1 + correctStep2;
+
+      correctPath.should.be.below(wrongPath);
+    });
+  });
+  describe('testing scale fingerings', function() {
     it ('C major ascending scale with 1,2,3,1,2,3,4,5 should be lower cost than 1,2,3,4,1,2,3', function() {
       var correctStep1= costDb['60,62,1,2'];
       var correctStep2 = costDb['62,64,2,3'];
