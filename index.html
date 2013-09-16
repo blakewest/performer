@@ -6,40 +6,23 @@
       <script src="lib/MIDI.js/inc/jasmid/stream.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/replayer.js"></script>
       <script src="lib/MIDI.js/inc/base64binary.js"></script>
-      <!-- <script src="lib/MIDI.js/build/MIDI.min.js"></script> -->
-      <script src="lib/MIDI.js/js/MIDI/Player.js"></script>
-      <script src="lib/MIDI.js/js/MIDI/AudioDetect.js"></script>
-      <script src="lib/MIDI.js/js/MIDI/LoadPlugin.js"></script>
-      <script src="lib/MIDI.js/js/MIDI/Plugin.js"></script>
-      <script src="lib/MIDI.js/js/Window/DOMLoader.script.js"></script>
-      <script src="lib/MIDI.js/js/Window/DOMLoader.XMLHttp.js"></script>
-      <script src="lib/MIDI.js/js/Window/Event.js"></script>
-
-
-
+      <script src="lib/MIDI.js/build/MIDI.min.js"></script>
+<!--       // <script src="lib/MIDI.js/js/MIDI/Player.js"></script>
+      // <script src="lib/MIDI.js/js/MIDI/AudioDetect.js"></script>
+      // <script src="lib/MIDI.js/js/MIDI/LoadPlugin.js"></script>
+      // <script src="lib/MIDI.js/js/MIDI/Plugin.js"></script>
+      // <script src="lib/MIDI.js/js/Window/DOMLoader.script.js"></script>
+      // <script src="lib/MIDI.js/js/Window/DOMLoader.XMLHttp.js"></script>
+      // <script src="lib/MIDI.js/js/Window/Event.js"></script> -->
 
       <script src="lib/three.min.js"></script>
       <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-      <script src="src/Visuals/Scene.js"></script>
-      <script src="src/Visuals/Hand/Finger.js"></script>
-      <script src="src/Visuals/Hand/Pinky.js"></script>
-      <script src="src/Visuals/Hand/RingFinger.js"></script>
-      <script src="src/Visuals/Hand/MiddleFinger.js"></script>
-      <script src="src/Visuals/Hand/IndexFinger.js"></script>
-      <script src="src/Visuals/Hand/Thumb.js"></script>
-      <script src="src/Visuals/Hand/HandDesign.js"></script>
-      <script src="src/Visuals/Hand/RightHand.js"></script>
-      <script src="src/Visuals/Piano/KeyboardDesign.js"></script>
-      <script src="src/Visuals/Piano/Keyboard.js"></script>
-      <script src="src/Visuals/Piano/PianoKey.js"></script>
       <script src="src/Algorithms/CostAlgorithm.js"></script>
-      <script src="src/App.js"></script>
-      <script src="src/Main.js"></script>
+      <script src="src/bundle.js"></script>
 
 
       <p>Upload MIDI here!</p>
-      <input type="file" id='filereader' onchange='sendToUpload(this.files[0])'>
+      <input type="file" id='filereader' onchange='app.upload(this.files[0])'>
 
       <div id="canvas"></div>
   </body>

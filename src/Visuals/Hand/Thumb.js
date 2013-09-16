@@ -1,4 +1,6 @@
-var Thumb = function(handInfo) {
+var Finger = require('./Finger.js').Finger;
+
+var Thumb = module.exports.Thumb = function(handInfo) {
   Finger.call(this);
   var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
   var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
@@ -8,5 +10,5 @@ var Thumb = function(handInfo) {
   this.originalY = thumbPosition.y;
 };
 
-Thumb.prototype = Object.create(Finger.prototype);
-Thumb.prototype.constructor = Thumb;
+module.exports.Thumb.prototype = Object.create(Finger.prototype);
+module.exports.Thumb.prototype.constructor = Thumb;

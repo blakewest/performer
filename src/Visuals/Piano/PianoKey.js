@@ -1,4 +1,4 @@
-var PianoKey = function(boardInfo, note) {
+var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
   var keyType               = boardInfo.keyInfo[note].keyType;
@@ -25,24 +25,22 @@ var PianoKey = function(boardInfo, note) {
   this.keyUpSpeed = boardInfo.keyUpSpeed;
   this.originalY = position.y;
   this.pressedY = this.originalY - boardInfo.keyDip;
+};
 
-  this.press = function() {
-    this.model.position.y = this.pressedY;
-    this.isPressed = true;
-  };
+PianoKey.prototype.press = function() {
+  this.model.position.y = this.pressedY;
+  this.isPressed = true;
+};
 
-  this.release = function() {
-    this.isPressed = false;
-  };
+PianoKey.prototype.release = function() {
+  this.isPressed = false;
+};
 
-  this.update = function() {
-    //this is really about making released notes edge up slowly, rather than quickly
-    if (this.model.position.y < this.originalY && this.isPressed === false) {
-      //offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
-      var offset = this.originalY - this.model.position.y;
-      this.model.position.y += Math.min(offset, keyUpSpeed);
-    }
-  };
-
-
+PianoKey.prototype.update = function() {
+  //this is really about making released notes edge up slowly, rather than quickly
+  if (this.model.position.y < this.originalY && this.isPressed === false) {
+    //offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
+    var offset = this.originalY - this.model.position.y;
+    this.model.position.y += Math.min(offset, this.keyUpSpeed);
+  }
 };

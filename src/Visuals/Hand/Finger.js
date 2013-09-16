@@ -1,4 +1,4 @@
-var Finger = function() {
+module.exports.Finger = function() {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;

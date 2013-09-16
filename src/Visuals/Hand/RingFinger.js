@@ -1,4 +1,6 @@
-var RingFinger = function(handInfo) {
+var Finger = require('./Finger.js').Finger;
+
+var RingFinger = module.exports.RingFinger = function(handInfo) {
   Finger.call(this);
   var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
   var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});

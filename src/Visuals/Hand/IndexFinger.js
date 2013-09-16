@@ -1,4 +1,6 @@
-var IndexFinger = function(handInfo) {
+var Finger = require('./Finger.js').Finger;
+
+var IndexFinger = module.exports.IndexFinger = function(handInfo) {
   Finger.call(this);
   var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
   var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});

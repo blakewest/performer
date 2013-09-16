@@ -1,4 +1,4 @@
-var Scene = function(container) {
+module.exports.Scene = function(container) {
   var $container = $(container);
   var width = $container.width();
   var height = $container.height();

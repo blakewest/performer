@@ -1,4 +1,6 @@
-var Pinky = function(handInfo) {
+var Finger = require('./Finger.js').Finger;
+
+var Pinky = module.exports.Pinky = function(handInfo) {
   Finger.call(this);
   var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
   var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})

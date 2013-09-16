@@ -1,15 +1,14 @@
-var App = function() {
+var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
+var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
+var RightHand = require('./Visuals/Hand/RightHand.js').RightHand;
+var Scene = require('./Visuals/Scene.js').Scene;
+
+module.exports.App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
-  this.handDesign = new HandDesign();
-  this.pinky = new Pinky(this.handDesign);
-  this.ringFinger = new RingFinger(this.handDesign);
-  this.middleFinger = new MiddleFinger(this.handDesign);
-  this.indexFinger = new IndexFinger(this.handDesign);
-  this.thumb = new Thumb(this.handDesign);
   this.keyboard = new Keyboard(this.keyboardDesign);
   console.log(this.keyboardDesign);
-  this.rightHand = new RightHand(this.pinky, this.ringFinger, this.middleFinger, this.indexFinger, this.thumb);
+  this.rightHand = new RightHand();
 
   //this is just here to run the function that kicks off getting the cost database;
   // createCostDatabase();

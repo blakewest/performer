@@ -1,4 +1,6 @@
-var Keyboard = function(keyboardDesign) {
+var PianoKey = require("./PianoKey.js").PianoKey;
+
+module.exports.Keyboard = function(keyboardDesign) {
   //keyboard design is a completed object where we've filled it out with note types and parameters. See keyboardDesign.js file for more.
   this.model = new THREE.Object3D();
   this.keys = [];

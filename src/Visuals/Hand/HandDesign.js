@@ -1,4 +1,4 @@
-var HandDesign = function() {
+module.exports.HandDesign = function() {
   //pinky specs
   this.pinkyWidth = 0.185;
   this.pinkyHeight = 0.1;

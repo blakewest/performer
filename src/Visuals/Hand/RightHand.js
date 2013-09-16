@@ -1,13 +1,24 @@
-var RightHand = function(pinky, ringFinger, middleFinger, indexFinger, thumb) {
-  // set up cubes and materials for each finger
-  //set their positions just above middle C position
-  //probably use something similar to the keys themselves interms of shapes and such.
+var Pinky = require('./Pinky.js').Pinky;
+var RingFinger = require('./RingFinger.js').RingFinger;
+var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
+var IndexFinger = require('./IndexFinger.js').IndexFinger;
+var Thumb = require('./Thumb.js').Thumb;
+var HandDesign = require('./HandDesign.js').HandDesign;
+
+module.exports.RightHand = function() {
   var _this = this;
+  var handDesign = new HandDesign();
+  var ringFinger = new RingFinger(handDesign);
+  var pinky = new Pinky(handDesign);
+  var middleFinger = new MiddleFinger(handDesign);
+  var indexFinger = new IndexFinger(handDesign);
+  var thumb = new Thumb(handDesign);
 
   this.fingers = [];
   this.model = new THREE.Object3D();
+
   //add fingers to hand model
-  this.fingers.push(pinky); // this is just here to make the off by 1 error go away. will take out soon.
+  this.fingers.push(undefined); // this is just here to make the off by 1 error go away. (We want finger 1 to be thumb so that semantically it makes sense)
 
   this.model.add(thumb.model);
   this.fingers.push(thumb);
@@ -40,7 +51,7 @@ var RightHand = function(pinky, ringFinger, middleFinger, indexFinger, thumb) {
 
   this.update = function() {
     var fingers = _this.fingers;
-    for (var i = 0; i < fingers.length; i++) {
+    for (var i = 1; i < fingers.length; i++) {
       fingers[i].update();
     }
   };

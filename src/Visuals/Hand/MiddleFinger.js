@@ -1,4 +1,6 @@
-var MiddleFinger = function(handInfo) {
+var Finger = require('./Finger.js').Finger;
+
+var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
   Finger.call(this);
   var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
   var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});

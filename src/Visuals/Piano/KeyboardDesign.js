@@ -1,4 +1,4 @@
-var KeyboardDesign = function() {
+module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
     WhiteD: 1,
