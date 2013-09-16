@@ -89,6 +89,18 @@ describe('cost database', function() {
 
         correctPath.should.be.below(wrongPath);
       });
+     it('A,B,C,G with 1,2,1,5 should have lower cost than using 1,2,3,5', function() {
+        var correctStep1= costDb['57,59,1,2'];
+        var correctStep2 = costDb['59,60,2,1'];
+        var correctStep3 = costDb['60,67,1,5'];
+        var wrongStep1= costDb['57,59,1,2'];
+        var wrongStep2 = costDb['59,60,2,3'];
+        var wrongStep3 = costDb['60,67,3,5'];
+        var wrongPath = wrongStep1 + wrongStep2 + wrongStep3;
+        var correctPath = correctStep1 + correctStep2 + correctStep3;
+
+        correctPath.should.be.below(wrongPath);
+      });
    });
 
   describe('ascending notes involving thumb, but not crossing under', function() {
