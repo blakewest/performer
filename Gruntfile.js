@@ -1,22 +1,22 @@
 module.exports = function(grunt) {
   grunt.initConfig ({
     pkg: grunt.file.readJSON('package.json'),
-    coffee: {
-      compile: {
+    browserify: {
+      dist: {
         files: {
-          'compiled/main.js': 'coffee/main.coffee'
+          'build/bundle.js' : ['src/Main.js']
         }
       }
     },
     watch: {
       scripts: {
-        files: 'coffee/main.coffee',
-        tasks: ['coffee']
+        files: 'src/**/*.js',
+        tasks: ['browserify']
       }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-coffee');
+  grunt.loadNpmTasks('grunt-browserify');
 
   grunt.registerTask('default', 'watch');
 };
