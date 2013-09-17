@@ -322,8 +322,57 @@ mod.fingStretch = {
 };
 
 },{}],4:[function(require,module,exports){
+var helpers = require('./FingeringAlgorithmHelpers.js');
+
+module.exports.FingeringAlgorithm = function(midiData) {
+ //this whole thing is an example of Viterbi's algorithm, if you're curious.
+  var RHnotes = helpers.makeRHNoteTrellis(midiData);
+
+  //traversing forward, computing costs and leaving our best path trail
+  for (var layer = 1; layer < RHnotes.length; layer++) {
+    for (var node1 = 0; node1 < 5 ; node1++) {
+      var min = Infinity;
+      for (var node2 = 0; node2 < 5; node2++) {
+        var curNode = RHnotes[layer][node1];
+        var prevNode = RHnotes[layer-1][node2];
+        var transCost = helpers.computeCost(prevNode.note, curNode.note, prevNode.finger, curNode.finger);
+        var totalCost = transCost + prevNode.nodeScore;
+        if (totalCost < min) {
+          min = totalCost;
+          curNode.nodeScore = totalCost;
+          curNode.bestPrev = node2;
+        }
+      }
+    }
+  }
+
+  /*Now we need to go backwards and collect the best path.
+  the currentNode variable is initialized to be the lowest score of the final layer.*/
+  var currentNode = helpers.findMin(RHnotes[RHnotes.length-1]);
+
+  /*from this point, we put the finger for that node in the array, then we track back to it's
+  best previous node, record it's finger, and repeat till we get to the end.
+  also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
+  since zero is just our start object.*/
+  var bestPath = [];
+  for (var j = RHnotes.length-1; j > 0; j--) {
+    var nodeObj = RHnotes[j][currentNode];
+    var curFinger = nodeObj.finger;
+    var note = helpers.notes[(nodeObj.note)%12];
+    bestPath.unshift([curFinger, note]); //use unshift, because otherwise we'd end up with a reversed fingering.
+    currentNode = nodeObj.bestPrev;
+  }
+  for (var i = 0; i < bestPath.length; i++) {
+    console.log('Note: ' + bestPath[i][1] + ' / Finger: ' + bestPath[i][0]);
+  }
+};
+
+},{"./FingeringAlgorithmHelpers.js":5}],5:[function(require,module,exports){
 var costDb = require('./CostAlgorithm.js').createCostDatabase();
-var curBest = Infinity;
+var mod = module.exports;
+
+mod.notes = {0: 'C', 1: 'C#',2: 'D',3: 'Eb',4: 'E',5: 'F',6: 'F#',7: 'G',8: 'G#',9: 'A',10: 'Bb',11: 'B'};
+
 var endCap = [
   {note: 'endCap'},
   {note: 'endCap'},
@@ -331,21 +380,6 @@ var endCap = [
   {note: 'endCap'},
   {note: 'endCap'},
 ];
-
-var Notes = {
-  0: 'C',
-  1: 'C#',
-  2: 'D',
-  3: 'Eb',
-  4: 'E',
-  5: 'F',
-  6: 'F#',
-  7: 'G',
-  8: 'G#',
-  9: 'A',
-  10: 'Bb',
-  11: 'B'
-};
 
 var makeNoteNode = function(noteNumber, fingerNumber) {
   this.note = noteNumber;
@@ -363,7 +397,7 @@ var makeLayer = function(noteNumber) {
   return layer;
 };
 
-var makeRHNoteTrellis = function(midiData) {
+mod.makeRHNoteTrellis = function(midiData) {
   var trellis = [];
   //putting the endCap at the beginning is a convenience so we don't have to have special conditions in the traversal loop.
   trellis.push(endCap);
@@ -378,7 +412,7 @@ var makeRHNoteTrellis = function(midiData) {
   return trellis;
 };
 
-var computeCost = function(n1,n2,f1,f2) {
+mod.computeCost = function(n1,n2,f1,f2) {
   if (n1 === 'endCap' || n2 === 'endCap') {
     return 0;
   }
@@ -386,7 +420,7 @@ var computeCost = function(n1,n2,f1,f2) {
   return costDb[key];
 };
 
-var findMin = function(layer) {
+mod.findMin = function(layer) {
   var minNode;
   var minScore = Infinity;
   for (var node = 0; node < layer.length; node++) {
@@ -397,53 +431,7 @@ var findMin = function(layer) {
   }
   return minNode;
 };
-
-module.exports.FingeringAlgorithm = function(midiData) {
-   //this whole thing is an example of Viterbi's algorithm, if you're curious.
-    var RHnotes = makeRHNoteTrellis(midiData);
-
-    //traversing forward, computing costs and leaving our best path trail
-    for (var layer = 1; layer < RHnotes.length; layer++) {
-      for (var node1 = 0; node1 < 5 ; node1++) {
-        var min = Infinity;
-        for (var node2 = 0; node2 < 5; node2++) {
-          var curNode = RHnotes[layer][node1];
-          var prevNode = RHnotes[layer-1][node2];
-          var transCost = computeCost(prevNode.note, curNode.note, prevNode.finger, curNode.finger);
-          var totalCost = transCost + prevNode.nodeScore;
-          if (totalCost < min) {
-            min = totalCost;
-            curNode.nodeScore = totalCost;
-            curNode.bestPrev = node2;
-          }
-        }
-      }
-    }
-
-    /*going backwards, collecting the best path along the way.
-    the curNode variable is initialized to be the lowest score of the final layer.*/
-    var currentNode = findMin(RHnotes[RHnotes.length-1]);
-    var bestPath = [];
-    /*from this point, we put the finger for that node in the array, then we track back to it's
-    best previous node, record it's finger, and repeat till we get to the end.
-    also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
-    since zero is just our start object.*/
-    for (var j = RHnotes.length-1; j > 0; j--) {
-      var nodeObj = RHnotes[j][currentNode];
-      var curFinger = nodeObj.finger;
-      var note = Notes[(nodeObj.note)%12];
-      bestPath.push([curFinger, note]);
-      currentNode = nodeObj.bestPrev;
-    }
-    bestPath.reverse();
-    for (var i = 0; i < bestPath.length; i++) {
-      console.log('Note: ' + bestPath[i][1] + ' / Finger: ' + bestPath[i][0]);
-    }
-
-    console.log(midiData);
-};
-
-},{"./CostAlgorithm.js":1}],5:[function(require,module,exports){
+},{"./CostAlgorithm.js":1}],6:[function(require,module,exports){
 var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
 var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
 var RightHand = require('./Visuals/Hand/RightHand.js').RightHand;
@@ -616,7 +604,7 @@ module.exports.App = function() {
 
 
 
-},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/RightHand.js":12,"./Visuals/Piano/Keyboard.js":15,"./Visuals/Piano/KeyboardDesign.js":16,"./Visuals/Scene.js":18}],6:[function(require,module,exports){
+},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/RightHand.js":13,"./Visuals/Piano/Keyboard.js":16,"./Visuals/Piano/KeyboardDesign.js":17,"./Visuals/Scene.js":19}],7:[function(require,module,exports){
 var App = require('./App.js').App;
 $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
@@ -626,7 +614,7 @@ $(document).on('ready', function() {
 
 
 
-},{"./App.js":5}],7:[function(require,module,exports){
+},{"./App.js":6}],8:[function(require,module,exports){
 module.exports.Finger = function() {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
@@ -648,7 +636,7 @@ module.exports.Finger = function() {
     }
   };
 };
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports.HandDesign = function() {
   //pinky specs
   this.pinkyWidth = 0.185;
@@ -682,7 +670,7 @@ module.exports.HandDesign = function() {
 
   this.keyboardHeight = 0.22;
 };
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var IndexFinger = module.exports.IndexFinger = function(handInfo) {
@@ -697,7 +685,7 @@ var IndexFinger = module.exports.IndexFinger = function(handInfo) {
 
 IndexFinger.prototype = Object.create(Finger.prototype);
 IndexFinger.prototype.constructor = IndexFinger;
-},{"./Finger.js":7}],10:[function(require,module,exports){
+},{"./Finger.js":8}],11:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
@@ -712,7 +700,7 @@ var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
 
 MiddleFinger.prototype = Object.create(Finger.prototype);
 MiddleFinger.prototype.constructor = MiddleFinger;
-},{"./Finger.js":7}],11:[function(require,module,exports){
+},{"./Finger.js":8}],12:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Pinky = module.exports.Pinky = function(handInfo) {
@@ -728,7 +716,7 @@ var Pinky = module.exports.Pinky = function(handInfo) {
 Pinky.prototype = Object.create(Finger.prototype);
 Pinky.prototype.constructor = Pinky;
 
-},{"./Finger.js":7}],12:[function(require,module,exports){
+},{"./Finger.js":8}],13:[function(require,module,exports){
 var Pinky = require('./Pinky.js').Pinky;
 var RingFinger = require('./RingFinger.js').RingFinger;
 var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
@@ -788,7 +776,7 @@ module.exports.RightHand = function() {
   };
 
 };
-},{"./HandDesign.js":8,"./IndexFinger.js":9,"./MiddleFinger.js":10,"./Pinky.js":11,"./RingFinger.js":13,"./Thumb.js":14}],13:[function(require,module,exports){
+},{"./HandDesign.js":9,"./IndexFinger.js":10,"./MiddleFinger.js":11,"./Pinky.js":12,"./RingFinger.js":14,"./Thumb.js":15}],14:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var RingFinger = module.exports.RingFinger = function(handInfo) {
@@ -803,7 +791,7 @@ var RingFinger = module.exports.RingFinger = function(handInfo) {
 
 RingFinger.prototype = Object.create(Finger.prototype);
 RingFinger.prototype.constructor = RingFinger;
-},{"./Finger.js":7}],14:[function(require,module,exports){
+},{"./Finger.js":8}],15:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Thumb = module.exports.Thumb = function(handInfo) {
@@ -818,7 +806,7 @@ var Thumb = module.exports.Thumb = function(handInfo) {
 
 module.exports.Thumb.prototype = Object.create(Finger.prototype);
 module.exports.Thumb.prototype.constructor = Thumb;
-},{"./Finger.js":7}],15:[function(require,module,exports){
+},{"./Finger.js":8}],16:[function(require,module,exports){
 var PianoKey = require("./PianoKey.js").PianoKey;
 
 module.exports.Keyboard = function(keyboardDesign) {
@@ -853,7 +841,7 @@ module.exports.Keyboard = function(keyboardDesign) {
     }
   };
 };
-},{"./PianoKey.js":17}],16:[function(require,module,exports){
+},{"./PianoKey.js":18}],17:[function(require,module,exports){
 module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
@@ -984,7 +972,7 @@ module.exports.KeyboardDesign = function() {
 
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
@@ -1031,7 +1019,7 @@ PianoKey.prototype.update = function() {
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
 };
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports.Scene = function(container) {
   var $container = $(container);
   var width = $container.width();
@@ -1096,5 +1084,5 @@ module.exports.Scene = function(container) {
     _this.renderer.render(_this.scene, _this.camera);
   };
 };
-},{}]},{},[6])
+},{}]},{},[7])
 ;
