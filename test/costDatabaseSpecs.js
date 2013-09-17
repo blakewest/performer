@@ -21,6 +21,18 @@ describe('cost database', function() {
       }
       anyNonNumbers.should.equal(false);
     });
+    it('should have positive values for every value', function() {
+      var anyNegativeNumbers = false;
+      var negativeNumbers = [];
+      for (var each in costDb) {
+        if (costDb[each] < 0) {
+          anyNegativeNumbers = true;
+          negativeNumbers.push(each);
+        }
+      }
+      console.log(negativeNumbers);
+      anyNegativeNumbers.should.equal(false);
+    });
   });
 
   describe('accuracy of ascending or same notes, not involving the thumb', function() {
