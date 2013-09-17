@@ -35,7 +35,7 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   else {
     var stretch = helpers.fingerStretch(f1,f2);
     var x = Math.abs(noteD - fingD) / stretch;
-    if (x > 10) {
+    if (x > 9) {
       costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
     }else{
       costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x);

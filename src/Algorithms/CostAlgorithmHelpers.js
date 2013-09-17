@@ -95,7 +95,7 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x) {
   has an odd shape to it where it goes sharply negative after 6.8  I know this appears janky, but after messing with other potential 
   regression formulas, I can't get any single one to match both the overall shape, and certainly specific Y values I want. So this seems like best option.
   */
-  if (x > 6.8 && x < 10) {
+  if (x > 6.8 && x <= 9) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     return costFunc(x);
