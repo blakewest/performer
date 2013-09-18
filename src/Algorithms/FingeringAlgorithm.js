@@ -43,13 +43,16 @@ module.exports.FingeringAlgorithm = function(midiData) {
   var bestPath = [];
   for (var j = RHnotes.length-1; j > 0; j--) {
     var nodeObj = RHnotes[j][currentNode];
-    var curFinger = nodeObj.finger;
-    var note = helpers.notes[(nodeObj.note)%12];
-    bestPath.unshift([curFinger, note]); //use unshift, because otherwise we'd end up with a reversed fingering.
+    var fingers = nodeObj.fingers;
+    var notes = nodeObj.notes;
+    for (var k = 0; k < notes.length; k++) {
+      bestPath.unshift([fingers[k], notes[k]]); //use unshift, because otherwise we'd end up with a reversed fingering.
+    }
     currentNode = nodeObj.bestPrev;
   }
   for (var i = 0; i < bestPath.length; i++) {
     console.log('Note: ' + bestPath[i][1] + ' / Finger: ' + bestPath[i][0]);
   }
-  console.log(RHnotesData);
+  console.log('bestPath: ', bestPath);
+  console.log('RHnotes: ', RHnotes);
 };

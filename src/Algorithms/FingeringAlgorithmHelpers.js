@@ -4,11 +4,11 @@ var mod = module.exports;
 mod.notes = {0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F', 6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'};
 
 var fingerOptions = {
-  '1': [[1], [2], [3], [4], [5]],
-  '2': [[1,2], [1,3], [1,4], [1,5], [2,3], [2,4], [2,5], [3,4], [3,5], [4,5]],
-  '3': [[1,2,3], [1,2,4], [1,2,5], [1,3,4], [1,3,5], [1,4,5], [2,3,4], [2,3,5], [2,4,5], [3,4,5]],
-  '4': [[1,2,3,4], [1,2,3,5], [1,2,4,5], [1,3,4,5], [2,3,4,5]],
-  '5': [[1,2,3,4,5]]
+  1: [[1], [2], [3], [4], [5]],
+  2: [[1,2], [1,3], [1,4], [1,5], [2,3], [2,4], [2,5], [3,4], [3,5], [4,5]],
+  3: [[1,2,3], [1,2,4], [1,2,5], [1,3,4], [1,3,5], [1,4,5], [2,3,4], [2,3,5], [2,4,5], [3,4,5]],
+  4: [[1,2,3,4], [1,2,3,5], [1,2,4,5], [1,3,4,5], [2,3,4,5]],
+  5: [[1,2,3,4,5]]
 };
 
 var endCap = [
@@ -27,23 +27,24 @@ var makeNoteNode = function(notes, fingers) {
   this.bestPrev = undefined;
 };
 
-var makeLayer = function(noteNumbers) {
-  var sortedNotes = noteNumbers.sort(function(a,b) {return a-b});
+var makeLayer = function(notes) {
+  var sortedNotes = notes.sort(function(a,b) {return a-b});
   var layer = [];
-  var options = polyPhonicOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
+  var options = fingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
   for (var i = 0; i < options.length; i++) {
     var fingerChoice = options[i];
-    var node = makeNoteNode(sortedNotes, fingerChoice);
+    var node = new makeNoteNode(sortedNotes, fingerChoice);
     layer.push(node);
   }
+  return layer;
 };
 
-mode.makeRHTrellis = function(midiData) {
+mod.makeRHNoteTrellis = function(midiData) {
   //i'll need a 'currentlyPlaying' array, a 'newLayer' array, and a 'lastwasOn' variable that tracks if the last event was a noteOn or noteOff
   //noteOn event comes in, put the note in currentlyPlaying
   //noteOff event comes in... 
-  // if 'lastwasOn' is true, then place all currentlyPlaying into newLayer, and remove the noteOff from currentlyPlaying
-  // if 'lastwasOn' is false, then remove that note from currentlyPlaying, and don't push anything to newLayer.
+  // if 'lastWasOn' is true, then place all currentlyPlaying into newLayer, and remove the noteOff from currentlyPlaying
+  // if 'lastWasOn' is false, then remove that note from currentlyPlaying, and don't push anything to newLayer.
   var curPlaying = [];
   var lastWasOn = false;
   var trellis = [];
@@ -51,21 +52,27 @@ mode.makeRHTrellis = function(midiData) {
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
+    var newLayer, notePlace;
     if (note >= 60 && eventData.subtype === 'noteOn') {
       curPlaying.push(note);
       lastWasOn = true;
     }
     if (note >= 60 && eventData.subtype === 'noteOff') {
       if (lastWasOn) {
-        var node = makePolyPhonicLayer(curPlaying);
-        trellis.push(node);
+        // debugger;
+        newLayer = makeLayer(curPlaying);
+        trellis.push(newLayer);
+        notePlace = curPlaying.indexOf(note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
       }else {
-        var notePlace = curPlaying.indexOf(note);
+        notePlace = curPlaying.indexOf(note);
         curPlaying.splice(notePlace, 1);
         lastWasOn = false;
       }
     }
   }
+  // debugger;
   return trellis;
 };
 
