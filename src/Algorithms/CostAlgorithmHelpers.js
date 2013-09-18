@@ -24,7 +24,7 @@ var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
     }
     //moving from black to white with the same finger is a slide. That's pretty easy and gets used all the time. So reducing cost a bit.
     else if (fingD === 0 && params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-      cost -= 2;
+      cost -= 1;
     }
   }
   return cost;
@@ -110,6 +110,7 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     cost = costFunc(x);
+    //if you're moving up white to black with pinky, that's much harder than white-to-white would be. So we're adding some amount.
     if (f2 === 5 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
       cost += 4;
     }
