@@ -17,6 +17,12 @@ module.exports.FingeringAlgorithm = function(midiData) {
         for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
           var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
           var curFinger = curNode.fingers[i];
+          var hasNextNote = curNode.notes[i+1] || false;
+          var nextFinger = curNode.fingers[i+1];
+          if(hasNextNote) {
+            //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+            totalCost += helpers.computeCost(curNote, hasNextNote[0], curFinger, nextFinger);
+          }
           for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
             var prevNote = prevNode.notes[j][0];
             var prevFinger = prevNode.fingers[j];
