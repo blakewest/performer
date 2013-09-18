@@ -7,9 +7,9 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
   //traversing forward, computing costs and leaving our best path trail
   for (var layer = 1; layer < RHnotes.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
-    for (var node1 = 0; node1 < 5 ; node1++) {               //go through each node in each layer
+    for (var node1 = 0; node1 < RHnotes[layer].length ; node1++) {               //go through each node in each layer
       var min = Infinity;                 
-      for (var node2 = 0; node2 < 5; node2++) {               //go through each node in prev layer.
+      for (var node2 = 0; node2 < RHnotes[layer-1].length; node2++) {               //go through each node in prev layer.
         var curNode = RHnotes[layer][node1];
         var prevNode = RHnotes[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;

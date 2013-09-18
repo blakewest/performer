@@ -12,11 +12,11 @@ var fingerOptions = {
 };
 
 var endCap = [
-  {note: 'endCap'},
-  {note: 'endCap'},
-  {note: 'endCap'},
-  {note: 'endCap'},
-  {note: 'endCap'},
+  {notes: ['endCap'], fingers: [1]},
+  {notes: ['endCap'], fingers: [1]},
+  {notes: ['endCap'], fingers: [1]},
+  {notes: ['endCap'], fingers: [1]},
+  {notes: ['endCap'], fingers: [1]},
 ];
 
 var makeNoteNode = function(notes, fingers) {
@@ -48,6 +48,7 @@ mod.makeRHNoteTrellis = function(midiData) {
   var curPlaying = [];
   var lastWasOn = false;
   var trellis = [];
+  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
 
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
@@ -59,7 +60,7 @@ mod.makeRHNoteTrellis = function(midiData) {
     }
     if (note >= 60 && eventData.subtype === 'noteOff') {
       if (lastWasOn) {
-        // debugger;
+        //must pass it a copy of curPlaying, or else everythang gits all messed up
         newLayer = makeLayer(curPlaying.slice());
         trellis.push(newLayer);
         notePlace = curPlaying.indexOf(note);
@@ -72,7 +73,6 @@ mod.makeRHNoteTrellis = function(midiData) {
       }
     }
   }
-  // debugger;
   return trellis;
 };
 
