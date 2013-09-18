@@ -9,11 +9,7 @@ module.exports.App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
-  console.log(this.keyboardDesign);
   this.rightHand = new RightHand();
-
-  //this is just here to run the function that kicks off getting the cost database;
-  // createCostDatabase();
 
   this.player = MIDI.Player;
 
@@ -61,7 +57,6 @@ module.exports.App = function() {
   this.upload = function(file) {
     // var uploadedFile = files[0];
     var _this = this;
-    console.log(file);
     var reader = new FileReader();
     reader.onload = function(e) {
       var midiFile = e.target.result;
@@ -88,7 +83,6 @@ module.exports.App = function() {
   };
 
   this.initMIDI = function(callback) {
-    console.log('theoretically initializing midi plugin');
     MIDI.loadPlugin(function() {
       MIDI.channels[9].mute = true;
     });
