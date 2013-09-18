@@ -60,7 +60,7 @@ mod.makeRHNoteTrellis = function(midiData) {
     if (note >= 60 && eventData.subtype === 'noteOff') {
       if (lastWasOn) {
         // debugger;
-        newLayer = makeLayer(curPlaying);
+        newLayer = makeLayer(curPlaying.slice());
         trellis.push(newLayer);
         notePlace = curPlaying.indexOf(note);
         curPlaying.splice(notePlace, 1);
