@@ -20,6 +20,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
           for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
             var prevNote = prevNode.notes[j][0];
             var prevFinger = prevNode.fingers[j];
+
             var transCost = helpers.computeCost(prevNote, curNote, prevFinger, curFinger);
             totalCost += transCost;
           }
@@ -41,22 +42,21 @@ module.exports.FingeringAlgorithm = function(midiData) {
   best previous node, record it's finger, and repeat till we get to the end.
   also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
   since zero is just our start object.*/
-  var bestPath = [];
+  var bestPathObj = {};
   for (var j = RHnotes.length-1; j > 0; j--) {
     var nodeObj = RHnotes[j][currentNode];
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
     for (var k = 0; k < notes.length; k++) {
-      bestPath.unshift([fingers[k], notes[k][0]]); //use unshift, because otherwise we'd end up with a reversed fingering.
+      var note = notes[k][0];
+      var startTime = notes[k][1];
+      var finger = fingers[k];
+      var key = note + ',' + startTime;
+      bestPathObj[key] = finger;
     }
     currentNode = nodeObj.bestPrev;
   }
-  for (var i = 0; i < bestPath.length; i++) {
-    console.log('Note: ' + bestPath[i][1] + ' / Finger: ' + bestPath[i][0]);
-  }
-  // console.log('bestPath: ', bestPath);
-  // helpers.distributePath(bestPath, midiData);
-  console.log(dataWithStarts);
+  helpers.distributePath(bestPathObj, dataWithStarts);
 };
 
 

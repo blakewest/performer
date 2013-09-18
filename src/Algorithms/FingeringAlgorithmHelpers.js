@@ -112,22 +112,16 @@ mod.findMin = function(layer) {
   return minNode;
 };
 
-mod.distributePath = function(bestPath, midiData) {
+mod.distributePath = function(bestPathObj, midiData) {
   var result = [];
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
     if (note >= 60 && eventData.subtype === 'noteOn') {
-      for (var i = 0; i < bestPath.length; i++) {
-        debugger;
-        if (note === bestPath[i][1]) {
-          var finger = bestPath[i][0];
-          result.push([note, finger]);
-          console.log('Note: ' + note + '/ Finger: ' + finger);
-          bestPath.splice(i, 1);
-          break;
-        }
-      }
+      var startTime = eventData.startTime;
+      var key = note + ',' + startTime;
+      var finger = bestPathObj[key];
+      console.log('Note: ' + note + '/ Finger: ' + finger);
     }
   }
   return result;
