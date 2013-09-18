@@ -121,7 +121,7 @@ var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
     }
     //moving from black to white with the same finger is a slide. That's pretty easy and gets used all the time. So reducing cost a bit.
     else if (fingD === 0 && params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-      cost -= 2;
+      cost -= 1;
     }
   }
   return cost;
@@ -207,6 +207,7 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     cost = costFunc(x);
+    //if you're moving up white to black with pinky, that's much harder than white-to-white would be. So we're adding some amount.
     if (f2 === 5 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
       cost += 4;
     }
@@ -313,7 +314,7 @@ var makeMoveHash = mod.makeMoveHash = function(fixedCost) {
   }
   return moveHash;
 };
-mod.moveHash = makeMoveHash(3);
+mod.moveHash = makeMoveHash(4);
 
 mod.descThumbStretchVals = {
   '1,2' : 1,
@@ -377,6 +378,12 @@ module.exports.FingeringAlgorithm = function(midiData) {
         for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
           var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
           var curFinger = curNode.fingers[i];
+          var hasNextNote = curNode.notes[i+1] || false;
+          var nextFinger = curNode.fingers[i+1];
+          if(hasNextNote) {
+            //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+            totalCost += helpers.computeCost(curNote, hasNextNote[0], curFinger, nextFinger);
+          }
           for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
             var prevNote = prevNode.notes[j][0];
             var prevFinger = prevNode.fingers[j];

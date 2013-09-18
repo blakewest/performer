@@ -77,7 +77,7 @@ var makeMoveHash = mod.makeMoveHash = function(fixedCost) {
   }
   return moveHash;
 };
-mod.moveHash = makeMoveHash(3);
+mod.moveHash = makeMoveHash(4);
 
 mod.descThumbStretchVals = {
   '1,2' : 1,
