@@ -2,7 +2,8 @@ var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
-  var RHnotes = helpers.makeRHNoteTrellis(midiData);
+  var dataWithStarts = helpers.addStartTimes(midiData);
+  var RHnotes = helpers.makeRHNoteTrellis(dataWithStarts);
   var RHnotesData = helpers.makeRHnotesData(midiData);
 
   //traversing forward, computing costs and leaving our best path trail
@@ -14,10 +15,10 @@ module.exports.FingeringAlgorithm = function(midiData) {
         var prevNode = RHnotes[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
         for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
-          var curNote = curNode.notes[i];
+          var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
           var curFinger = curNode.fingers[i];
           for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
-            var prevNote = prevNode.notes[j];
+            var prevNote = prevNode.notes[j][0];
             var prevFinger = prevNode.fingers[j];
             var transCost = helpers.computeCost(prevNote, curNote, prevFinger, curFinger);
             totalCost += transCost;
@@ -46,13 +47,31 @@ module.exports.FingeringAlgorithm = function(midiData) {
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
     for (var k = 0; k < notes.length; k++) {
-      bestPath.unshift([fingers[k], notes[k]]); //use unshift, because otherwise we'd end up with a reversed fingering.
+      bestPath.unshift([fingers[k], notes[k][0]]); //use unshift, because otherwise we'd end up with a reversed fingering.
     }
     currentNode = nodeObj.bestPrev;
   }
   for (var i = 0; i < bestPath.length; i++) {
     console.log('Note: ' + bestPath[i][1] + ' / Finger: ' + bestPath[i][0]);
   }
-  console.log('bestPath: ', bestPath);
-  console.log('RHnotes: ', RHnotes);
+  // console.log('bestPath: ', bestPath);
+  // helpers.distributePath(bestPath, midiData);
+  console.log(dataWithStarts);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

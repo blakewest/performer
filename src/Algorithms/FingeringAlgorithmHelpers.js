@@ -21,14 +21,14 @@ var endCap = [
 
 var makeNoteNode = function(notes, fingers) {
   //the notes and fingers property can have either one or multiple notes. 
-  this.notes = notes;     //this is an array of notes
+  this.notes = notes;     //this is an array of array pairs, with notes and startTimes.
   this.fingers = fingers; // this is an array of finger options. 
   this.nodeScore = 0;
   this.bestPrev = undefined;
 };
 
 var makeLayer = function(notes) {
-  var sortedNotes = notes.sort(function(a,b) {return a-b});
+  var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
   var layer = [];
   var options = fingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
   for (var i = 0; i < options.length; i++) {
@@ -39,12 +39,16 @@ var makeLayer = function(notes) {
   return layer;
 };
 
+var findNoteHolder = function(curPlaying, note) {
+  for (var i = 0; i < curPlaying.length; i++) {
+    if (curPlaying[i][0] === note) {
+      return i;
+    }
+  }
+};
+
 mod.makeRHNoteTrellis = function(midiData) {
-  //i'll need a 'currentlyPlaying' array, a 'newLayer' array, and a 'lastwasOn' variable that tracks if the last event was a noteOn or noteOff
-  //noteOn event comes in, put the note in currentlyPlaying
-  //noteOff event comes in... 
-  // if 'lastWasOn' is true, then place all currentlyPlaying into newLayer, and remove the noteOff from currentlyPlaying
-  // if 'lastWasOn' is false, then remove that note from currentlyPlaying, and don't push anything to newLayer.
+  // debugger;
   var curPlaying = [];
   var lastWasOn = false;
   var trellis = [];
@@ -55,7 +59,8 @@ mod.makeRHNoteTrellis = function(midiData) {
     var note = eventData.noteNumber;
     var newLayer, notePlace;
     if (note >= 60 && eventData.subtype === 'noteOn') {
-      curPlaying.push(note);
+      var startTime = eventData.startTime;
+      curPlaying.push([note, startTime]);
       lastWasOn = true;
     }
     if (note >= 60 && eventData.subtype === 'noteOff') {
@@ -63,11 +68,11 @@ mod.makeRHNoteTrellis = function(midiData) {
         //must pass it a copy of curPlaying, or else everythang gits all messed up
         newLayer = makeLayer(curPlaying.slice());
         trellis.push(newLayer);
-        notePlace = curPlaying.indexOf(note);
+        notePlace = findNoteHolder(curPlaying, note);
         curPlaying.splice(notePlace, 1);
         lastWasOn = false;
       }else {
-        notePlace = curPlaying.indexOf(note);
+        notePlace = findNoteHolder(curPlaying, note);
         curPlaying.splice(notePlace, 1);
         lastWasOn = false;
       }
@@ -106,3 +111,52 @@ mod.findMin = function(layer) {
   }
   return minNode;
 };
+
+mod.distributePath = function(bestPath, midiData) {
+  var result = [];
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    var note = eventData.noteNumber;
+    if (note >= 60 && eventData.subtype === 'noteOn') {
+      for (var i = 0; i < bestPath.length; i++) {
+        debugger;
+        if (note === bestPath[i][1]) {
+          var finger = bestPath[i][0];
+          result.push([note, finger]);
+          console.log('Note: ' + note + '/ Finger: ' + finger);
+          bestPath.splice(i, 1);
+          break;
+        }
+      }
+    }
+  }
+  return result;
+};
+
+mod.addStartTimes = function(midiData) {
+  //initialize counter variable at zero;
+  //set first item startTime to counter variable. 
+  //increment counter by TicksToNextEvent for either noteOn or noteOff events
+  var curStartTime = 0;
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    if (eventData.subtype === 'noteOff') {
+      curStartTime += eventData.deltaTime;  //deltaTime is really 'ticksToNextEvent'
+    }else if(eventData.subtype === 'noteOn') {
+      eventData.startTime = curStartTime;
+      curStartTime += eventData.deltaTime;
+    }
+  }
+  return midiData;
+};
+
+
+
+
+
+
+
+
+
+
+
