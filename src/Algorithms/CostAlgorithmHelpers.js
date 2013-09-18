@@ -91,11 +91,11 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x) {
   0.03719817227*Math.pow(x,3)+0.4554696705*Math.pow(x,2)-0.08305450359*x+0.3020594956;
   };
 
-  /*if it's above 6.8, but below 10 (current MoveFormula cut off), then we use an additional formula because the current one
+  /*if it's above 6.8, but below moveCutoff, then we use an additional formula because the current one
   has an odd shape to it where it goes sharply negative after 6.8  I know this appears janky, but after messing with other potential 
   regression formulas, I can't get any single one to match both the overall shape, and certainly specific Y values I want. So this seems like best option.
   */
-  if (x > 6.8 && x <= 9) {
+  if (x > 6.8 && x <= params.moveCutoff) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     return costFunc(x);
