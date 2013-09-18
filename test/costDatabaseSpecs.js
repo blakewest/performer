@@ -2,9 +2,9 @@ var should = require('should');
 var db = require('../src/Algorithms/CostAlgorithm.js');
 var _ = require('underscore');
 
-describe('cost database', function() {
+describe('|cost database|', function() {
   var costDb = db.createCostDatabase();
-  describe('Database itself', function() {
+  describe('|Database itself|', function() {
     it('has a length of 193600', function() {
       should(Object.keys(costDb)).have.lengthOf(193600);
     });
@@ -35,7 +35,7 @@ describe('cost database', function() {
     });
   });
 
-  describe('accuracy of ascending or same notes, not involving the thumb', function() {
+  describe('|accuracy of ascending or same notes, not involving the thumb|', function() {
     it('E,G with 3,5 should have lower cost than E,G with 3,2', function() {
       costDb['64,67,3,5'].should.be.below(costDb['64,67,3,2']);
     });
@@ -76,7 +76,7 @@ describe('cost database', function() {
     });
   });
 
-  describe('accuracy of ascending or same notes involving crossing under thumb', function() {
+  describe('|accuracy of ascending or same notes involving crossing under thumb|', function() {
      it('E,F,G,A with 3,1,2,3 should have lower cost than using 3,4,5,5', function() {
         var correctStep1= costDb['64,65,3,1'];
         var correctStep2 = costDb['65,67,1,2'];
@@ -115,7 +115,7 @@ describe('cost database', function() {
       });
    });
 
-  describe('ascending notes involving thumb, but not crossing under', function() {
+  describe('|ascending notes involving thumb, but not crossing under|', function() {
     it('C,F,G,A with 1,3,4,5 should have lower cost than using 1,4,5,5', function() {
       var correctStep1= costDb['60,65,1,3'];
       var correctStep2 = costDb['65,67,3,4'];
@@ -147,9 +147,24 @@ describe('cost database', function() {
 
       correctPath.should.be.below(wrongPath);
     });
+    it('C, up to A, then High C, with 1, 3, 5, should have lower cost than 1,5,5,', function() {
+      var correctStep1= costDb['60,69,1,3'];
+      var correctStep2 = costDb['69,72,3,5'];
+      var wrongStep1 = costDb['60,69,1,5'];
+      var wrongStep2 = costDb['69,72,5,5'];
+      var wrongPath = wrongStep1 + wrongStep2;
+      var correctPath = correctStep1 + correctStep2;
+
+      console.log('correctStep1: ', correctStep1);
+      console.log('correctStep2: ', correctStep2);
+      console.log('wrongStep1: ', wrongStep1);
+      console.log('wrongStep2: ', wrongStep2);
+
+      correctPath.should.be.below(wrongPath);
+    });
   });
 
-  describe('descending notes involving crossing over thumb', function() {
+  describe('|descending notes involving crossing over thumb|', function() {
     it('C down to B with 1,2 should have lower cost than using 1,3', function() {
       var correctStep1= costDb['60,59,1,2'];
       var wrongStep1 = costDb['60,59,1,3'];
@@ -209,7 +224,7 @@ describe('cost database', function() {
       correctPath.should.be.below(wrongPath);
     });
   });
-  describe('ascending and descending notes, not involving thumb', function() {
+  describe('|ascending and descending notes, not involving thumb|', function() {
     it ('E up A down G with 2,5,4 should have lower cost than using 2,5,3', function() {
       var correctStep1= costDb['64,69,2,5'];
       var correctStep2 = costDb['69,67,5,4'];
@@ -241,7 +256,7 @@ describe('cost database', function() {
       correctPath.should.be.below(wrongPath);
     });
   });
-  describe('ascending and descending with thumb', function() {
+  describe('|ascending and descending with thumb|', function() {
     it ('D down C down B up C with 2,1,2,1 should have lower cost than using 2,1,1,1', function() {
       var correctStep1= costDb['62,60,2,1'];
       var correctStep2 = costDb['60,59,1,2'];
@@ -267,7 +282,7 @@ describe('cost database', function() {
       correctPath.should.be.below(wrongPath);
     });
   });
-  describe('testing scale fingerings', function() {
+  describe('|testing scale fingerings|', function() {
     it ('C major ascending scale with 1,2,3,1,2,3,4,5 should be lower cost than 1,2,3,4,1,2,3', function() {
       var correctStep1= costDb['60,62,1,2'];
       var correctStep2 = costDb['62,64,2,3'];
