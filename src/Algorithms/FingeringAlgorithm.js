@@ -6,14 +6,23 @@ module.exports.FingeringAlgorithm = function(midiData) {
   var RHnotesData = helpers.makeRHnotesData(midiData);
 
   //traversing forward, computing costs and leaving our best path trail
-  for (var layer = 1; layer < RHnotes.length; layer++) {
-    for (var node1 = 0; node1 < 5 ; node1++) {
-      var min = Infinity;
-      for (var node2 = 0; node2 < 5; node2++) {
+  for (var layer = 1; layer < RHnotes.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
+    for (var node1 = 0; node1 < 5 ; node1++) {               //go through each node in each layer
+      var min = Infinity;                 
+      for (var node2 = 0; node2 < 5; node2++) {               //go through each node in prev layer.
         var curNode = RHnotes[layer][node1];
         var prevNode = RHnotes[layer-1][node2];
-        var transCost = helpers.computeCost(prevNode.note, curNode.note, prevNode.finger, curNode.finger);
-        var totalCost = transCost + prevNode.nodeScore;
+        var totalCost = prevNode.nodeScore || 0;
+        for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
+          var curNote = curNode.notes[i];
+          var curFinger = curNode.fingers[i];
+          for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
+            var prevNote = prevNode.notes[j];
+            var prevFinger = prevNode.fingers[j];
+            var transCost = helpers.computeCost(prevNote, curNote, prevFinger, curFinger);
+            totalCost += transCost;
+          }
+        }
         if (totalCost < min) {
           min = totalCost;
           curNode.nodeScore = totalCost;

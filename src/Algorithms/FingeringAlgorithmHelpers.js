@@ -3,7 +3,8 @@ var mod = module.exports;
 
 mod.notes = {0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F', 6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'};
 
-var polyPhonicOptions = {
+var fingerOptions = {
+  '1': [[1], [2], [3], [4], [5]],
   '2': [[1,2], [1,3], [1,4], [1,5], [2,3], [2,4], [2,5], [3,4], [3,5], [4,5]],
   '3': [[1,2,3], [1,2,4], [1,2,5], [1,3,4], [1,3,5], [1,4,5], [2,3,4], [2,3,5], [2,4,5], [3,4,5]],
   '4': [[1,2,3,4], [1,2,3,5], [1,2,4,5], [1,3,4,5], [2,3,4,5]],
@@ -20,48 +21,24 @@ var endCap = [
 
 var makeNoteNode = function(notes, fingers) {
   //the notes and fingers property can have either one or multiple notes. 
-  this.notes = notes;
-  this.fingers = fingers;
+  this.notes = notes;     //this is an array of notes
+  this.fingers = fingers; // this is an array of finger options. 
   this.nodeScore = 0;
   this.bestPrev = undefined;
 };
 
-var makeLayer = function(noteNumber) {
+var makeLayer = function(noteNumbers) {
+  var sortedNotes = noteNumbers.sort(function(a,b) {return a-b});
   var layer = [];
-  for (var finger = 1; finger <= 5; finger++) {
-    var node = new makeNoteNode(noteNumber, finger);
-    layer.push(node);
-  }
-  return layer;
-};
-
-var makePolyPhonicLayer = function(noteNumbers) {
-  var layer = [];
-  var options = polyPhonicOptions[noteNumbers.length]; // this grabs the appropriate list of options. 
+  var options = polyPhonicOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
   for (var i = 0; i < options.length; i++) {
     var fingerChoice = options[i];
-    var node = makeNoteNode(noteNumbers, fingerChoice);
+    var node = makeNoteNode(sortedNotes, fingerChoice);
     layer.push(node);
   }
 };
 
-mod.makeRHNoteTrellis = function(midiData) {
-  var curPlaying = [];
-  var trellis = [];
-  //putting the endCap at the beginning is a convenience so we don't have to have special conditions in the traversal loop.
-  trellis.push(endCap);
-  for (var pair = 0; pair < midiData.length; pair++) {
-    var eventData = midiData[pair][0].event;
-    var note = eventData.noteNumber;
-    if (eventData.noteNumber >= 60 && eventData.subtype === 'noteOn') {
-      var layer = makeLayer(note);
-      trellis.push(layer);
-    }
-  }
-  return trellis;
-};
-
-mode.makeRHPolyNoteTrellis = function(midiData) {
+mode.makeRHTrellis = function(midiData) {
   //i'll need a 'currentlyPlaying' array, a 'newLayer' array, and a 'lastwasOn' variable that tracks if the last event was a noteOn or noteOff
   //noteOn event comes in, put the note in currentlyPlaying
   //noteOff event comes in... 
