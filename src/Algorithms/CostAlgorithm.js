@@ -9,7 +9,7 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
   //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
   if (Math.abs(n2 - n1) > 0 && f2-f1 === 0) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2);
   }
   //handles ascending notes and descending fingers, but f2 isn't thumb
   //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
@@ -38,7 +38,7 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
     if (x > params.moveCutoff) {
       costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
     }else{
-      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x);
+      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
     }
   }
 

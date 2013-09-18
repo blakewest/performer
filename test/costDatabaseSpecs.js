@@ -113,6 +113,16 @@ describe('|cost database|', function() {
 
         correctPath.should.be.below(wrongPath);
       });
+     it('C,C#,D with 1,2,1 should have lower cost than using 1,1,1', function() {
+        var correctStep1= costDb['60,61,1,2'];
+        var correctStep2 = costDb['61,62,2,1'];
+        var wrongStep1= costDb['60,61,1,1'];
+        var wrongStep2 = costDb['61,62,1,1'];
+        var wrongPath = wrongStep1 + wrongStep2;
+        var correctPath = correctStep1 + correctStep2;
+
+        correctPath.should.be.below(wrongPath);
+      });
    });
 
   describe('|ascending notes involving thumb, but not crossing under|', function() {
@@ -147,18 +157,35 @@ describe('|cost database|', function() {
 
       correctPath.should.be.below(wrongPath);
     });
-    it('C, up to A, then High C, with 1, 3, 5, should have lower cost than 1,5,5,', function() {
-      var correctStep1= costDb['60,69,1,3'];
-      var correctStep2 = costDb['69,72,3,5'];
-      var wrongStep1 = costDb['60,69,1,5'];
-      var wrongStep2 = costDb['69,72,5,5'];
-      var wrongPath = wrongStep1 + wrongStep2;
-      var correctPath = correctStep1 + correctStep2;
+    it('E, C, C, D, Eb, E, C with 1, 5, 1, 2, 3, 3, 1 should have lower cost than 1,5,5,4,5,5,3', function() {
+      var correctStep6= costDb['64,72,1,5'];
+      var correctStep1= costDb['72,72,5,1'];
+      var correctStep2 = costDb['72,74,1,2'];
+      var correctStep3 = costDb['74,75,2,3'];
+      var correctStep4 = costDb['75,76,3,3'];
+      var correctStep5 = costDb['76,72,3,1'];
+
+      var wrongStep6= costDb['64,72,1,5'];
+      var wrongStep1= costDb['72,72,5,5'];
+      var wrongStep2 = costDb['72,74,5,4'];
+      var wrongStep3 = costDb['74,75,4,5'];
+      var wrongStep4 = costDb['75,76,5,5'];
+      var wrongStep5 = costDb['76,72,5,3'];
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5;
+      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + wrongStep6;
 
       console.log('correctStep1: ', correctStep1);
       console.log('correctStep2: ', correctStep2);
+      console.log('correctStep3: ', correctStep3);
+      console.log('correctStep4: ', correctStep4);
+      console.log('correctStep5: ', correctStep5);
+
       console.log('wrongStep1: ', wrongStep1);
       console.log('wrongStep2: ', wrongStep2);
+      console.log('wrongStep3: ', wrongStep3);
+      console.log('wrongStep4: ', wrongStep4);
+      console.log('wrongStep5: ', wrongStep5);
+
 
       correctPath.should.be.below(wrongPath);
     });

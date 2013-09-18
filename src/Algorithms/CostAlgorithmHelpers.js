@@ -6,18 +6,28 @@ var ThumbCrossCostFunc = function(x) {
  3.884106308*Math.pow(x,3) - 6.723075747*Math.pow(x,2) + 1.581196785*x + 7.711241722;
 };
 
-var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD) {
+var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
   //This is for situations where direction of notes and fingers are opposite, because either way, you want to add the distance between the fingers.
 
   //the Math.ceil part is so it def hits a value in our moveHash. This could be fixed if I put more resolution into the moveHash
   var totalD = Math.ceil(noteD + fingD);
+  var cost;
 
   //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
   if (totalD > 24) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
-    return params.moveHash[totalD];
+    cost = params.moveHash[totalD];
+    //moving up to a black note from a white note is extra expensive with the same finger.
+    if (fingD === 0 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
+      cost += 4;
+    }
+    //moving from black to white with the same finger is a slide. That's pretty easy and gets used all the time. So reducing cost a bit.
+    else if (fingD === 0 && params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
+      cost -= 2;
+    }
   }
+  return cost;
 };
 
 mod.descMoveFormula = function(noteD,fingD) {
@@ -84,12 +94,13 @@ mod.fingerStretch = function(f1,f2) {
   return params.fingStretch[key];
 };
 
-mod.ascDescNoCrossCost = function(noteD,fingD,x) {
+mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
   var costFunc = function(x) {
     return  -0.0000006589793725*Math.pow(x,10) -0.000002336381414*Math.pow(x,9) +0.00009925769823*Math.pow(x,8)+
   0.0001763353131*Math.pow(x,7)-0.004660305277*Math.pow(x,6)-0.004290746384*Math.pow(x,5)+0.06855725903*Math.pow(x,4)+
   0.03719817227*Math.pow(x,3)+0.4554696705*Math.pow(x,2)-0.08305450359*x+0.3020594956;
   };
+  var cost;
 
   /*if it's above 6.8, but below moveCutoff, then we use an additional formula because the current one
   has an odd shape to it where it goes sharply negative after 6.8  I know this appears janky, but after messing with other potential 
@@ -98,6 +109,29 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x) {
   if (x > 6.8 && x <= params.moveCutoff) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
-    return costFunc(x);
+    cost = costFunc(x);
+    if (f2 === 5 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
+      cost += 4;
+    }
+    return cost;
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

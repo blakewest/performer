@@ -33,6 +33,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
       }
     }
   }
+  console.log('RH notes: ', RHnotes);
 
   /*Now we need to go backwards and collect the best path.
   the currentNode variable is initialized to be the lowest score of the final layer.*/
