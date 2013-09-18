@@ -3,6 +3,7 @@ var helpers = require('./FingeringAlgorithmHelpers.js');
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
   var RHnotes = helpers.makeRHNoteTrellis(midiData);
+  var RHnotesData = helpers.makeRHnotesData(midiData);
 
   //traversing forward, computing costs and leaving our best path trail
   for (var layer = 1; layer < RHnotes.length; layer++) {
@@ -41,4 +42,5 @@ module.exports.FingeringAlgorithm = function(midiData) {
   for (var i = 0; i < bestPath.length; i++) {
     console.log('Note: ' + bestPath[i][1] + ' / Finger: ' + bestPath[i][0]);
   }
+  console.log(RHnotesData);
 };
