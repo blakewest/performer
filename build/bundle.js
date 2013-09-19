@@ -59,97 +59,6 @@ var RHcostDatabase = {};
   return RHcostDatabase;
 };
 
-var LHcostAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
-  var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
-  var noteD = Math.abs(n2-n1);
-  var fingD = helpers.fingerDistance(f1,f2);
-
-  //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
-  //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
-  if (noteD > 0 && f2-f1 === 0) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2);
-  }
-  //handles descending notes and descending fingers, but f2 isn't thumb
-  //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
-  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 !== 1) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
-  }
-  //this handles ascending notes with ascending fingers where f1 isn't thumb
-  //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
-  else if (n2 - n1 > 0 && f2-f1 > 0 && f1 !== 1){
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
-  }
-  //this handles descending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
-  //Thus bringing your thumb under. 
-  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 === 1) {
-    costDatabase[key] = helpers.ascThumbCost(noteD,fingD,n1,n2,f1,f2);
-  }
-  //this handles ascending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
-  else if (n2 - n1 >= 0 && f1 === 1 && f2 !== 1) {
-    costDatabase[key] = helpers.descThumbCost(noteD,fingD,n1,n2,f1,f2);
-  }
-  //this handles ascending or same note, with descending fingers or it takes descending notes with ascending fingers
-  //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 < 0 || n2-n1 <= 0 && f2-f1 > 0)
-  else {
-    var stretch = helpers.fingerStretch(f1,f2);
-    var x = Math.abs(noteD - fingD) / stretch;
-    if (x > params.moveCutoff) {
-      costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
-    }else{
-      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
-    }
-  }
-};
-
-var createLHCostDatabase = module.exports.createLHCostDatabase = function() {
-  var LHcostDatabase = {};
-  for (var finger1 = 1; finger1 <=5; finger1++) {
-    for (var note1 = 21; note1 < 109; note1++) { // in MIDI land, note 21 is actually the lowest note on the piano, and 109 is the highest.
-      for (var finger2 = 1; finger2 <= 5; finger2++) {
-        for (var note2 = 21; note2 < 109; note2++) {
-          LHcostAlgorithmRouter(note1, note2, finger1, finger2, LHcostDatabase);
-        }
-      }
-    }
-  }
-  return LHcostDatabase;
-};
-
-LHcostAlgorithmRouter(72,72,5,1,{});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 },{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],2:[function(require,module,exports){
 var params = require('./CostAlgorithmParameters.js')
 var mod = module.exports;
@@ -423,7 +332,7 @@ mod.fingStretch = {
 },{}],4:[function(require,module,exports){
 var helpers = require('./FingeringAlgorithmHelpers.js');
 
-module.exports.FingeringAlgorithm = function(midiData) {
+module.exports.RHFingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
   var dataWithStarts = helpers.addStartTimes(midiData);
   var RHnotes = helpers.makeRHNoteTrellis(dataWithStarts);
@@ -460,7 +369,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
           curNode.bestPrev = node2;
         }
       }
-      
+
     }
   }
   console.log('RH notes: ', RHnotes);
@@ -476,6 +385,72 @@ module.exports.FingeringAlgorithm = function(midiData) {
   var bestPathObj = {};
   for (var j = RHnotes.length-1; j > 0; j--) {
     var nodeObj = RHnotes[j][currentNode];
+    var fingers = nodeObj.fingers;
+    var notes = nodeObj.notes;
+    for (var k = 0; k < notes.length; k++) {
+      var note = notes[k][0];
+      var startTime = notes[k][1];
+      var finger = fingers[k];
+      var key = note + ',' + startTime;
+      bestPathObj[key] = finger;
+    }
+    currentNode = nodeObj.bestPrev;
+  }
+  helpers.distributePath(bestPathObj, dataWithStarts);
+};
+
+module.exports.FingeringAlgorithm = function(midiData) {
+ //this whole thing is an example of Viterbi's algorithm, if you're curious.
+  var dataWithStarts = helpers.addStartTimes(midiData);
+  var LHnotes = helpers.makeLHNoteTrellis(dataWithStarts);
+
+  //traversing forward, computing costs and leaving our best path trail
+  for (var layer = 1; layer < LHnotes.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
+    for (var node1 = 0; node1 < LHnotes[layer].length ; node1++) {               //go through each node in each layer
+      var min = Infinity;                 
+      for (var node2 = 0; node2 < LHnotes[layer-1].length; node2++) {               //go through each node in prev layer.
+        var curNode = LHnotes[layer][node1];
+        var prevNode = LHnotes[layer-1][node2];
+        var totalCost = prevNode.nodeScore || 0;
+        for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
+          var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
+          var curFinger = curNode.fingers[i];
+          var hasNextNote = curNode.notes[i+1] || false;
+          var nextFinger = curNode.fingers[i+1];
+          if(hasNextNote) {
+            //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+            totalCost += helpers.computeCost(curNote, hasNextNote[0], curFinger, nextFinger);
+          }
+          for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
+            var prevNote = prevNode.notes[j][0];
+            var prevFinger = prevNode.fingers[j];
+
+            var transCost = helpers.computeLHCost(prevNote, curNote, prevFinger, curFinger);
+            totalCost += transCost;
+          }
+        }
+        if (totalCost < min) {
+          min = totalCost;
+          curNode.nodeScore = totalCost;
+          curNode.bestPrev = node2;
+        }
+      }
+      
+    }
+  }
+  console.log('LH notes: ', LHnotes);
+
+  /*Now we need to go backwards and collect the best path.
+  the currentNode variable is initialized to be the lowest score of the final layer.*/
+  var currentNode = helpers.findMin(LHnotes[LHnotes.length-1]);
+
+  /*from this point, we put the finger for that node in the array, then we track back to it's
+  best previous node, record it's finger, and repeat till we get to the end.
+  also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
+  since zero is just our start object.*/
+  var bestPathObj = {};
+  for (var j = LHnotes.length-1; j > 0; j--) {
+    var nodeObj = LHnotes[j][currentNode];
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
     for (var k = 0; k < notes.length; k++) {
@@ -506,9 +481,10 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
 
 
-
 },{"./FingeringAlgorithmHelpers.js":5}],5:[function(require,module,exports){
-var costDb = require('./CostAlgorithm.js').createCostDatabase();
+var RHcostDb = require('./CostAlgorithm.js').createCostDatabase();
+var LHcostDb = require('./LHCostAlgorithm.js').createLHCostDatabase();
+
 var mod = module.exports;
 
 mod.notes = {0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F', 6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'};
@@ -519,6 +495,14 @@ var fingerOptions = {
   3: [[1,2,3], [1,2,4], [1,2,5], [1,3,4], [1,3,5], [1,4,5], [2,3,4], [2,3,5], [2,4,5], [3,4,5]],
   4: [[1,2,3,4], [1,2,3,5], [1,2,4,5], [1,3,4,5], [2,3,4,5]],
   5: [[1,2,3,4,5]]
+};
+
+var LHfingerOptions = {
+  1: [[5], [4], [3], [2], [1]],
+  2: [[5,4], [5,3], [5,2], [5,1], [4,3], [4,2], [4,1], [3,2], [3,1], [2,1]],
+  3: [[5,4,3], [5,4,2], [5,4,1], [5,3,2], [5,3,1], [5,2,1], [4,3,2], [4,3,1], [4,2,1], [3,2,1]],
+  4: [[5,4,3,2], [5,4,3,1], [5,4,2,1], [5,3,2,1], [4,3,2,1]],
+  5: [[5,4,3,2,1]]
 };
 
 var endCap = [
@@ -541,6 +525,18 @@ var makeLayer = function(notes) {
   var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
   var layer = [];
   var options = fingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
+  for (var i = 0; i < options.length; i++) {
+    var fingerChoice = options[i];
+    var node = new makeNoteNode(sortedNotes, fingerChoice);
+    layer.push(node);
+  }
+  return layer;
+};
+
+var makeLHLayer = function(notes) {
+  var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
+  var layer = [];
+  var options = LHfingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
   for (var i = 0; i < options.length; i++) {
     var fingerChoice = options[i];
     var node = new makeNoteNode(sortedNotes, fingerChoice);
@@ -591,6 +587,40 @@ mod.makeRHNoteTrellis = function(midiData) {
   return trellis;
 };
 
+mod.makeLHNoteTrellis = function(midiData) {
+  // debugger;
+  var curPlaying = [];
+  var lastWasOn = false;
+  var trellis = [];
+  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
+
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    var note = eventData.noteNumber;
+    var newLayer, notePlace;
+    if (note <= 60 && eventData.subtype === 'noteOn') {
+      var startTime = eventData.startTime;
+      curPlaying.push([note, startTime]);
+      lastWasOn = true;
+    }
+    if (note <= 60 && eventData.subtype === 'noteOff') {
+      if (lastWasOn) {
+        //must pass it a copy of curPlaying, or else everythang gits all messed up
+        newLayer = makeLHLayer(curPlaying.slice());
+        trellis.push(newLayer);
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }else {
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }
+    }
+  }
+  return trellis;
+};
+
 mod.makeRHnotesData = function(midiData) {
   var noteData = [];
   for (var pair = 0; pair < midiData.length; pair++) {
@@ -607,7 +637,15 @@ mod.computeCost = function(n1,n2,f1,f2) {
     return 0;
   }
   var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
-  return costDb[key];
+  return RHcostDb[key];
+};
+
+mod.computeLHCost = function(n1,n2,f1,f2) {
+  if (n1 === 'endCap' || n2 === 'endCap') {
+    return 0;
+  }
+  var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
+  return LHcostDb[key];
 };
 
 mod.findMin = function(layer) {
@@ -627,7 +665,7 @@ mod.distributePath = function(bestPathObj, midiData) {
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
-    if (note >= 60 && eventData.subtype === 'noteOn') {
+    if (note <= 60 && eventData.subtype === 'noteOn') {
       var startTime = eventData.startTime;
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
@@ -665,7 +703,66 @@ mod.addStartTimes = function(midiData) {
 
 
 
-},{"./CostAlgorithm.js":1}],6:[function(require,module,exports){
+},{"./CostAlgorithm.js":1,"./LHCostAlgorithm.js":6}],6:[function(require,module,exports){
+var params = require('./CostAlgorithmParameters.js');
+var helpers = require('./CostAlgorithmHelpers.js');
+
+var LHcostAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
+  var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
+  var noteD = Math.abs(n2-n1);
+  var fingD = helpers.fingerDistance(f1,f2);
+
+  //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
+  if (noteD > 0 && f2-f1 === 0) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2);
+  }
+  //handles descending notes and descending fingers, but f2 isn't thumb
+  //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
+  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 !== 1) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+  }
+  //this handles ascending notes with ascending fingers where f1 isn't thumb
+  //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
+  else if (n2 - n1 > 0 && f2-f1 > 0 && f1 !== 1){
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+  }
+  //this handles descending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
+  //Thus bringing your thumb under. 
+  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 === 1) {
+    costDatabase[key] = helpers.ascThumbCost(noteD,fingD,n1,n2,f1,f2);
+  }
+  //this handles ascending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  else if (n2 - n1 >= 0 && f1 === 1 && f2 !== 1) {
+    costDatabase[key] = helpers.descThumbCost(noteD,fingD,n1,n2,f1,f2);
+  }
+  //this handles ascending or same note, with descending fingers or it takes descending notes with ascending fingers
+  //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 < 0 || n2-n1 <= 0 && f2-f1 > 0)
+  else {
+    var stretch = helpers.fingerStretch(f1,f2);
+    var x = Math.abs(noteD - fingD) / stretch;
+    if (x > params.moveCutoff) {
+      costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
+    }else{
+      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
+    }
+  }
+};
+
+var createLHCostDatabase = module.exports.createLHCostDatabase = function() {
+  var LHcostDatabase = {};
+  for (var finger1 = 1; finger1 <=5; finger1++) {
+    for (var note1 = 21; note1 < 109; note1++) { // in MIDI land, note 21 is actually the lowest note on the piano, and 109 is the highest.
+      for (var finger2 = 1; finger2 <= 5; finger2++) {
+        for (var note2 = 21; note2 < 109; note2++) {
+          LHcostAlgorithmRouter(note1, note2, finger1, finger2, LHcostDatabase);
+        }
+      }
+    }
+  }
+  return LHcostDatabase;
+};
+},{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],7:[function(require,module,exports){
 var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
 var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
 var RightHand = require('./Visuals/Hand/RightHand.js').RightHand;
@@ -832,7 +929,7 @@ module.exports.App = function() {
 
 
 
-},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/RightHand.js":13,"./Visuals/Piano/Keyboard.js":16,"./Visuals/Piano/KeyboardDesign.js":17,"./Visuals/Scene.js":19}],7:[function(require,module,exports){
+},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/RightHand.js":14,"./Visuals/Piano/Keyboard.js":17,"./Visuals/Piano/KeyboardDesign.js":18,"./Visuals/Scene.js":20}],8:[function(require,module,exports){
 var App = require('./App.js').App;
 $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
@@ -842,7 +939,7 @@ $(document).on('ready', function() {
 
 
 
-},{"./App.js":6}],8:[function(require,module,exports){
+},{"./App.js":7}],9:[function(require,module,exports){
 module.exports.Finger = function() {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
@@ -864,7 +961,7 @@ module.exports.Finger = function() {
     }
   };
 };
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports.HandDesign = function() {
   //pinky specs
   this.pinkyWidth = 0.185;
@@ -898,7 +995,7 @@ module.exports.HandDesign = function() {
 
   this.keyboardHeight = 0.22;
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var IndexFinger = module.exports.IndexFinger = function(handInfo) {
@@ -913,7 +1010,7 @@ var IndexFinger = module.exports.IndexFinger = function(handInfo) {
 
 IndexFinger.prototype = Object.create(Finger.prototype);
 IndexFinger.prototype.constructor = IndexFinger;
-},{"./Finger.js":8}],11:[function(require,module,exports){
+},{"./Finger.js":9}],12:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
@@ -928,7 +1025,7 @@ var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
 
 MiddleFinger.prototype = Object.create(Finger.prototype);
 MiddleFinger.prototype.constructor = MiddleFinger;
-},{"./Finger.js":8}],12:[function(require,module,exports){
+},{"./Finger.js":9}],13:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Pinky = module.exports.Pinky = function(handInfo) {
@@ -944,7 +1041,7 @@ var Pinky = module.exports.Pinky = function(handInfo) {
 Pinky.prototype = Object.create(Finger.prototype);
 Pinky.prototype.constructor = Pinky;
 
-},{"./Finger.js":8}],13:[function(require,module,exports){
+},{"./Finger.js":9}],14:[function(require,module,exports){
 var Pinky = require('./Pinky.js').Pinky;
 var RingFinger = require('./RingFinger.js').RingFinger;
 var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
@@ -1004,7 +1101,7 @@ module.exports.RightHand = function() {
   };
 
 };
-},{"./HandDesign.js":9,"./IndexFinger.js":10,"./MiddleFinger.js":11,"./Pinky.js":12,"./RingFinger.js":14,"./Thumb.js":15}],14:[function(require,module,exports){
+},{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":12,"./Pinky.js":13,"./RingFinger.js":15,"./Thumb.js":16}],15:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var RingFinger = module.exports.RingFinger = function(handInfo) {
@@ -1019,7 +1116,7 @@ var RingFinger = module.exports.RingFinger = function(handInfo) {
 
 RingFinger.prototype = Object.create(Finger.prototype);
 RingFinger.prototype.constructor = RingFinger;
-},{"./Finger.js":8}],15:[function(require,module,exports){
+},{"./Finger.js":9}],16:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Thumb = module.exports.Thumb = function(handInfo) {
@@ -1034,7 +1131,7 @@ var Thumb = module.exports.Thumb = function(handInfo) {
 
 module.exports.Thumb.prototype = Object.create(Finger.prototype);
 module.exports.Thumb.prototype.constructor = Thumb;
-},{"./Finger.js":8}],16:[function(require,module,exports){
+},{"./Finger.js":9}],17:[function(require,module,exports){
 var PianoKey = require("./PianoKey.js").PianoKey;
 
 module.exports.Keyboard = function(keyboardDesign) {
@@ -1069,7 +1166,7 @@ module.exports.Keyboard = function(keyboardDesign) {
     }
   };
 };
-},{"./PianoKey.js":18}],17:[function(require,module,exports){
+},{"./PianoKey.js":19}],18:[function(require,module,exports){
 module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
@@ -1200,7 +1297,7 @@ module.exports.KeyboardDesign = function() {
 
 
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
@@ -1247,7 +1344,7 @@ PianoKey.prototype.update = function() {
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
 };
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports.Scene = function(container) {
   var $container = $(container);
   var width = $container.width();
@@ -1312,5 +1409,5 @@ module.exports.Scene = function(container) {
     _this.renderer.render(_this.scene, _this.camera);
   };
 };
-},{}]},{},[7])
+},{}]},{},[8])
 ;
