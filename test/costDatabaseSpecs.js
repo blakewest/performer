@@ -2,7 +2,7 @@ var should = require('should');
 var db = require('../src/Algorithms/CostAlgorithm.js');
 var _ = require('underscore');
 
-describe('|cost database|', function() {
+describe('|RH cost database|', function() {
   var costDb = db.createCostDatabase();
   describe('|Database itself|', function() {
     it('has a length of 193600', function() {
@@ -171,21 +171,8 @@ describe('|cost database|', function() {
       var wrongStep3 = costDb['74,75,4,5'];
       var wrongStep4 = costDb['75,76,5,5'];
       var wrongStep5 = costDb['76,72,5,3'];
-      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5;
-      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 + wrongStep6;
-
-      console.log('correctStep1: ', correctStep1);
-      console.log('correctStep2: ', correctStep2);
-      console.log('correctStep3: ', correctStep3);
-      console.log('correctStep4: ', correctStep4);
-      console.log('correctStep5: ', correctStep5);
-
-      console.log('wrongStep1: ', wrongStep1);
-      console.log('wrongStep2: ', wrongStep2);
-      console.log('wrongStep3: ', wrongStep3);
-      console.log('wrongStep4: ', wrongStep4);
-      console.log('wrongStep5: ', wrongStep5);
-
+      var wrongPath = wrongStep1 + wrongStep2 + wrongStep3 + wrongStep4 + wrongStep5 + + wrongStep6;
+      var correctPath = correctStep1 + correctStep2 + correctStep3 + correctStep4 + correctStep5 + correctStep6 ;
 
       correctPath.should.be.below(wrongPath);
     });
