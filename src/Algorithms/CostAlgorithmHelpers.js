@@ -6,7 +6,20 @@ var ThumbCrossCostFunc = function(x) {
  3.884106308*Math.pow(x,3) - 6.723075747*Math.pow(x,2) + 1.581196785*x + 7.711241722;
 };
 
-var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
+var colorRules = function(n1,n2,f1,f2, fingD) {
+  //if you're moving up from white to black with pinky or thumb, that's much harder than white-to-white would be. So we're adding some amount.
+  if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
+    if (f2 === 5 || f2 === 1) {return 4;} //using thumb or pinky on black is extra expensive
+    if (fingD === 0) {return 4;} //using same finger is extra expensive
+  }
+  if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
+    if (f1 === 5 || f1 === 1) {return 4;} //moving from thumb or pinky that's already on black is extra expensive
+    if (fingD === 0) {return -1;} //moving black to white with same finger is a slide. That's easy and common. reduce slightly.
+  }
+  return 0; //if none of the rules apply, then don't add or subtract anything
+};
+
+var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
   //This is for situations where direction of notes and fingers are opposite, because either way, you want to add the distance between the fingers.
 
   //the Math.ceil part is so it def hits a value in our moveHash. This could be fixed if I put more resolution into the moveHash
@@ -18,27 +31,23 @@ var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
     cost = params.moveHash[totalD];
-    //moving up to a black note from a white note is extra expensive with the same finger.
-    if (fingD === 0 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-      cost += 4;
-    }
-    //moving from black to white with the same finger is a slide. That's pretty easy and gets used all the time. So reducing cost a bit.
-    else if (fingD === 0 && params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-      cost -= 1;
-    }
+    cost += colorRules(n1,n2,f1,f2,fingD);
+    return cost;
   }
-  return cost;
 };
 
-mod.descMoveFormula = function(noteD,fingD) {
+mod.descMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
   //this is for situations where direction of notes and fingers is the same. You want to subtract finger distance in that case.
   var totalD = Math.ceil(noteD - fingD);
+  var cost;
 
   //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
   if (totalD > 24) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
-    return params.moveHash[totalD];
+    cost = params.moveHash[totalD];
+    cost += colorRules(n1,n2,f1,f2,fingD);
+    return cost;
   }
 };
 
@@ -56,11 +65,11 @@ mod.ascThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-    var y = ThumbCrossCostFunc(x);
+    var cost = ThumbCrossCostFunc(x);
     if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-      y += 8;
+      cost += 8;
     }
-    return y;
+    return cost;
   }
 };
 
@@ -71,11 +80,11 @@ mod.descThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-    var y = ThumbCrossCostFunc(x);
+    var cost = ThumbCrossCostFunc(x);
     if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-      y += 8;
+      cost += 8;
     }
-    return y;
+    return cost;
   }
 };
 
@@ -110,10 +119,7 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     cost = costFunc(x);
-    //if you're moving up white to black with pinky, that's much harder than white-to-white would be. So we're adding some amount.
-    if (f2 === 5 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-      cost += 4;
-    }
+    cost += colorRules(n1,n2,f1,f2);
     return cost;
   }
 };

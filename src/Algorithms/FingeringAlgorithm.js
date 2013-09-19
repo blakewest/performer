@@ -37,6 +37,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
           curNode.bestPrev = node2;
         }
       }
+      
     }
   }
   console.log('RH notes: ', RHnotes);
