@@ -15,12 +15,12 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
   //handles ascending notes and descending fingers, but f2 isn't thumb
   //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
   else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 !== 1) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2,f1,f2);
   }
   //this handles descending notes with ascending fingers where f1 isn't thumb
   //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
   else if (n2 - n1 < 0 && f2-f1 > 0 && f1 !== 1){
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2,f1,f2);
   }
   //this handles ascending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
   //Thus bringing your thumb under. 
@@ -37,7 +37,7 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
     var stretch = helpers.fingerStretch(f1,f2);
     var x = Math.abs(noteD - fingD) / stretch;
     if (x > params.moveCutoff) {
-      costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
+      costDatabase[key] = helpers.descMoveFormula(noteD,fingD,n1,n2,f1,f2);
     }else{
       costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
     }
@@ -46,20 +46,76 @@ var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
 };
 
 var createCostDatabase = module.exports.createCostDatabase = function() {
-var costDatabase = {};
+var RHcostDatabase = {};
   for (var finger1 = 1; finger1 <=5; finger1++) {
     for (var note1 = 21; note1 < 109; note1++) { // in MIDI land, note 21 is actually the lowest note on the piano, and 109 is the highest.
       for (var finger2 = 1; finger2 <= 5; finger2++) {
         for (var note2 = 21; note2 < 109; note2++) {
-          costAlgorithmRouter(note1, note2, finger1, finger2, costDatabase);
+          costAlgorithmRouter(note1, note2, finger1, finger2, RHcostDatabase);
         }
       }
     }
   }
-  return costDatabase;
+  return RHcostDatabase;
 };
 
+var LHcostAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
+  var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
+  var noteD = Math.abs(n2-n1);
+  var fingD = helpers.fingerDistance(f1,f2);
 
+  //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
+  if (noteD > 0 && f2-f1 === 0) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2);
+  }
+  //handles descending notes and descending fingers, but f2 isn't thumb
+  //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
+  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 !== 1) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+  }
+  //this handles ascending notes with ascending fingers where f1 isn't thumb
+  //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
+  else if (n2 - n1 > 0 && f2-f1 > 0 && f1 !== 1){
+    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+  }
+  //this handles descending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
+  //Thus bringing your thumb under. 
+  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 === 1) {
+    costDatabase[key] = helpers.ascThumbCost(noteD,fingD,n1,n2,f1,f2);
+  }
+  //this handles ascending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  else if (n2 - n1 >= 0 && f1 === 1 && f2 !== 1) {
+    costDatabase[key] = helpers.descThumbCost(noteD,fingD,n1,n2,f1,f2);
+  }
+  //this handles ascending or same note, with descending fingers or it takes descending notes with ascending fingers
+  //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 < 0 || n2-n1 <= 0 && f2-f1 > 0)
+  else {
+    var stretch = helpers.fingerStretch(f1,f2);
+    var x = Math.abs(noteD - fingD) / stretch;
+    if (x > params.moveCutoff) {
+      costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
+    }else{
+      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
+    }
+  }
+};
+
+var createLHCostDatabase = module.exports.createLHCostDatabase = function() {
+  var LHcostDatabase = {};
+  for (var finger1 = 1; finger1 <=5; finger1++) {
+    for (var note1 = 21; note1 < 109; note1++) { // in MIDI land, note 21 is actually the lowest note on the piano, and 109 is the highest.
+      for (var finger2 = 1; finger2 <= 5; finger2++) {
+        for (var note2 = 21; note2 < 109; note2++) {
+          LHcostAlgorithmRouter(note1, note2, finger1, finger2, LHcostDatabase);
+        }
+      }
+    }
+  }
+  return LHcostDatabase;
+};
+
+LHcostAlgorithmRouter(72,72,5,1,{});
 
 
 
@@ -103,7 +159,20 @@ var ThumbCrossCostFunc = function(x) {
  3.884106308*Math.pow(x,3) - 6.723075747*Math.pow(x,2) + 1.581196785*x + 7.711241722;
 };
 
-var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
+var colorRules = function(n1,n2,f1,f2, fingD) {
+  //if you're moving up from white to black with pinky or thumb, that's much harder than white-to-white would be. So we're adding some amount.
+  if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
+    if (f2 === 5 || f2 === 1) {return 4;} //using thumb or pinky on black is extra expensive
+    if (fingD === 0) {return 4;} //using same finger is extra expensive
+  }
+  if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
+    if (f1 === 5 || f1 === 1) {return 4;} //moving from thumb or pinky that's already on black is extra expensive
+    if (fingD === 0) {return -1;} //moving black to white with same finger is a slide. That's easy and common. reduce slightly.
+  }
+  return 0; //if none of the rules apply, then don't add or subtract anything
+};
+
+var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
   //This is for situations where direction of notes and fingers are opposite, because either way, you want to add the distance between the fingers.
 
   //the Math.ceil part is so it def hits a value in our moveHash. This could be fixed if I put more resolution into the moveHash
@@ -115,27 +184,23 @@ var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
     cost = params.moveHash[totalD];
-    //moving up to a black note from a white note is extra expensive with the same finger.
-    if (fingD === 0 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-      cost += 4;
-    }
-    //moving from black to white with the same finger is a slide. That's pretty easy and gets used all the time. So reducing cost a bit.
-    else if (fingD === 0 && params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-      cost -= 1;
-    }
+    cost += colorRules(n1,n2,f1,f2,fingD);
+    return cost;
   }
-  return cost;
 };
 
-mod.descMoveFormula = function(noteD,fingD) {
+mod.descMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
   //this is for situations where direction of notes and fingers is the same. You want to subtract finger distance in that case.
   var totalD = Math.ceil(noteD - fingD);
+  var cost;
 
   //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
   if (totalD > 24) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
-    return params.moveHash[totalD];
+    cost = params.moveHash[totalD];
+    cost += colorRules(n1,n2,f1,f2,fingD);
+    return cost;
   }
 };
 
@@ -153,11 +218,11 @@ mod.ascThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-    var y = ThumbCrossCostFunc(x);
+    var cost = ThumbCrossCostFunc(x);
     if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-      y += 8;
+      cost += 8;
     }
-    return y;
+    return cost;
   }
 };
 
@@ -168,11 +233,11 @@ mod.descThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
-    var y = ThumbCrossCostFunc(x);
+    var cost = ThumbCrossCostFunc(x);
     if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-      y += 8;
+      cost += 8;
     }
-    return y;
+    return cost;
   }
 };
 
@@ -207,10 +272,7 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
     return costFunc(6.8) + ((x-6.8) *3 );
   }else{
     cost = costFunc(x);
-    //if you're moving up white to black with pinky, that's much harder than white-to-white would be. So we're adding some amount.
-    if (f2 === 5 && params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-      cost += 4;
-    }
+    cost += colorRules(n1,n2,f1,f2);
     return cost;
   }
 };
@@ -398,6 +460,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
           curNode.bestPrev = node2;
         }
       }
+      
     }
   }
   console.log('RH notes: ', RHnotes);
