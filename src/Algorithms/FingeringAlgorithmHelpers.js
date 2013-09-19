@@ -1,4 +1,6 @@
-var costDb = require('./CostAlgorithm.js').createCostDatabase();
+var RHcostDb = require('./CostAlgorithm.js').createCostDatabase();
+var LHcostDb = require('./LHCostAlgorithm.js').createLHCostDatabase();
+
 var mod = module.exports;
 
 mod.notes = {0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F', 6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'};
@@ -9,6 +11,14 @@ var fingerOptions = {
   3: [[1,2,3], [1,2,4], [1,2,5], [1,3,4], [1,3,5], [1,4,5], [2,3,4], [2,3,5], [2,4,5], [3,4,5]],
   4: [[1,2,3,4], [1,2,3,5], [1,2,4,5], [1,3,4,5], [2,3,4,5]],
   5: [[1,2,3,4,5]]
+};
+
+var LHfingerOptions = {
+  1: [[5], [4], [3], [2], [1]],
+  2: [[5,4], [5,3], [5,2], [5,1], [4,3], [4,2], [4,1], [3,2], [3,1], [2,1]],
+  3: [[5,4,3], [5,4,2], [5,4,1], [5,3,2], [5,3,1], [5,2,1], [4,3,2], [4,3,1], [4,2,1], [3,2,1]],
+  4: [[5,4,3,2], [5,4,3,1], [5,4,2,1], [5,3,2,1], [4,3,2,1]],
+  5: [[5,4,3,2,1]]
 };
 
 var endCap = [
@@ -31,6 +41,18 @@ var makeLayer = function(notes) {
   var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
   var layer = [];
   var options = fingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
+  for (var i = 0; i < options.length; i++) {
+    var fingerChoice = options[i];
+    var node = new makeNoteNode(sortedNotes, fingerChoice);
+    layer.push(node);
+  }
+  return layer;
+};
+
+var makeLHLayer = function(notes) {
+  var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
+  var layer = [];
+  var options = LHfingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
   for (var i = 0; i < options.length; i++) {
     var fingerChoice = options[i];
     var node = new makeNoteNode(sortedNotes, fingerChoice);
@@ -81,6 +103,40 @@ mod.makeRHNoteTrellis = function(midiData) {
   return trellis;
 };
 
+mod.makeLHNoteTrellis = function(midiData) {
+  // debugger;
+  var curPlaying = [];
+  var lastWasOn = false;
+  var trellis = [];
+  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
+
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    var note = eventData.noteNumber;
+    var newLayer, notePlace;
+    if (note <= 60 && eventData.subtype === 'noteOn') {
+      var startTime = eventData.startTime;
+      curPlaying.push([note, startTime]);
+      lastWasOn = true;
+    }
+    if (note <= 60 && eventData.subtype === 'noteOff') {
+      if (lastWasOn) {
+        //must pass it a copy of curPlaying, or else everythang gits all messed up
+        newLayer = makeLHLayer(curPlaying.slice());
+        trellis.push(newLayer);
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }else {
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }
+    }
+  }
+  return trellis;
+};
+
 mod.makeRHnotesData = function(midiData) {
   var noteData = [];
   for (var pair = 0; pair < midiData.length; pair++) {
@@ -97,7 +153,15 @@ mod.computeCost = function(n1,n2,f1,f2) {
     return 0;
   }
   var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
-  return costDb[key];
+  return RHcostDb[key];
+};
+
+mod.computeLHCost = function(n1,n2,f1,f2) {
+  if (n1 === 'endCap' || n2 === 'endCap') {
+    return 0;
+  }
+  var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
+  return LHcostDb[key];
 };
 
 mod.findMin = function(layer) {
@@ -117,7 +181,7 @@ mod.distributePath = function(bestPathObj, midiData) {
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
-    if (note >= 60 && eventData.subtype === 'noteOn') {
+    if (note <= 60 && eventData.subtype === 'noteOn') {
       var startTime = eventData.startTime;
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
