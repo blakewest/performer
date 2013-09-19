@@ -27,12 +27,8 @@ var getAllFingerOptions = function(numFingers) {
 
   var walker = function(numFingers, currentFingers, fingerOptions) {
     if (currentFingers.length === numFingers) {
-      var sorted = currentFingers.slice().sort(function(a,b) {return a-b;})
-      //the toString thing is just a hack to test that both are in sorted order. Might want to benchmark this to see if just iterating through each would be faster.
-      if (sorted.toString() === currentFingers.toString()) {
-        results.push(currentFingers.slice());
-        return;
-      }
+      results.push(currentFingers.slice());
+      return;
     }
 
     for (var i = 0; i < fingerOptions.length; i++) {
