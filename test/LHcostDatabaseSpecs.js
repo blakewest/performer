@@ -1,5 +1,5 @@
 var should = require('should');
-var db = require('../src/Algorithms/CostAlgorithm.js');
+var db = require('../src/Algorithms/LHCostAlgorithm.js');
 var _ = require('underscore');
 
 describe('|LH cost database|', function() {
