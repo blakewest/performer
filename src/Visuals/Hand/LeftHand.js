@@ -5,15 +5,14 @@ var IndexFinger = require('./IndexFinger.js').IndexFinger;
 var Thumb = require('./Thumb.js').Thumb;
 var HandDesign = require('./HandDesign.js').HandDesign;
 
-module.exports.RightHand = function(keyboard) {
+module.exports.LeftHand = function(keyboard) {
   var _this = this;
-  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
-  var handDesign = new HandDesign(keyboard); 
-  var pinky = new Pinky(handDesign, 'right');
-  var ring = new RingFinger(handDesign, 'right');
-  var middle = new MiddleFinger(handDesign, 'right');
-  var index = new IndexFinger(handDesign, 'right');
-  var thumb = new Thumb(handDesign, 'right');
+  var handDesign = new HandDesign(keyboard);
+  var pinky = new Pinky(handDesign, 'left');
+  var ring = new RingFinger(handDesign, 'left');
+  var middle = new MiddleFinger(handDesign, 'left');
+  var index = new IndexFinger(handDesign, 'left');
+  var thumb = new Thumb(handDesign, 'left');
 
   this.fingers = [];
   this.model = new THREE.Object3D();
@@ -21,23 +20,23 @@ module.exports.RightHand = function(keyboard) {
   //add fingers to hand model
   this.fingers.push(undefined); // this is just here to make the off by 1 error go away. (We want finger 1 to be thumb so that semantically it makes sense)
 
-  thumb.moveToNote(60);
+  thumb.moveToNote(55);
   this.model.add(thumb.model);
   this.fingers.push(thumb);
 
-  index.moveToNote(62);
+  index.moveToNote(53);
   this.model.add(index.model);
   this.fingers.push(index);
 
-  middle.moveToNote(64);
+  middle.moveToNote(52);
   this.model.add(middle.model);
   this.fingers.push(middle);
 
-  ring.moveToNote(65);
+  ring.moveToNote(50);
   this.model.add(ring.model);
   this.fingers.push(ring);
 
-  pinky.moveToNote(67);
+  pinky.moveToNote(48);
   this.model.add(pinky.model);
   this.fingers.push(pinky);
 

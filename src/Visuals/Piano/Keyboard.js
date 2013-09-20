@@ -10,7 +10,7 @@ module.exports.Keyboard = function(keyboardDesign) {
   for (var note = 0; note < keyboardDesign.keyInfo.length; note++) {
     var key = new PianoKey(keyboardDesign, note);
     _this.keys.push(key);
-    if (note > 20 && note < 109) {
+    if (note > 20 && note < 109) { //strips to 88 keys
       this.model.add(key.model);
     }
   }

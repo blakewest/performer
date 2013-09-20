@@ -1,4 +1,4 @@
-module.exports.HandDesign = function() {
+module.exports.HandDesign = function(keyboard) {
   //pinky specs
   this.pinkyWidth = 0.185;
   this.pinkyHeight = 0.1;
@@ -29,5 +29,6 @@ module.exports.HandDesign = function() {
   this.thumbLength = 0.5;
   this.thumbColor = 0xFF33FF;
 
+  this.keyboard = keyboard;
   this.keyboardHeight = 0.22;
 };
