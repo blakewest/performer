@@ -89,6 +89,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
     currentNode = nodeObj.bestPrev;
   }
   helpers.distributePath(bestPathObj, dataWithStarts);
+  app.showData();
 };
 
 

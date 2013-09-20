@@ -34,7 +34,7 @@ for (var i = 1; i <=10; i++) {
 }
 
 var endCap = [
-  {notes: ['e','e'], fingers: [1,-2]}
+  {notes: ['e','e'], fingers: [1,-1]}
 ];
 
 var makeNoteNode = function(notes, fingers) {
@@ -148,7 +148,7 @@ mod.findMin = function(layer) {
 };
 
 mod.distributePath = function(bestPathObj, midiData) {
-  var result = [];
+  var nowPlaying = {};
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
@@ -157,9 +157,13 @@ mod.distributePath = function(bestPathObj, midiData) {
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
       console.log('Note: ' + note + '/ Finger: ' + finger);
+      eventData.finger = finger;
+      nowPlaying[note] = finger;//adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
+    }
+    if (eventData.subtype === 'noteOff') {
+      eventData.finger = nowPlaying[note]; //this gets the same finger from the noteOn event that 'caused' this noteOff event.
     }
   }
-  return result;
 };
 
 mod.addStartTimes = function(midiData) {
