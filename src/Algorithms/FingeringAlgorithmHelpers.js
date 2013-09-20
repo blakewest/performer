@@ -43,7 +43,7 @@ var getAllFingerOptions = function(numFingers) {
   walker(numFingers, [], fingOptions);
   return results;
 };
-
+//initialize finger options object
 var allFingerOptions = {};
 for (var i = 1; i <=10; i++) {
   allFingerOptions[i] = getAllFingerOptions(i);
@@ -68,7 +68,7 @@ var makeNoteNode = function(notes, fingers) {
 var makeLayer = function(notes) {
   var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
   var layer = [];
-  var options = fingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
+  var options = allFingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
   for (var i = 0; i < options.length; i++) {
     var fingerChoice = options[i];
     var node = new makeNoteNode(sortedNotes, fingerChoice);
@@ -95,6 +95,40 @@ var findNoteHolder = function(curPlaying, note) {
       return i;
     }
   }
+};
+
+mod.makeNoteTrellis = function(midiData) {
+  // debugger;
+  var curPlaying = [];
+  var lastWasOn = false;
+  var trellis = [];
+  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
+
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    var note = eventData.noteNumber;
+    var newLayer, notePlace; 
+    if (eventData.subtype === 'noteOn') {
+      var startTime = eventData.startTime;
+      curPlaying.push([note, startTime]);
+      lastWasOn = true;
+    }
+    if (eventData.subtype === 'noteOff') {
+      if (lastWasOn) {
+        //must pass it a copy of curPlaying, or else everythang gits all messed up
+        newLayer = makeLayer(curPlaying.slice());
+        trellis.push(newLayer);
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }else {
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }
+    }
+  }
+  return trellis;
 };
 
 mod.makeRHNoteTrellis = function(midiData) {
@@ -174,9 +208,9 @@ mod.makeRHnotesData = function(midiData) {
     }
   }
   return noteData;
-}
+};
 
-mod.computeCost = function(n1,n2,f1,f2) {
+var computeRHCost = function(n1,n2,f1,f2) {
   if (n1 === 'endCap' || n2 === 'endCap') {
     return 0;
   }
@@ -184,7 +218,7 @@ mod.computeCost = function(n1,n2,f1,f2) {
   return RHcostDb[key];
 };
 
-mod.computeLHCost = function(n1,n2,f1,f2) {
+var computeLHCost = function(n1,n2,f1,f2) {
   if (n1 === 'endCap' || n2 === 'endCap') {
     return 0;
   }
@@ -209,7 +243,7 @@ mod.distributePath = function(bestPathObj, midiData) {
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
-    if (note <= 60 && eventData.subtype === 'noteOn') {
+    if (eventData.subtype === 'noteOn') {
       var startTime = eventData.startTime;
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
@@ -235,6 +269,53 @@ mod.addStartTimes = function(midiData) {
   }
   return midiData;
 };
+
+mod.getSplitData = function(node) {
+  var result = {
+    right: {
+      notes: [],
+      fingers:[]
+    },
+    left: {
+      notes: [],
+      fingers:[]
+    }
+  };
+  for (var i = 0; i < node.fingers.length; i++) {
+    if (node.fingers[i] > 0) {
+      result.right.fingers.push(node.fingers[i]);
+      result.right.notes.push(node.notes[i]);
+    }else {
+      result.left.fingers.push(node.fingers[i]);
+      result.left.notes.push(node.notes[i]);
+    }
+  }
+  return result;
+};
+
+mod.calcCost = function(curNode, prevNode, whichHand) {
+  var costFunction = whichHand === 'RH' ? computeRHCost : computeLHCost;
+  var totalCost = 0;
+
+  for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
+    var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
+    var curFinger = curNode.fingers[i];
+    var hasNextNote = curNode.notes[i+1] || false;
+    var nextFinger = curNode.fingers[i+1];
+    if(hasNextNote) {
+      //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+      totalCost += costFunction(curNote, hasNextNote[0], curFinger, nextFinger);
+    }
+    for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
+      var prevNote = prevNode.notes[j][0];
+      var prevFinger = prevNode.fingers[j];
+
+      var transCost = costFunction(prevNote, curNote, prevFinger, curFinger);
+      totalCost += transCost;
+    }
+  }
+  return totalCost;
+}
 
 
 

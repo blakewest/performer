@@ -70,33 +70,30 @@ module.exports.RHFingeringAlgorithm = function(midiData) {
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
   var dataWithStarts = helpers.addStartTimes(midiData);
-  var LHnotes = helpers.makeLHNoteTrellis(dataWithStarts);
+  var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
   //traversing forward, computing costs and leaving our best path trail
-  for (var layer = 1; layer < LHnotes.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
-    for (var node1 = 0; node1 < LHnotes[layer].length ; node1++) {               //go through each node in each layer
+  for (var layer = 1; layer < noteTrellis.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               //go through each node in each layer
       var min = Infinity;                 
-      for (var node2 = 0; node2 < LHnotes[layer-1].length; node2++) {               //go through each node in prev layer.
-        var curNode = LHnotes[layer][node1];
-        var prevNode = LHnotes[layer-1][node2];
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               //go through each node in prev layer.
+        var curNode = noteTrellis[layer][node1];
+        var prevNode = noteTrellis[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
-        for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
-          var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
-          var curFinger = curNode.fingers[i];
-          var hasNextNote = curNode.notes[i+1] || false;
-          var nextFinger = curNode.fingers[i+1];
-          if(hasNextNote) {
-            //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
-            totalCost += helpers.computeCost(curNote, hasNextNote[0], curFinger, nextFinger);
-          }
-          for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
-            var prevNote = prevNode.notes[j][0];
-            var prevFinger = prevNode.fingers[j];
+        var curData = helpers.getSplitData(curNode);
+        var prevData = helpers.getSplitData(prevNode);
 
-            var transCost = helpers.computeLHCost(prevNote, curNote, prevFinger, curFinger);
-            totalCost += transCost;
-          }
-        }
+        var curRH = curData.right;
+        var curLH = curData.left;
+        var prevRH = prevData.right;
+        var prevLH = prevData.left;
+
+        var RHCost = helpers.calcCost(curRH, prevRH, 'RH');
+        var LHCost = helpers.calcCost(curLH, prevLH, 'LH');
+
+        totalCost += RHCost + LHCost;
+
+       
         if (totalCost < min) {
           min = totalCost;
           curNode.nodeScore = totalCost;
@@ -106,19 +103,21 @@ module.exports.FingeringAlgorithm = function(midiData) {
       
     }
   }
-  console.log('LH notes: ', LHnotes);
+  console.log('note Trellis: ', noteTrellis);
 
   /*Now we need to go backwards and collect the best path.
   the currentNode variable is initialized to be the lowest score of the final layer.*/
-  var currentNode = helpers.findMin(LHnotes[LHnotes.length-1]);
+  var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
 
   /*from this point, we put the finger for that node in the array, then we track back to it's
   best previous node, record it's finger, and repeat till we get to the end.
   also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
   since zero is just our start object.*/
   var bestPathObj = {};
-  for (var j = LHnotes.length-1; j > 0; j--) {
-    var nodeObj = LHnotes[j][currentNode];
+  for (var j = noteTrellis.length-1; j > 0; j--) {
+    var nodeObj = noteTrellis[j][currentNode];
+    console.log('j=', j);
+    console.log('currentNode = ', currentNode);
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
     for (var k = 0; k < notes.length; k++) {
