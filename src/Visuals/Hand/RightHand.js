@@ -44,9 +44,9 @@ module.exports.RightHand = function(keyboard) {
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
-  this.press = function(finger) {
+  this.press = function(finger, noteNum) {
     console.log('the right ' + finger + ' finger is trying to press');
-    _this.fingers[finger].press();
+    _this.fingers[finger].press(noteNum);
   };
 
   this.release = function(finger) {

@@ -31,7 +31,7 @@ module.exports.App = function() {
 
     if (message === NOTE_ON) {
       _this.keyboard.press(note);
-      finger > 0 ? rightHand.press(finger) : leftHand.press(finger);    
+      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger, note);
     }else if(message === NOTE_OFF) {
       _this.keyboard.release(note);
       finger > 0 ? rightHand.release(finger) : leftHand.release(finger);

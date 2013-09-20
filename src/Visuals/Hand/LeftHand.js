@@ -7,6 +7,7 @@ var HandDesign = require('./HandDesign.js').HandDesign;
 
 module.exports.LeftHand = function(keyboard) {
   var _this = this;
+  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
   var handDesign = new HandDesign(keyboard);
   var pinky = new Pinky(handDesign, 'left');
   var ring = new RingFinger(handDesign, 'left');
@@ -43,10 +44,10 @@ module.exports.LeftHand = function(keyboard) {
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
-  this.press = function(finger) {
+  this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
     console.log('the left ' + finger + ' finger is trying to press');
-    _this.fingers[finger].press();
+    _this.fingers[finger].press(noteNum);
   };
 
   this.release = function(finger) {
