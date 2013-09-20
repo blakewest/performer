@@ -217,9 +217,10 @@ mod.calcCost = function(curNode, prevNode, otherHandCurNode, whichHand) {
     if(hasNextNote) {
       //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
       totalCost += costFunction(curNote, hasNextNote[0], curFinger, nextFinger);
+    }else {
+      totalCost += whichHand === 'RH' ? 60 - curNote : curNote - 60; //this adds a 'stateCost' for one note that helps seperate the hands where they should be.
     }
     for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
-      debugger;
       var prevNote = prevNode.notes[j][0];
       var prevFinger = prevNode.fingers[j];
 
