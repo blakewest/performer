@@ -421,6 +421,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
     currentNode = nodeObj.bestPrev;
   }
   helpers.distributePath(bestPathObj, dataWithStarts);
+  app.showData();
 };
 
 
@@ -476,7 +477,7 @@ for (var i = 1; i <=10; i++) {
 }
 
 var endCap = [
-  {notes: ['e','e'], fingers: [1,-2]}
+  {notes: ['e','e'], fingers: [1,-1]}
 ];
 
 var makeNoteNode = function(notes, fingers) {
@@ -590,7 +591,7 @@ mod.findMin = function(layer) {
 };
 
 mod.distributePath = function(bestPathObj, midiData) {
-  var result = [];
+  var nowPlaying = {};
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
@@ -599,9 +600,13 @@ mod.distributePath = function(bestPathObj, midiData) {
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
       console.log('Note: ' + note + '/ Finger: ' + finger);
+      eventData.finger = finger;
+      nowPlaying[note] = finger;//adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
+    }
+    if (eventData.subtype === 'noteOff') {
+      eventData.finger = nowPlaying[note]; //this gets the same finger from the noteOn event that 'caused' this noteOff event.
     }
   }
-  return result;
 };
 
 mod.addStartTimes = function(midiData) {
@@ -747,6 +752,7 @@ var createLHCostDatabase = module.exports.createLHCostDatabase = function() {
 var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
 var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
 var RightHand = require('./Visuals/Hand/RightHand.js').RightHand;
+var LeftHand = require('./Visuals/Hand/LeftHand.js').LeftHand;
 var Scene = require('./Visuals/Scene.js').Scene;
 var createDb = require('./Algorithms/CostAlgorithm').createCostDatabase;
 var fingeringAlgo = require('./Algorithms/FingeringAlgorithm.js').FingeringAlgorithm;
@@ -755,7 +761,9 @@ module.exports.App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
-  this.rightHand = new RightHand();
+  console.log(this.keyboard);
+  this.rightHand = new RightHand(this.keyboard);
+  this.leftHand = new LeftHand(this.keyboard);
 
   this.player = MIDI.Player;
 
@@ -763,22 +771,22 @@ module.exports.App = function() {
   var _this = this;
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
-  // this.player.addListener(function(data) {
-  //   var rightHand = _this.rightHand;
-  //   var NOTE_ON = 144;
-  //   var NOTE_OFF = 128;
-  //   var note = data.note;
-  //   var message = data.message;
-  //   var finger = data.finger;
+  this.player.addListener(function(data) {
+    var rightHand = _this.rightHand;
+    var NOTE_ON = 144;
+    var NOTE_OFF = 128;
+    var note = data.note;
+    var message = data.message;
+    var finger = data.finger;
 
-  //   if (message === NOTE_ON) {
-  //     _this.keyboard.press(note);
-  //     rightHand.press(finger);
-  //   }else if(message === NOTE_OFF) {
-  //     _this.keyboard.release(note);
-  //     rightHand.release(finger);
-  //   }
-  // });
+    if (message === NOTE_ON) {
+      _this.keyboard.press(note);
+      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger,note);    
+    }else if(message === NOTE_OFF) {
+      _this.keyboard.release(note);
+      finger > 0 ? rightHand.release(finger) : leftHand.release(finger);
+    }
+  });
 
   this.player.setAnimation({
     delay: 20,
@@ -814,6 +822,7 @@ module.exports.App = function() {
     // scene.add(this.test.sphere);
     this.scene.add(this.keyboard.model);
     this.scene.add(this.rightHand.model);
+    this.scene.add(this.leftHand.model);
     // scene.add(this.rightHand);
     // scene.animate(function() {
     //   _this.keyboard.update();
@@ -870,6 +879,10 @@ module.exports.App = function() {
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
   };
+
+  this.showData = function() {
+    console.log('data after Algo: ', _this.player.data);
+  };
 };
 
 
@@ -907,7 +920,7 @@ module.exports.App = function() {
 
 
 
-},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/RightHand.js":14,"./Visuals/Piano/Keyboard.js":17,"./Visuals/Piano/KeyboardDesign.js":18,"./Visuals/Scene.js":20}],8:[function(require,module,exports){
+},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/LeftHand.js":12,"./Visuals/Hand/RightHand.js":15,"./Visuals/Piano/Keyboard.js":18,"./Visuals/Piano/KeyboardDesign.js":19,"./Visuals/Scene.js":21}],8:[function(require,module,exports){
 var App = require('./App.js').App;
 $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
@@ -918,11 +931,12 @@ $(document).on('ready', function() {
 
 
 },{"./App.js":7}],9:[function(require,module,exports){
-module.exports.Finger = function() {
+module.exports.Finger = function(Keyboard) {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.03;
+  var keyboard = Keyboard;
 
   this.press = function() {
     this.model.position.y = this.pressedY;
@@ -930,6 +944,10 @@ module.exports.Finger = function() {
   };
   this.release = function() {
     this.isPressed = false;
+  };
+
+  this.moveToNote = function(noteNum) {
+    this.model.position.x = keyboard.keys[noteNum].model.position.x;
   };
 
   this.update = function() {
@@ -940,7 +958,7 @@ module.exports.Finger = function() {
   };
 };
 },{}],10:[function(require,module,exports){
-module.exports.HandDesign = function() {
+module.exports.HandDesign = function(keyboard) {
   //pinky specs
   this.pinkyWidth = 0.185;
   this.pinkyHeight = 0.1;
@@ -971,16 +989,17 @@ module.exports.HandDesign = function() {
   this.thumbLength = 0.5;
   this.thumbColor = 0xFF33FF;
 
+  this.keyboard = keyboard;
   this.keyboardHeight = 0.22;
 };
 },{}],11:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var IndexFinger = module.exports.IndexFinger = function(handInfo) {
-  Finger.call(this);
+  Finger.call(this, handInfo.keyboard);
   var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
   var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
-  var indexFingerPosition = new THREE.Vector3(8.496, 0.20, 0.45); // this first value is just hardcoded to put the finger directly on top of a note.
+  var indexFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
   this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
   this.model.position.copy(indexFingerPosition);
   this.originalY = indexFingerPosition.y;
@@ -989,37 +1008,6 @@ var IndexFinger = module.exports.IndexFinger = function(handInfo) {
 IndexFinger.prototype = Object.create(Finger.prototype);
 IndexFinger.prototype.constructor = IndexFinger;
 },{"./Finger.js":9}],12:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
-
-var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
-  Finger.call(this);
-  var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
-  var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
-  var middleFingerPosition = new THREE.Vector3(8.732, 0.20, 0.4); // this first value is just hardcoded to put the finger directly on top of a note.
-  this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
-  this.model.position.copy(middleFingerPosition);
-  this.originalY = middleFingerPosition.y;
-};
-
-MiddleFinger.prototype = Object.create(Finger.prototype);
-MiddleFinger.prototype.constructor = MiddleFinger;
-},{"./Finger.js":9}],13:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
-
-var Pinky = module.exports.Pinky = function(handInfo) {
-  Finger.call(this);
-  var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
-  var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
-  var pinkyPosition = new THREE.Vector3(9.204, 0.20, 0.54);
-  this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
-  this.model.position.copy(pinkyPosition);
-  this.originalY = pinkyPosition.y;
-};
-
-Pinky.prototype = Object.create(Finger.prototype);
-Pinky.prototype.constructor = Pinky;
-
-},{"./Finger.js":9}],14:[function(require,module,exports){
 var Pinky = require('./Pinky.js').Pinky;
 var RingFinger = require('./RingFinger.js').RingFinger;
 var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
@@ -1027,14 +1015,14 @@ var IndexFinger = require('./IndexFinger.js').IndexFinger;
 var Thumb = require('./Thumb.js').Thumb;
 var HandDesign = require('./HandDesign.js').HandDesign;
 
-module.exports.RightHand = function() {
+module.exports.LeftHand = function(keyboard) {
   var _this = this;
-  var handDesign = new HandDesign();
-  var ringFinger = new RingFinger(handDesign);
-  var pinky = new Pinky(handDesign);
-  var middleFinger = new MiddleFinger(handDesign);
-  var indexFinger = new IndexFinger(handDesign);
-  var thumb = new Thumb(handDesign);
+  var handDesign = new HandDesign(keyboard);
+  var pinky = new Pinky(handDesign, 'left');
+  var ring = new RingFinger(handDesign, 'left');
+  var middle = new MiddleFinger(handDesign, 'left');
+  var index = new IndexFinger(handDesign, 'left');
+  var thumb = new Thumb(handDesign, 'left');
 
   this.fingers = [];
   this.model = new THREE.Object3D();
@@ -1042,21 +1030,25 @@ module.exports.RightHand = function() {
   //add fingers to hand model
   this.fingers.push(undefined); // this is just here to make the off by 1 error go away. (We want finger 1 to be thumb so that semantically it makes sense)
 
+  thumb.moveToNote(55);
   this.model.add(thumb.model);
   this.fingers.push(thumb);
 
-  this.model.add(indexFinger.model);
-  this.fingers.push(indexFinger);
+  index.moveToNote(53);
+  this.model.add(index.model);
+  this.fingers.push(index);
 
-  this.model.add(middleFinger.model);
-  this.fingers.push(middleFinger);
+  middle.moveToNote(52);
+  this.model.add(middle.model);
+  this.fingers.push(middle);
 
-  this.model.add(ringFinger.model);
-  this.fingers.push(ringFinger);
+  ring.moveToNote(50);
+  this.model.add(ring.model);
+  this.fingers.push(ring);
 
+  pinky.moveToNote(48);
   this.model.add(pinky.model);
   this.fingers.push(pinky);
-
 
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
@@ -1079,14 +1071,110 @@ module.exports.RightHand = function() {
   };
 
 };
-},{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":12,"./Pinky.js":13,"./RingFinger.js":15,"./Thumb.js":16}],15:[function(require,module,exports){
+},{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":13,"./Pinky.js":14,"./RingFinger.js":16,"./Thumb.js":17}],13:[function(require,module,exports){
+var Finger = require('./Finger.js').Finger;
+
+var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
+  var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
+  var middleFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
+  this.model.position.copy(middleFingerPosition);
+  this.originalY = middleFingerPosition.y;
+};
+
+MiddleFinger.prototype = Object.create(Finger.prototype);
+MiddleFinger.prototype.constructor = MiddleFinger;
+},{"./Finger.js":9}],14:[function(require,module,exports){
+var Finger = require('./Finger.js').Finger;
+
+var Pinky = module.exports.Pinky = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
+  var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
+  var pinkyPosition = new THREE.Vector3(0, 0.20, 0.54);
+  this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
+  this.model.position.copy(pinkyPosition);
+  this.originalY = pinkyPosition.y;
+};
+
+Pinky.prototype = Object.create(Finger.prototype);
+Pinky.prototype.constructor = Pinky;
+
+},{"./Finger.js":9}],15:[function(require,module,exports){
+var Pinky = require('./Pinky.js').Pinky;
+var RingFinger = require('./RingFinger.js').RingFinger;
+var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
+var IndexFinger = require('./IndexFinger.js').IndexFinger;
+var Thumb = require('./Thumb.js').Thumb;
+var HandDesign = require('./HandDesign.js').HandDesign;
+
+module.exports.RightHand = function(keyboard) {
+  var _this = this;
+  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
+  var handDesign = new HandDesign(keyboard); 
+  var pinky = new Pinky(handDesign, 'right');
+  var ring = new RingFinger(handDesign, 'right');
+  var middle = new MiddleFinger(handDesign, 'right');
+  var index = new IndexFinger(handDesign, 'right');
+  var thumb = new Thumb(handDesign, 'right');
+
+  this.fingers = [];
+  this.model = new THREE.Object3D();
+
+  //add fingers to hand model
+  this.fingers.push(undefined); // this is just here to make the off by 1 error go away. (We want finger 1 to be thumb so that semantically it makes sense)
+
+  thumb.moveToNote(60);
+  this.model.add(thumb.model);
+  this.fingers.push(thumb);
+
+  index.moveToNote(62);
+  this.model.add(index.model);
+  this.fingers.push(index);
+
+  middle.moveToNote(64);
+  this.model.add(middle.model);
+  this.fingers.push(middle);
+
+  ring.moveToNote(65);
+  this.model.add(ring.model);
+  this.fingers.push(ring);
+
+  pinky.moveToNote(67);
+  this.model.add(pinky.model);
+  this.fingers.push(pinky);
+
+  //set position of hand
+  this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+
+  this.press = function(finger) {
+    console.log('the ' + finger + ' finger is trying to press');
+    _this.fingers[finger].press();
+  };
+
+  this.release = function(finger) {
+    console.log('the ' + finger + ' finger is trying to release');
+    _this.fingers[finger].release();
+  };
+
+  this.update = function() {
+    var fingers = _this.fingers;
+    for (var i = 1; i < fingers.length; i++) {
+      fingers[i].update();
+    }
+  };
+
+};
+},{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":13,"./Pinky.js":14,"./RingFinger.js":16,"./Thumb.js":17}],16:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var RingFinger = module.exports.RingFinger = function(handInfo) {
-  Finger.call(this);
+  Finger.call(this, handInfo.keyboard);
   var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
   var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});
-  var ringFingerPosition = new THREE.Vector3(8.968, 0.20, 0.45); // this first value is just hardcoded to put the finger directly on top of a note.
+  var ringFingerPosition = new THREE.Vector3(0, 0.20, 0.45);
   this.model = new THREE.Mesh(ringFingerGeometry, ringFingerMaterial);
   this.model.position.copy(ringFingerPosition);
   this.originalY = ringFingerPosition.y;
@@ -1094,14 +1182,14 @@ var RingFinger = module.exports.RingFinger = function(handInfo) {
 
 RingFinger.prototype = Object.create(Finger.prototype);
 RingFinger.prototype.constructor = RingFinger;
-},{"./Finger.js":9}],16:[function(require,module,exports){
+},{"./Finger.js":9}],17:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Thumb = module.exports.Thumb = function(handInfo) {
-  Finger.call(this);
+  Finger.call(this, handInfo.keyboard);
   var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
   var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
-  var thumbPosition = new THREE.Vector3(8.260, 0.20, 0.6); // this first value is just hardcoded to put the finger directly on top of a note.
+  var thumbPosition = new THREE.Vector3(0, 0.20, 0.6);
   this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
@@ -1109,7 +1197,7 @@ var Thumb = module.exports.Thumb = function(handInfo) {
 
 module.exports.Thumb.prototype = Object.create(Finger.prototype);
 module.exports.Thumb.prototype.constructor = Thumb;
-},{"./Finger.js":9}],17:[function(require,module,exports){
+},{"./Finger.js":9}],18:[function(require,module,exports){
 var PianoKey = require("./PianoKey.js").PianoKey;
 
 module.exports.Keyboard = function(keyboardDesign) {
@@ -1122,7 +1210,7 @@ module.exports.Keyboard = function(keyboardDesign) {
   for (var note = 0; note < keyboardDesign.keyInfo.length; note++) {
     var key = new PianoKey(keyboardDesign, note);
     _this.keys.push(key);
-    if (note > 20 && note < 109) {
+    if (note > 20 && note < 109) { //strips to 88 keys
       this.model.add(key.model);
     }
   }
@@ -1144,7 +1232,7 @@ module.exports.Keyboard = function(keyboardDesign) {
     }
   };
 };
-},{"./PianoKey.js":19}],18:[function(require,module,exports){
+},{"./PianoKey.js":20}],19:[function(require,module,exports){
 module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
@@ -1275,7 +1363,7 @@ module.exports.KeyboardDesign = function() {
 
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
@@ -1322,7 +1410,7 @@ PianoKey.prototype.update = function() {
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
 };
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports.Scene = function(container) {
   var $container = $(container);
   var width = $container.width();

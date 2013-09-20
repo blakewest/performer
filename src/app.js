@@ -1,6 +1,7 @@
 var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
 var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
 var RightHand = require('./Visuals/Hand/RightHand.js').RightHand;
+var LeftHand = require('./Visuals/Hand/LeftHand.js').LeftHand;
 var Scene = require('./Visuals/Scene.js').Scene;
 var createDb = require('./Algorithms/CostAlgorithm').createCostDatabase;
 var fingeringAlgo = require('./Algorithms/FingeringAlgorithm.js').FingeringAlgorithm;
@@ -9,7 +10,9 @@ module.exports.App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
-  this.rightHand = new RightHand();
+  console.log(this.keyboard);
+  this.rightHand = new RightHand(this.keyboard);
+  this.leftHand = new LeftHand(this.keyboard);
 
   this.player = MIDI.Player;
 
@@ -17,22 +20,22 @@ module.exports.App = function() {
   var _this = this;
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
-  // this.player.addListener(function(data) {
-  //   var rightHand = _this.rightHand;
-  //   var NOTE_ON = 144;
-  //   var NOTE_OFF = 128;
-  //   var note = data.note;
-  //   var message = data.message;
-  //   var finger = data.finger;
+  this.player.addListener(function(data) {
+    var rightHand = _this.rightHand;
+    var NOTE_ON = 144;
+    var NOTE_OFF = 128;
+    var note = data.note;
+    var message = data.message;
+    var finger = data.finger;
 
-  //   if (message === NOTE_ON) {
-  //     _this.keyboard.press(note);
-  //     rightHand.press(finger);
-  //   }else if(message === NOTE_OFF) {
-  //     _this.keyboard.release(note);
-  //     rightHand.release(finger);
-  //   }
-  // });
+    if (message === NOTE_ON) {
+      _this.keyboard.press(note);
+      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger,note);    
+    }else if(message === NOTE_OFF) {
+      _this.keyboard.release(note);
+      finger > 0 ? rightHand.release(finger) : leftHand.release(finger);
+    }
+  });
 
   this.player.setAnimation({
     delay: 20,
@@ -68,6 +71,7 @@ module.exports.App = function() {
     // scene.add(this.test.sphere);
     this.scene.add(this.keyboard.model);
     this.scene.add(this.rightHand.model);
+    this.scene.add(this.leftHand.model);
     // scene.add(this.rightHand);
     // scene.animate(function() {
     //   _this.keyboard.update();
@@ -123,6 +127,10 @@ module.exports.App = function() {
 
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
+  };
+
+  this.showData = function() {
+    console.log('data after Algo: ', _this.player.data);
   };
 };
 
