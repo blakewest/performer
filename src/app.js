@@ -46,11 +46,8 @@ module.exports.App = function() {
   this.loadMidiFile = function(midiFile, callback) {
     var _this = this;
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
-    //we also use the callback of the loadFile function to set the MIDI data of our right hand model, so we can animate it properly.
     this.player.loadFile(midiFile, function() {
-      _this.fingeringAlgorithm();
       _this.player.resume();
-      // _this.rightHand.setMidiData(_this.player.data, callback);
     });
   };
 

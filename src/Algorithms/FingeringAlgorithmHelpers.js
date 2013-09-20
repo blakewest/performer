@@ -5,22 +5,6 @@ var mod = module.exports;
 
 mod.notes = {0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F', 6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'};
 
-var fingerOptions = {
-  1: [[1], [2], [3], [4], [5]],
-  2: [[1,2], [1,3], [1,4], [1,5], [2,3], [2,4], [2,5], [3,4], [3,5], [4,5]],
-  3: [[1,2,3], [1,2,4], [1,2,5], [1,3,4], [1,3,5], [1,4,5], [2,3,4], [2,3,5], [2,4,5], [3,4,5]],
-  4: [[1,2,3,4], [1,2,3,5], [1,2,4,5], [1,3,4,5], [2,3,4,5]],
-  5: [[1,2,3,4,5]]
-};
-
-var LHfingerOptions = {
-  1: [[5], [4], [3], [2], [1]],
-  2: [[5,4], [5,3], [5,2], [5,1], [4,3], [4,2], [4,1], [3,2], [3,1], [2,1]],
-  3: [[5,4,3], [5,4,2], [5,4,1], [5,3,2], [5,3,1], [5,2,1], [4,3,2], [4,3,1], [4,2,1], [3,2,1]],
-  4: [[5,4,3,2], [5,4,3,1], [5,4,2,1], [5,3,2,1], [4,3,2,1]],
-  5: [[5,4,3,2,1]]
-};
-
 var getAllFingerOptions = function(numFingers) {
   var results = [];
   var fingOptions = [-5,-4,-3,-2,-1,1,2,3,4,5];
@@ -50,11 +34,7 @@ for (var i = 1; i <=10; i++) {
 }
 
 var endCap = [
-  {notes: ['endCap'], fingers: [1]},
-  {notes: ['endCap'], fingers: [1]},
-  {notes: ['endCap'], fingers: [1]},
-  {notes: ['endCap'], fingers: [1]},
-  {notes: ['endCap'], fingers: [1]},
+  {notes: ['e','e'], fingers: [1,-2]}
 ];
 
 var makeNoteNode = function(notes, fingers) {
@@ -131,101 +111,28 @@ mod.makeNoteTrellis = function(midiData) {
   return trellis;
 };
 
-mod.makeRHNoteTrellis = function(midiData) {
-  // debugger;
-  var curPlaying = [];
-  var lastWasOn = false;
-  var trellis = [];
-  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
-
-  for (var pair = 0; pair < midiData.length; pair++) {
-    var eventData = midiData[pair][0].event;
-    var note = eventData.noteNumber;
-    var newLayer, notePlace;
-    if (note >= 60 && eventData.subtype === 'noteOn') {
-      var startTime = eventData.startTime;
-      curPlaying.push([note, startTime]);
-      lastWasOn = true;
-    }
-    if (note >= 60 && eventData.subtype === 'noteOff') {
-      if (lastWasOn) {
-        //must pass it a copy of curPlaying, or else everythang gits all messed up
-        newLayer = makeLayer(curPlaying.slice());
-        trellis.push(newLayer);
-        notePlace = findNoteHolder(curPlaying, note);
-        curPlaying.splice(notePlace, 1);
-        lastWasOn = false;
-      }else {
-        notePlace = findNoteHolder(curPlaying, note);
-        curPlaying.splice(notePlace, 1);
-        lastWasOn = false;
-      }
-    }
-  }
-  return trellis;
-};
-
-mod.makeLHNoteTrellis = function(midiData) {
-  // debugger;
-  var curPlaying = [];
-  var lastWasOn = false;
-  var trellis = [];
-  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
-
-  for (var pair = 0; pair < midiData.length; pair++) {
-    var eventData = midiData[pair][0].event;
-    var note = eventData.noteNumber;
-    var newLayer, notePlace;
-    if (note <= 60 && eventData.subtype === 'noteOn') {
-      var startTime = eventData.startTime;
-      curPlaying.push([note, startTime]);
-      lastWasOn = true;
-    }
-    if (note <= 60 && eventData.subtype === 'noteOff') {
-      if (lastWasOn) {
-        //must pass it a copy of curPlaying, or else everythang gits all messed up
-        newLayer = makeLHLayer(curPlaying.slice());
-        trellis.push(newLayer);
-        notePlace = findNoteHolder(curPlaying, note);
-        curPlaying.splice(notePlace, 1);
-        lastWasOn = false;
-      }else {
-        notePlace = findNoteHolder(curPlaying, note);
-        curPlaying.splice(notePlace, 1);
-        lastWasOn = false;
-      }
-    }
-  }
-  return trellis;
-};
-
-mod.makeRHnotesData = function(midiData) {
-  var noteData = [];
-  for (var pair = 0; pair < midiData.length; pair++) {
-    var eventData = midiData[pair][0].event;
-    if (eventData.noteNumber >= 60 && eventData.subtype === 'noteOn') {
-      noteData.push(midiData[pair]);
-    }
-  }
-  return noteData;
-};
-
 var computeRHCost = function(n1,n2,f1,f2) {
-  if (n1 === 'endCap' || n2 === 'endCap') {
+  if (n1 === 'e' || n2 === 'e') {
     return 0;
   }
   var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
-  return RHcostDb[key];
+  var cost = RHcostDb[key];
+  var distBelowC = 60-n2;
+  cost += distBelowC > 0 ? distBelowC : 0; //this is for giving a slight tax to the left hand being above middle c.
+  return cost;
 };
 
 var computeLHCost = function(n1,n2,f1,f2) {
-  if (n1 === 'endCap' || n2 === 'endCap') {
+  if (n1 === 'e' || n2 === 'e') {
     return 0;
   }
   f1 = Math.abs(f1);
   f2 = Math.abs(f2);
   var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
-  return LHcostDb[key];
+  var cost = LHcostDb[key];
+  var distAboveC = n2 - 60; 
+  cost += distAboveC > 0 ? distAboveC : 0; //this is for giving a slight tax to the left hand being above middle c.
+  return cost;
 };
 
 mod.findMin = function(layer) {
@@ -295,9 +202,12 @@ mod.getSplitData = function(node) {
   return result;
 };
 
-mod.calcCost = function(curNode, prevNode, whichHand) {
+mod.calcCost = function(curNode, prevNode, otherHandCurNode, whichHand) {
   var costFunction = whichHand === 'RH' ? computeRHCost : computeLHCost;
   var totalCost = 0;
+  //if curNode has nothing, then that means there are no immediate notes to try out for that same hand. Thus it's temporarily only right or only left.
+  //We need to return what the cost would be to move to that other note. (ie. if your left hand doens't need to play anything,
+  // but your right hand is playing a note 2 octaves up, we should return that cost of the left hand jumping up to play that right hand note.)
 
   for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
     var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
@@ -309,6 +219,7 @@ mod.calcCost = function(curNode, prevNode, whichHand) {
       totalCost += costFunction(curNote, hasNextNote[0], curFinger, nextFinger);
     }
     for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
+      debugger;
       var prevNote = prevNode.notes[j][0];
       var prevFinger = prevNode.fingers[j];
 
@@ -317,7 +228,7 @@ mod.calcCost = function(curNode, prevNode, whichHand) {
     }
   }
   return totalCost;
-}
+};
 
 
 
