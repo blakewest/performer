@@ -222,6 +222,8 @@ var computeLHCost = function(n1,n2,f1,f2) {
   if (n1 === 'endCap' || n2 === 'endCap') {
     return 0;
   }
+  f1 = Math.abs(f1);
+  f2 = Math.abs(f2);
   var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
   return LHcostDb[key];
 };
