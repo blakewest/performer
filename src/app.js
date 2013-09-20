@@ -21,8 +21,9 @@ module.exports.App = function() {
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
   this.player.addListener(function(data) {
-    var rightHand = _this.rightHand;
-    var NOTE_ON = 144;
+    var rightHand = _this.rightHand
+    var leftHand = _this.leftHand;
+    var NOTE_ON = 144
     var NOTE_OFF = 128;
     var note = data.note;
     var message = data.message;
@@ -30,7 +31,7 @@ module.exports.App = function() {
 
     if (message === NOTE_ON) {
       _this.keyboard.press(note);
-      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger,note);    
+      finger > 0 ? rightHand.press(finger) : leftHand.press(finger);    
     }else if(message === NOTE_OFF) {
       _this.keyboard.release(note);
       finger > 0 ? rightHand.release(finger) : leftHand.release(finger);
@@ -80,6 +81,7 @@ module.exports.App = function() {
     this.scene.animate(function() {
       _this.keyboard.update();
       _this.rightHand.update();
+      _this.leftHand.update();
     });
   };
 
@@ -127,10 +129,6 @@ module.exports.App = function() {
 
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
-  };
-
-  this.showData = function() {
-    console.log('data after Algo: ', _this.player.data);
   };
 };
 

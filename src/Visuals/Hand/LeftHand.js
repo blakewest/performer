@@ -44,13 +44,15 @@ module.exports.LeftHand = function(keyboard) {
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
   this.press = function(finger) {
-    console.log('the ' + finger + ' finger is trying to press');
+    finger = Math.abs(finger);
+    console.log('the left ' + finger + ' finger is trying to press');
     _this.fingers[finger].press();
   };
 
   this.release = function(finger) {
-    console.log('the ' + finger + ' finger is trying to release');
-    _this.fingers[finger].release();
+    finger = Math.abs(finger);
+    console.log('the left ' + finger + ' finger is trying to release');
+    _this.fingers[finger].release('left');
   };
 
   this.update = function() {

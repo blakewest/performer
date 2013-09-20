@@ -76,9 +76,6 @@ module.exports.FingeringAlgorithm = function(midiData) {
     var nodeObj = noteTrellis[j][currentNode];
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
-    console.log('j: ', j);
-    console.log('note: ', notes);
-    console.log('fingers: ', fingers);
     for (var k = 0; k < notes.length; k++) {
       var note = notes[k][0];
       var startTime = notes[k][1];
@@ -89,7 +86,6 @@ module.exports.FingeringAlgorithm = function(midiData) {
     currentNode = nodeObj.bestPrev;
   }
   helpers.distributePath(bestPathObj, dataWithStarts);
-  app.showData();
 };
 
 
