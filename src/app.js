@@ -69,11 +69,9 @@ module.exports.App = function() {
   this.initScene = function() {
     var _this = this;
     this.scene = new Scene('#canvas');
-    // scene.add(this.test.sphere);
     this.scene.add(this.keyboard.model);
     this.scene.add(this.rightHand.model);
     this.scene.add(this.leftHand.model);
-    // scene.add(this.rightHand);
     // scene.animate(function() {
     //   _this.keyboard.update();
     //   _this.rightHand.update();
@@ -82,6 +80,7 @@ module.exports.App = function() {
       _this.keyboard.update();
       _this.rightHand.update();
       _this.leftHand.update();
+      TWEEN.update();
     });
   };
 
