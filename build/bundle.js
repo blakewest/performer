@@ -930,12 +930,13 @@ module.exports.Finger = function(Keyboard) {
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
+  this.currentNote = 60;
   // this.newX = this.model.position.x;
   // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
 
   this.press = function(note) {
-    this.moveToNote(note);
+    // this.moveToNote(note);
     this.model.position.y = this.pressedY;
     this.isPressed = true;
   };
@@ -946,10 +947,11 @@ module.exports.Finger = function(Keyboard) {
   this.moveToNote = function(noteNum) {
     this.currentPos.x = this.model.position.x;
     this.newPos.x = keyboard.keys[noteNum].model.position.x;
+    this.currentNote = noteNum;
     this.setUpNewTween();
   };
 
-  this.update = function(finger) {
+  this.update = function() {
     if (this.model.position.y < this.originalY && this.isPressed === false) {
       var offset = this.originalY - this.model.position.y;
       this.model.position.y += Math.min(offset, this.releaseSpeed);
@@ -984,10 +986,6 @@ module.exports.Finger = function(Keyboard) {
     tween.start();
   };
 };
-
-
-//need to call setUpTween whenever a new noteEvent comes in.
-//prob want to have some conditional logic to only set up the tween when you actually move to a different note. 
 
 
 
@@ -1113,12 +1111,35 @@ module.exports.LeftHand = function(keyboard) {
   this.model.add(pinky.model);
   this.fingers.push(pinky);
 
+  this.currentPos = {
+    x: 0,
+    y: 0, 
+    z: 0
+  };
+
+  this.newPos = {
+    x: 0,
+    y: 0,
+    z: 0
+  };
+
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
+  this.offSet = 0.2222;
+
   this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
-    console.log('the left ' + finger + ' finger is trying to press');
+    _this.currentPos.x = _this.model.position.x;
+    var newPosition = keyboard.keys[noteNum].model.position.x;
+    var oldPosition = _this.fingers[finger].currentPos.x;
+    var delta = newPosition - oldPosition;
+    if (delta > _this.currentPos.x) {
+      _this.setAscNewPos(delta, finger);
+    }else {
+      _this.setDescNewPos(delta, finger);
+    }
+    _this.setUpNewTween();
     _this.fingers[finger].press(noteNum);
   };
 
@@ -1135,7 +1156,47 @@ module.exports.LeftHand = function(keyboard) {
     }
   };
 
+  this.setUpNewTween = function() {
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(_this.currentPos)
+      .to(_this.newPos, 300)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+
+  this.setAscNewPos = function(delta, finger) {
+    console.log('current RH x pos: ', _this.currentPos.x);
+    _this.newPos.x = delta + (_this.offSet * (3-finger));
+  };
+
+  this.setDescNewPos = function(delta, finger) {
+    _this.newPos.x = delta + (_this.offSet * (finger - 3));
+  };
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 },{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":13,"./Pinky.js":14,"./RingFinger.js":16,"./Thumb.js":17}],13:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
@@ -1212,11 +1273,40 @@ module.exports.RightHand = function(keyboard) {
   this.fingers.push(pinky);
 
   //set position of hand
-  this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  // this.currentPos = {
+  //   x: 0,
+  //   y: 0,  
+  //   z: 0
+  // };
+
+  // this.newPos = {
+  //   x: 0,
+  //   y: 0,
+  //   z: 0
+  // };
+
+  // this.offSet = 0.32;
+
+  this.model.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
   this.press = function(finger, noteNum) {
-    console.log('the right ' + finger + ' finger is trying to press');
-    _this.fingers[finger].press(noteNum);
+    // _this.currentPos.x = _this.model.position.x;
+    var newPosition = keyboard.keys[noteNum].model.position.x;
+    // var oldPosition = _this.fingers[finger].currentPos.x;
+    // var delta = newPosition - oldPosition;
+    // if (delta > _this.currentPos.x) {
+    //   _this.setAscNewPos(delta, finger);
+    // }else {
+    //   _this.setDescNewPos(delta, finger);
+    // }
+    // _this.setUpNewTween();
+    for (var i = 1; i <= 5; i++) {
+      if (i === finger) {
+        _this.fingers[finger].press(noteNum);
+      }else {
+        _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
+      }
+    }
   };
 
   this.release = function(finger) {
@@ -1230,6 +1320,48 @@ module.exports.RightHand = function(keyboard) {
       fingers[i].update();
     }
   };
+
+  this.setUpNewTween = function() {
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(_this.currentPos)
+      .to(_this.newPos, 300)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+
+  this.setAscNewPos = function(delta, finger) {
+    console.log('current RH x pos: ', _this.currentPos.x);
+    _this.newPos.x = delta + (_this.offSet * (3-finger));
+  };
+
+  this.setDescNewPos = function(delta, finger) {
+    _this.newPos.x = delta + (_this.offSet * (finger - 3));
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 };
 },{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":13,"./Pinky.js":14,"./RingFinger.js":16,"./Thumb.js":17}],16:[function(require,module,exports){
@@ -1258,6 +1390,48 @@ var Thumb = module.exports.Thumb = function(handInfo) {
   this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX,newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if (delta > 0 && delta < 1.652) {
+      return;
+    } else if (delta > 1.652) {
+      this.moveToNote(newNote - 7);
+    }
+    else {
+      //do stuff in the other cases;
+    }
+  };
+  this.ringRules = function(delta, curX, newNote) {
+    //do stuff
+    if (delta > 0 && delta < 1.28) {
+      return;
+    }else if (delta > 1.28) {
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    //do stuff
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    //do stuff
+  };
 };
 
 module.exports.Thumb.prototype = Object.create(Finger.prototype);
