@@ -408,9 +408,6 @@ module.exports.FingeringAlgorithm = function(midiData) {
     var nodeObj = noteTrellis[j][currentNode];
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
-    console.log('j: ', j);
-    console.log('note: ', notes);
-    console.log('fingers: ', fingers);
     for (var k = 0; k < notes.length; k++) {
       var note = notes[k][0];
       var startTime = notes[k][1];
@@ -421,7 +418,6 @@ module.exports.FingeringAlgorithm = function(midiData) {
     currentNode = nodeObj.bestPrev;
   }
   helpers.distributePath(bestPathObj, dataWithStarts);
-  app.showData();
 };
 
 
@@ -772,8 +768,9 @@ module.exports.App = function() {
 
   //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
   this.player.addListener(function(data) {
-    var rightHand = _this.rightHand;
-    var NOTE_ON = 144;
+    var rightHand = _this.rightHand
+    var leftHand = _this.leftHand;
+    var NOTE_ON = 144
     var NOTE_OFF = 128;
     var note = data.note;
     var message = data.message;
@@ -781,7 +778,7 @@ module.exports.App = function() {
 
     if (message === NOTE_ON) {
       _this.keyboard.press(note);
-      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger,note);    
+      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger, note);
     }else if(message === NOTE_OFF) {
       _this.keyboard.release(note);
       finger > 0 ? rightHand.release(finger) : leftHand.release(finger);
@@ -819,11 +816,9 @@ module.exports.App = function() {
   this.initScene = function() {
     var _this = this;
     this.scene = new Scene('#canvas');
-    // scene.add(this.test.sphere);
     this.scene.add(this.keyboard.model);
     this.scene.add(this.rightHand.model);
     this.scene.add(this.leftHand.model);
-    // scene.add(this.rightHand);
     // scene.animate(function() {
     //   _this.keyboard.update();
     //   _this.rightHand.update();
@@ -831,6 +826,8 @@ module.exports.App = function() {
     this.scene.animate(function() {
       _this.keyboard.update();
       _this.rightHand.update();
+      _this.leftHand.update();
+      TWEEN.update();
     });
   };
 
@@ -878,10 +875,6 @@ module.exports.App = function() {
 
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
-  };
-
-  this.showData = function() {
-    console.log('data after Algo: ', _this.player.data);
   };
 };
 
@@ -935,10 +928,14 @@ module.exports.Finger = function(Keyboard) {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;
-  this.releaseSpeed = 0.03;
+  this.releaseSpeed = 0.05;
+  this.moveSpeed = 0.1;
+  // this.newX = this.model.position.x;
+  // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
 
-  this.press = function() {
+  this.press = function(note) {
+    this.moveToNote(note);
     this.model.position.y = this.pressedY;
     this.isPressed = true;
   };
@@ -947,16 +944,81 @@ module.exports.Finger = function(Keyboard) {
   };
 
   this.moveToNote = function(noteNum) {
-    this.model.position.x = keyboard.keys[noteNum].model.position.x;
+    this.currentPos.x = this.model.position.x;
+    this.newPos.x = keyboard.keys[noteNum].model.position.x;
+    this.setUpNewTween();
   };
 
-  this.update = function() {
+  this.update = function(finger) {
     if (this.model.position.y < this.originalY && this.isPressed === false) {
       var offset = this.originalY - this.model.position.y;
       this.model.position.y += Math.min(offset, this.releaseSpeed);
     }
   };
+
+  //just initializing values here. They'll get overwritten immediately;
+  this.currentPos = {
+    x: 0,
+    y: 0,
+    z: 0
+  };
+
+  this.newPos = {
+    x: 0,
+    y: 0,
+    z: 0
+  };
+
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 300)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
 };
+
+
+//need to call setUpTween whenever a new noteEvent comes in.
+//prob want to have some conditional logic to only set up the tween when you actually move to a different note. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 },{}],10:[function(require,module,exports){
 module.exports.HandDesign = function(keyboard) {
   //pinky specs
@@ -1017,6 +1079,7 @@ var HandDesign = require('./HandDesign.js').HandDesign;
 
 module.exports.LeftHand = function(keyboard) {
   var _this = this;
+  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
   var handDesign = new HandDesign(keyboard);
   var pinky = new Pinky(handDesign, 'left');
   var ring = new RingFinger(handDesign, 'left');
@@ -1053,14 +1116,16 @@ module.exports.LeftHand = function(keyboard) {
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
-  this.press = function(finger) {
-    console.log('the ' + finger + ' finger is trying to press');
-    _this.fingers[finger].press();
+  this.press = function(finger, noteNum) {
+    finger = Math.abs(finger);
+    console.log('the left ' + finger + ' finger is trying to press');
+    _this.fingers[finger].press(noteNum);
   };
 
   this.release = function(finger) {
-    console.log('the ' + finger + ' finger is trying to release');
-    _this.fingers[finger].release();
+    finger = Math.abs(finger);
+    console.log('the left ' + finger + ' finger is trying to release');
+    _this.fingers[finger].release('left');
   };
 
   this.update = function() {
@@ -1149,13 +1214,13 @@ module.exports.RightHand = function(keyboard) {
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
-  this.press = function(finger) {
-    console.log('the ' + finger + ' finger is trying to press');
-    _this.fingers[finger].press();
+  this.press = function(finger, noteNum) {
+    console.log('the right ' + finger + ' finger is trying to press');
+    _this.fingers[finger].press(noteNum);
   };
 
   this.release = function(finger) {
-    console.log('the ' + finger + ' finger is trying to release');
+    console.log('the right ' + finger + ' finger is trying to release');
     _this.fingers[finger].release();
   };
 
@@ -1189,7 +1254,7 @@ var Thumb = module.exports.Thumb = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
   var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
-  var thumbPosition = new THREE.Vector3(0, 0.20, 0.6);
+  var thumbPosition = new THREE.Vector3(0, 0.30, 0.6);
   this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
