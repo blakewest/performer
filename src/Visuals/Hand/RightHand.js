@@ -42,11 +42,32 @@ module.exports.RightHand = function(keyboard) {
   this.fingers.push(pinky);
 
   //set position of hand
-  this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.currentPos = {
+    x: 0,
+    y: 0,  
+    z: 0
+  };
+
+  this.newPos = {
+    x: 0,
+    y: 0,
+    z: 0
+  };
+
+  this.model.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
   this.press = function(finger, noteNum) {
     console.log('the right ' + finger + ' finger is trying to press');
     _this.fingers[finger].press(noteNum);
+    // _this.currentPos.x = _this.model.position.x;
+    // var newPosition = keyboard.keys[noteNum].model.position.x;
+    // if (newPosition > _this.currentPos.x) {
+    //   _this.setAscNewPos(newPosition);
+    // }else {
+    //   _this.setDescNewPos(newPosition);
+    // }
+
+    // _this.setUpTween(finger,noteNum);
   };
 
   this.release = function(finger) {
@@ -60,5 +81,41 @@ module.exports.RightHand = function(keyboard) {
       fingers[i].update();
     }
   };
+
+  this.setUpNewTween = function(finger, noteNum) {
+    var update = function() {
+      _this.model.x = _this.currentPos.x;
+    };
+
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(_this.current)
+      .to(_this.newPos)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+
+  // this.setAscNewPos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 };

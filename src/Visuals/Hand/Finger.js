@@ -23,7 +23,7 @@ module.exports.Finger = function(Keyboard) {
     this.setUpNewTween();
   };
 
-  this.update = function(finger) {
+  this.update = function() {
     if (this.model.position.y < this.originalY && this.isPressed === false) {
       var offset = this.originalY - this.model.position.y;
       this.model.position.y += Math.min(offset, this.releaseSpeed);
