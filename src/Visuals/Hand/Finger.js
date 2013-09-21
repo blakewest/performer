@@ -1,3 +1,5 @@
+var params = require('./FingerMoveParams.js').params;
+
 module.exports.Finger = function(Keyboard) {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
@@ -8,6 +10,7 @@ module.exports.Finger = function(Keyboard) {
   // this.newX = this.model.position.x;
   // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
+  this.distances = params(keyboard);
 
   this.press = function(note) {
     // this.moveToNote(note);

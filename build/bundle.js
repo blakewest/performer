@@ -913,7 +913,7 @@ module.exports.App = function() {
 
 
 
-},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/LeftHand.js":12,"./Visuals/Hand/RightHand.js":15,"./Visuals/Piano/Keyboard.js":18,"./Visuals/Piano/KeyboardDesign.js":19,"./Visuals/Scene.js":21}],8:[function(require,module,exports){
+},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/LeftHand.js":13,"./Visuals/Hand/RightHand.js":16,"./Visuals/Piano/Keyboard.js":19,"./Visuals/Piano/KeyboardDesign.js":20,"./Visuals/Scene.js":22}],8:[function(require,module,exports){
 var App = require('./App.js').App;
 $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
@@ -924,6 +924,8 @@ $(document).on('ready', function() {
 
 
 },{"./App.js":7}],9:[function(require,module,exports){
+var params = require('./FingerMoveParams.js').params;
+
 module.exports.Finger = function(Keyboard) {
   var pressAmount = 0.08; 
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
@@ -934,6 +936,7 @@ module.exports.Finger = function(Keyboard) {
   // this.newX = this.model.position.x;
   // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
+  this.distances = params(keyboard);
 
   this.press = function(note) {
     // this.moveToNote(note);
@@ -1017,7 +1020,29 @@ module.exports.Finger = function(Keyboard) {
 
 
 
-},{}],10:[function(require,module,exports){
+},{"./FingerMoveParams.js":10}],10:[function(require,module,exports){
+module.exports.params = function(keyboard) {
+  //should contain distance from one note to another, in half steps;
+  var distances = {};
+  distances[-4] = keyboard.keys[12].model.position.x - keyboard.keys[8].model.position.x;
+  distances[-3] = keyboard.keys[12].model.position.x - keyboard.keys[9].model.position.x;
+  distances[-2] = keyboard.keys[12].model.position.x - keyboard.keys[10].model.position.x;
+  distances[-1] = keyboard.keys[12].model.position.x - keyboard.keys[11].model.position.x;
+  distances[1] = keyboard.keys[1].model.position.x - keyboard.keys[0].model.position.x;
+  distances[2] = keyboard.keys[2].model.position.x - keyboard.keys[0].model.position.x;
+  distances[3] = keyboard.keys[3].model.position.x - keyboard.keys[0].model.position.x;
+  distances[4] = keyboard.keys[4].model.position.x - keyboard.keys[0].model.position.x;
+  distances[5] = keyboard.keys[5].model.position.x - keyboard.keys[0].model.position.x;
+  distances[6] = keyboard.keys[6].model.position.x - keyboard.keys[0].model.position.x;
+  distances[7] = keyboard.keys[7].model.position.x - keyboard.keys[0].model.position.x;
+  distances[8] = keyboard.keys[8].model.position.x - keyboard.keys[0].model.position.x;
+  distances[9] = keyboard.keys[9].model.position.x - keyboard.keys[0].model.position.x;
+  distances[10] = keyboard.keys[10].model.position.x - keyboard.keys[0].model.position.x;
+  distances[11] = keyboard.keys[11].model.position.x - keyboard.keys[0].model.position.x;
+  distances[12] = keyboard.keys[12].model.position.x - keyboard.keys[0].model.position.x;
+  return distances;
+};
+},{}],11:[function(require,module,exports){
 module.exports.HandDesign = function(keyboard) {
   //pinky specs
   this.pinkyWidth = 0.185;
@@ -1052,7 +1077,7 @@ module.exports.HandDesign = function(keyboard) {
   this.keyboard = keyboard;
   this.keyboardHeight = 0.22;
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var IndexFinger = module.exports.IndexFinger = function(handInfo) {
@@ -1067,7 +1092,7 @@ var IndexFinger = module.exports.IndexFinger = function(handInfo) {
 
 IndexFinger.prototype = Object.create(Finger.prototype);
 IndexFinger.prototype.constructor = IndexFinger;
-},{"./Finger.js":9}],12:[function(require,module,exports){
+},{"./Finger.js":9}],13:[function(require,module,exports){
 var Pinky = require('./Pinky.js').Pinky;
 var RingFinger = require('./RingFinger.js').RingFinger;
 var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
@@ -1197,7 +1222,7 @@ module.exports.LeftHand = function(keyboard) {
 
 
 
-},{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":13,"./Pinky.js":14,"./RingFinger.js":16,"./Thumb.js":17}],13:[function(require,module,exports){
+},{"./HandDesign.js":11,"./IndexFinger.js":12,"./MiddleFinger.js":14,"./Pinky.js":15,"./RingFinger.js":17,"./Thumb.js":18}],14:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
@@ -1212,7 +1237,7 @@ var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
 
 MiddleFinger.prototype = Object.create(Finger.prototype);
 MiddleFinger.prototype.constructor = MiddleFinger;
-},{"./Finger.js":9}],14:[function(require,module,exports){
+},{"./Finger.js":9}],15:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Pinky = module.exports.Pinky = function(handInfo) {
@@ -1228,7 +1253,7 @@ var Pinky = module.exports.Pinky = function(handInfo) {
 Pinky.prototype = Object.create(Finger.prototype);
 Pinky.prototype.constructor = Pinky;
 
-},{"./Finger.js":9}],15:[function(require,module,exports){
+},{"./Finger.js":9}],16:[function(require,module,exports){
 var Pinky = require('./Pinky.js').Pinky;
 var RingFinger = require('./RingFinger.js').RingFinger;
 var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
@@ -1364,7 +1389,7 @@ module.exports.RightHand = function(keyboard) {
 
 
 };
-},{"./HandDesign.js":10,"./IndexFinger.js":11,"./MiddleFinger.js":13,"./Pinky.js":14,"./RingFinger.js":16,"./Thumb.js":17}],16:[function(require,module,exports){
+},{"./HandDesign.js":11,"./IndexFinger.js":12,"./MiddleFinger.js":14,"./Pinky.js":15,"./RingFinger.js":17,"./Thumb.js":18}],17:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var RingFinger = module.exports.RingFinger = function(handInfo) {
@@ -1379,7 +1404,7 @@ var RingFinger = module.exports.RingFinger = function(handInfo) {
 
 RingFinger.prototype = Object.create(Finger.prototype);
 RingFinger.prototype.constructor = RingFinger;
-},{"./Finger.js":9}],17:[function(require,module,exports){
+},{"./Finger.js":9}],18:[function(require,module,exports){
 var Finger = require('./Finger.js').Finger;
 
 var Thumb = module.exports.Thumb = function(handInfo) {
@@ -1390,6 +1415,8 @@ var Thumb = module.exports.Thumb = function(handInfo) {
   this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
+  var distances = this.distances;
+
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
@@ -1409,34 +1436,40 @@ var Thumb = module.exports.Thumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if (delta > 0 && delta < 1.652) {
+    if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
       return;
-    } else if (delta > 1.652) {
+    } else { //definitely move
       this.moveToNote(newNote - 7);
-    }
-    else {
-      //do stuff in the other cases;
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    //do stuff
-    if (delta > 0 && delta < 1.28) {
+    if ( delta > distances[4] && delta < distances[9] ) {
       return;
-    }else if (delta > 1.28) {
+    }else {
       this.moveToNote(newNote - 5);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    //do stuff
+    if ( delta > distances[2] && delta < distances[7] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 4);
+    }
   };
   this.indexRules = function(delta, curX, newNote) {
-    //do stuff
+    if ( delta > 0 && delta < distances[4] ) {
+      return;
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      return;
+    }else {
+      this.moveToNote(newNote-2);
+    }
   };
 };
 
 module.exports.Thumb.prototype = Object.create(Finger.prototype);
 module.exports.Thumb.prototype.constructor = Thumb;
-},{"./Finger.js":9}],18:[function(require,module,exports){
+},{"./Finger.js":9}],19:[function(require,module,exports){
 var PianoKey = require("./PianoKey.js").PianoKey;
 
 module.exports.Keyboard = function(keyboardDesign) {
@@ -1471,7 +1504,7 @@ module.exports.Keyboard = function(keyboardDesign) {
     }
   };
 };
-},{"./PianoKey.js":20}],19:[function(require,module,exports){
+},{"./PianoKey.js":21}],20:[function(require,module,exports){
 module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
@@ -1602,7 +1635,7 @@ module.exports.KeyboardDesign = function() {
 
 
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
@@ -1649,7 +1682,7 @@ PianoKey.prototype.update = function() {
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
 };
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports.Scene = function(container) {
   var $container = $(container);
   var width = $container.width();

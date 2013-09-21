@@ -8,6 +8,8 @@ var Thumb = module.exports.Thumb = function(handInfo) {
   this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
+  var distances = this.distances;
+
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
@@ -27,28 +29,34 @@ var Thumb = module.exports.Thumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if (delta > 0 && delta < 1.652) {
+    if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
       return;
-    } else if (delta > 1.652) {
+    } else { //definitely move
       this.moveToNote(newNote - 7);
-    }
-    else {
-      //do stuff in the other cases;
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    //do stuff
-    if (delta > 0 && delta < 1.28) {
+    if ( delta > distances[4] && delta < distances[9] ) {
       return;
-    }else if (delta > 1.28) {
+    }else {
       this.moveToNote(newNote - 5);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    //do stuff
+    if ( delta > distances[2] && delta < distances[7] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 4);
+    }
   };
   this.indexRules = function(delta, curX, newNote) {
-    //do stuff
+    if ( delta > 0 && delta < distances[4] ) {
+      return;
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      return;
+    }else {
+      this.moveToNote(newNote-2);
+    }
   };
 };
 
