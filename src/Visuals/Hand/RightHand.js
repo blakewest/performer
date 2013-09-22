@@ -71,7 +71,7 @@ module.exports.RightHand = function(keyboard) {
     // _this.setUpNewTween();
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
-        _this.fingers[finger].press(noteNum);
+        _this.fingers[i].press(noteNum);
       }else {
         _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
       }
