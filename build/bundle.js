@@ -747,8 +747,8 @@ var createLHCostDatabase = module.exports.createLHCostDatabase = function() {
 },{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],7:[function(require,module,exports){
 var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
 var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
-var RightHand = require('./Visuals/Hand/RightHand.js').RightHand;
-var LeftHand = require('./Visuals/Hand/LeftHand.js').LeftHand;
+var RightHand = require('./Visuals/Hands/Right/RightHand.js').RightHand;
+var LeftHand = require('./Visuals/Hands/Left/LeftHand.js').LeftHand;
 var Scene = require('./Visuals/Scene.js').Scene;
 var createDb = require('./Algorithms/CostAlgorithm').createCostDatabase;
 var fingeringAlgo = require('./Algorithms/FingeringAlgorithm.js').FingeringAlgorithm;
@@ -913,7 +913,7 @@ module.exports.App = function() {
 
 
 
-},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hand/LeftHand.js":13,"./Visuals/Hand/RightHand.js":16,"./Visuals/Piano/Keyboard.js":19,"./Visuals/Piano/KeyboardDesign.js":20,"./Visuals/Scene.js":22}],8:[function(require,module,exports){
+},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./Visuals/Hands/Left/LeftHand.js":12,"./Visuals/Hands/Right/RightHand.js":18,"./Visuals/Piano/Keyboard.js":24,"./Visuals/Piano/KeyboardDesign.js":25,"./Visuals/Scene.js":27}],8:[function(require,module,exports){
 var App = require('./App.js').App;
 $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
@@ -1078,27 +1078,12 @@ module.exports.HandDesign = function(keyboard) {
   this.keyboardHeight = 0.22;
 };
 },{}],12:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
-
-var IndexFinger = module.exports.IndexFinger = function(handInfo) {
-  Finger.call(this, handInfo.keyboard);
-  var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
-  var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
-  var indexFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
-  this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
-  this.model.position.copy(indexFingerPosition);
-  this.originalY = indexFingerPosition.y;
-};
-
-IndexFinger.prototype = Object.create(Finger.prototype);
-IndexFinger.prototype.constructor = IndexFinger;
-},{"./Finger.js":9}],13:[function(require,module,exports){
-var Pinky = require('./Pinky.js').Pinky;
-var RingFinger = require('./RingFinger.js').RingFinger;
-var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
-var IndexFinger = require('./IndexFinger.js').IndexFinger;
-var Thumb = require('./Thumb.js').Thumb;
-var HandDesign = require('./HandDesign.js').HandDesign;
+var Pinky = require('./LeftPinky.js').Pinky;
+var RingFinger = require('./LeftRing.js').RingFinger;
+var MiddleFinger = require('./LeftMiddle.js').MiddleFinger;
+var IndexFinger = require('./LeftIndex.js').IndexFinger;
+var Thumb = require('./LeftThumb.js').Thumb;
+var HandDesign = require('../HandDesign.js').HandDesign;
 
 module.exports.LeftHand = function(keyboard) {
   var _this = this;
@@ -1136,18 +1121,6 @@ module.exports.LeftHand = function(keyboard) {
   this.model.add(pinky.model);
   this.fingers.push(pinky);
 
-  this.currentPos = {
-    x: 0,
-    y: 0, 
-    z: 0
-  };
-
-  this.newPos = {
-    x: 0,
-    y: 0,
-    z: 0
-  };
-
   //set position of hand
   this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
@@ -1155,17 +1128,13 @@ module.exports.LeftHand = function(keyboard) {
 
   this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
-    _this.currentPos.x = _this.model.position.x;
     var newPosition = keyboard.keys[noteNum].model.position.x;
-    var oldPosition = _this.fingers[finger].currentPos.x;
-    var delta = newPosition - oldPosition;
-    if (delta > _this.currentPos.x) {
-      _this.setAscNewPos(delta, finger);
-    }else {
-      _this.setDescNewPos(delta, finger);
+    for (var i = 1; i <= 5; i++) {
+      if (i === finger) {
+        _this.fingers[i].press(noteNum);
+      }
+      _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
     }
-    _this.setUpNewTween();
-    _this.fingers[finger].press(noteNum);
   };
 
   this.release = function(finger) {
@@ -1180,30 +1149,6 @@ module.exports.LeftHand = function(keyboard) {
       fingers[i].update();
     }
   };
-
-  this.setUpNewTween = function() {
-    var update = function() {
-      _this.model.position.x = _this.currentPos.x;
-    };
-    var easing = TWEEN.Easing.Quadratic.Out;
-
-    var tween = new TWEEN.Tween(_this.currentPos)
-      .to(_this.newPos, 300)
-      .easing(easing)
-      .onUpdate(update);
-
-    tween.start();
-  };
-
-  this.setAscNewPos = function(delta, finger) {
-    console.log('current RH x pos: ', _this.currentPos.x);
-    _this.newPos.x = delta + (_this.offSet * (3-finger));
-  };
-
-  this.setDescNewPos = function(delta, finger) {
-    _this.newPos.x = delta + (_this.offSet * (finger - 3));
-  };
-
 };
 
 
@@ -1222,10 +1167,78 @@ module.exports.LeftHand = function(keyboard) {
 
 
 
-},{"./HandDesign.js":11,"./IndexFinger.js":12,"./MiddleFinger.js":14,"./Pinky.js":15,"./RingFinger.js":17,"./Thumb.js":18}],14:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
+},{"../HandDesign.js":11,"./LeftIndex.js":13,"./LeftMiddle.js":14,"./LeftPinky.js":15,"./LeftRing.js":16,"./LeftThumb.js":17}],13:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
 
-var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
+var IndexFinger = module.exports.LeftIndex = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
+  var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
+  var indexFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
+  this.model.position.copy(indexFingerPosition);
+  this.originalY = indexFingerPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX,newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[4] && delta < distances[8]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[3] && delta < distances[7] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[2] && delta < distances[5] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 4);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < 0) {
+      return;
+    }else if (delta > 0 && delta < distances[3]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+2), 100);
+    }
+    else {
+      this.moveToNote(newNote+2);
+    }
+  };
+};
+
+IndexFinger.prototype = Object.create(Finger.prototype);
+IndexFinger.prototype.constructor = IndexFinger;
+
+},{"../Finger.js":9}],14:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var MiddleFinger = module.exports.LeftMiddle = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
   var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
@@ -1233,14 +1246,67 @@ var MiddleFinger = module.exports.MiddleFinger = function(handInfo) {
   this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
   this.model.position.copy(middleFingerPosition);
   this.originalY = middleFingerPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[3] && delta < distances[5]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[1] && delta < distances[4] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < distances[-1] ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-6] && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < distances[4]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+3), 100);
+    }
+    else {
+      this.moveToNote(newNote+3);
+    }
+  };
 };
 
 MiddleFinger.prototype = Object.create(Finger.prototype);
 MiddleFinger.prototype.constructor = MiddleFinger;
-},{"./Finger.js":9}],15:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
 
-var Pinky = module.exports.Pinky = function(handInfo) {
+},{"../Finger.js":9}],15:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var Pinky = module.exports.LeftPinky = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
   var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
@@ -1248,151 +1314,67 @@ var Pinky = module.exports.Pinky = function(handInfo) {
   this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
   this.model.position.copy(pinkyPosition);
   this.originalY = pinkyPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.ringRules(delta, curX, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < 0) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[-5] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > distances[-7] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 5);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-12] && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < distances[1]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+7), 100);
+    }
+    else {
+      this.moveToNote(newNote+7);
+    }
+  };
 };
 
 Pinky.prototype = Object.create(Finger.prototype);
 Pinky.prototype.constructor = Pinky;
 
-},{"./Finger.js":9}],16:[function(require,module,exports){
-var Pinky = require('./Pinky.js').Pinky;
-var RingFinger = require('./RingFinger.js').RingFinger;
-var MiddleFinger = require('./MiddleFinger.js').MiddleFinger;
-var IndexFinger = require('./IndexFinger.js').IndexFinger;
-var Thumb = require('./Thumb.js').Thumb;
-var HandDesign = require('./HandDesign.js').HandDesign;
+},{"../Finger.js":9}],16:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
 
-module.exports.RightHand = function(keyboard) {
-  var _this = this;
-  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
-  var handDesign = new HandDesign(keyboard); 
-  var pinky = new Pinky(handDesign, 'right');
-  var ring = new RingFinger(handDesign, 'right');
-  var middle = new MiddleFinger(handDesign, 'right');
-  var index = new IndexFinger(handDesign, 'right');
-  var thumb = new Thumb(handDesign, 'right');
-
-  this.fingers = [];
-  this.model = new THREE.Object3D();
-
-  //add fingers to hand model
-  this.fingers.push(undefined); // this is just here to make the off by 1 error go away. (We want finger 1 to be thumb so that semantically it makes sense)
-
-  thumb.moveToNote(60);
-  this.model.add(thumb.model);
-  this.fingers.push(thumb);
-
-  index.moveToNote(62);
-  this.model.add(index.model);
-  this.fingers.push(index);
-
-  middle.moveToNote(64);
-  this.model.add(middle.model);
-  this.fingers.push(middle);
-
-  ring.moveToNote(65);
-  this.model.add(ring.model);
-  this.fingers.push(ring);
-
-  pinky.moveToNote(67);
-  this.model.add(pinky.model);
-  this.fingers.push(pinky);
-
-  //set position of hand
-  // this.currentPos = {
-  //   x: 0,
-  //   y: 0,  
-  //   z: 0
-  // };
-
-  // this.newPos = {
-  //   x: 0,
-  //   y: 0,
-  //   z: 0
-  // };
-
-  // this.offSet = 0.32;
-
-  this.model.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
-
-  this.press = function(finger, noteNum) {
-    // _this.currentPos.x = _this.model.position.x;
-    var newPosition = keyboard.keys[noteNum].model.position.x;
-    // var oldPosition = _this.fingers[finger].currentPos.x;
-    // var delta = newPosition - oldPosition;
-    // if (delta > _this.currentPos.x) {
-    //   _this.setAscNewPos(delta, finger);
-    // }else {
-    //   _this.setDescNewPos(delta, finger);
-    // }
-    // _this.setUpNewTween();
-    for (var i = 1; i <= 5; i++) {
-      if (i === finger) {
-        _this.fingers[finger].press(noteNum);
-      }else {
-        _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
-      }
-    }
-  };
-
-  this.release = function(finger) {
-    console.log('the right ' + finger + ' finger is trying to release');
-    _this.fingers[finger].release();
-  };
-
-  this.update = function() {
-    var fingers = _this.fingers;
-    for (var i = 1; i < fingers.length; i++) {
-      fingers[i].update();
-    }
-  };
-
-  this.setUpNewTween = function() {
-    var update = function() {
-      _this.model.position.x = _this.currentPos.x;
-    };
-    var easing = TWEEN.Easing.Quadratic.Out;
-
-    var tween = new TWEEN.Tween(_this.currentPos)
-      .to(_this.newPos, 300)
-      .easing(easing)
-      .onUpdate(update);
-
-    tween.start();
-  };
-
-  this.setAscNewPos = function(delta, finger) {
-    console.log('current RH x pos: ', _this.currentPos.x);
-    _this.newPos.x = delta + (_this.offSet * (3-finger));
-  };
-
-  this.setDescNewPos = function(delta, finger) {
-    _this.newPos.x = delta + (_this.offSet * (finger - 3));
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-};
-},{"./HandDesign.js":11,"./IndexFinger.js":12,"./MiddleFinger.js":14,"./Pinky.js":15,"./RingFinger.js":17,"./Thumb.js":18}],17:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
-
-var RingFinger = module.exports.RingFinger = function(handInfo) {
+var RightRing = module.exports.LeftRing = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
   var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});
@@ -1400,14 +1382,78 @@ var RingFinger = module.exports.RingFinger = function(handInfo) {
   this.model = new THREE.Mesh(ringFingerGeometry, ringFingerMaterial);
   this.model.position.copy(ringFingerPosition);
   this.originalY = ringFingerPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[2] && delta < distances[3]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > distances[-5] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-8] && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < distances[2]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+5), 100);
+    }
+    else {
+      this.moveToNote(newNote+5);
+    }
+  };
 };
 
 RingFinger.prototype = Object.create(Finger.prototype);
 RingFinger.prototype.constructor = RingFinger;
-},{"./Finger.js":9}],18:[function(require,module,exports){
-var Finger = require('./Finger.js').Finger;
 
-var Thumb = module.exports.Thumb = function(handInfo) {
+},{"../Finger.js":9}],17:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+
+/*
+BIGGEST THINGS TO IMPLEMENT FOR MAKING MOVEMENT BETTER:
+    -Moving up Y value for black notes.
+    -Look-ahead of some kind. 
+        -Either attach a 'next note' property, for each finger, so you know the next note as the info comes in. Or... 
+        -Delay the sound, so that the piano and the fingers move in sync better. 
+    -Making thumb lower than the rest of the fingers, so it looks more like it moves under. 
+
+*/
+
+var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
   var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
@@ -1469,7 +1515,425 @@ var Thumb = module.exports.Thumb = function(handInfo) {
 
 module.exports.Thumb.prototype = Object.create(Finger.prototype);
 module.exports.Thumb.prototype.constructor = Thumb;
-},{"./Finger.js":9}],19:[function(require,module,exports){
+
+},{"../Finger.js":9}],18:[function(require,module,exports){
+var Pinky = require('./RightPinky.js').Pinky;
+var RingFinger = require('./RightRing.js').RingFinger;
+var MiddleFinger = require('./RightMiddle.js').MiddleFinger;
+var IndexFinger = require('./RightIndex.js').IndexFinger;
+var Thumb = require('./RightThumb.js').Thumb;
+var HandDesign = require('../HandDesign.js').HandDesign;
+
+module.exports.RightHand = function(keyboard) {
+  var _this = this;
+  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
+  var handDesign = new HandDesign(keyboard); 
+  var pinky = new Pinky(handDesign, 'right');
+  var ring = new RingFinger(handDesign, 'right');
+  var middle = new MiddleFinger(handDesign, 'right');
+  var index = new IndexFinger(handDesign, 'right');
+  var thumb = new Thumb(handDesign, 'right');
+
+  this.fingers = [];
+  this.model = new THREE.Object3D();
+
+  //add fingers to hand model
+  this.fingers.push(undefined); // this is just here to make the off by 1 error go away. (We want finger 1 to be thumb so that semantically it makes sense)
+
+  thumb.moveToNote(60);
+  this.model.add(thumb.model);
+  this.fingers.push(thumb);
+
+  index.moveToNote(62);
+  this.model.add(index.model);
+  this.fingers.push(index);
+
+  middle.moveToNote(64);
+  this.model.add(middle.model);
+  this.fingers.push(middle);
+
+  ring.moveToNote(65);
+  this.model.add(ring.model);
+  this.fingers.push(ring);
+
+  pinky.moveToNote(67);
+  this.model.add(pinky.model);
+  this.fingers.push(pinky);
+
+  this.model.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+
+  this.press = function(finger, noteNum) {
+    var newPosition = keyboard.keys[noteNum].model.position.x;
+    for (var i = 1; i <= 5; i++) {
+      if (i === finger) {
+        _this.fingers[i].press(noteNum);
+      }
+      _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
+    }
+  };
+
+  this.release = function(finger) {
+    console.log('the right ' + finger + ' finger is trying to release');
+    _this.fingers[finger].release();
+  };
+
+  this.update = function() {
+    var fingers = _this.fingers;
+    for (var i = 1; i < fingers.length; i++) {
+      fingers[i].update();
+    }
+  };
+};
+},{"../HandDesign.js":11,"./RightIndex.js":19,"./RightMiddle.js":20,"./RightPinky.js":21,"./RightRing.js":22,"./RightThumb.js":23}],19:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var IndexFinger = module.exports.RightIndex = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
+  var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
+  var indexFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
+  this.model.position.copy(indexFingerPosition);
+  this.originalY = indexFingerPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX,newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[4] && delta < distances[8]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[3] && delta < distances[7] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[2] && delta < distances[5] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 4);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < 0) {
+      return;
+    }else if (delta > 0 && delta < distances[3]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+2), 100);
+    }
+    else {
+      this.moveToNote(newNote+2);
+    }
+  };
+};
+
+IndexFinger.prototype = Object.create(Finger.prototype);
+IndexFinger.prototype.constructor = IndexFinger;
+
+},{"../Finger.js":9}],20:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var MiddleFinger = module.exports.RightMiddle = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
+  var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
+  var middleFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
+  this.model.position.copy(middleFingerPosition);
+  this.originalY = middleFingerPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[3] && delta < distances[5]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[1] && delta < distances[4] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < distances[-1] ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-6] && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < distances[4]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+3), 100);
+    }
+    else {
+      this.moveToNote(newNote+3);
+    }
+  };
+};
+
+MiddleFinger.prototype = Object.create(Finger.prototype);
+MiddleFinger.prototype.constructor = MiddleFinger;
+
+},{"../Finger.js":9}],21:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var Pinky = module.exports.RightPinky = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
+  var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
+  var pinkyPosition = new THREE.Vector3(0, 0.20, 0.54);
+  this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
+  this.model.position.copy(pinkyPosition);
+  this.originalY = pinkyPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.ringRules(delta, curX, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < 0) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[-5] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > distances[-7] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 5);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-12] && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < distances[1]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+7), 100);
+    }
+    else {
+      this.moveToNote(newNote+7);
+    }
+  };
+};
+
+Pinky.prototype = Object.create(Finger.prototype);
+Pinky.prototype.constructor = Pinky;
+
+},{"../Finger.js":9}],22:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var RightRing = module.exports.RightRing = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
+  var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});
+  var ringFingerPosition = new THREE.Vector3(0, 0.20, 0.45);
+  this.model = new THREE.Mesh(ringFingerGeometry, ringFingerMaterial);
+  this.model.position.copy(ringFingerPosition);
+  this.originalY = ringFingerPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[2] && delta < distances[3]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[-3] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > distances[-5] && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.thumbRules = function(delta, curX, newNote) {
+    if ( delta > distances[-8] && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < distances[2]) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+5), 100);
+    }
+    else {
+      this.moveToNote(newNote+5);
+    }
+  };
+};
+
+RingFinger.prototype = Object.create(Finger.prototype);
+RingFinger.prototype.constructor = RingFinger;
+
+},{"../Finger.js":9}],23:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+
+/*
+BIGGEST THINGS TO IMPLEMENT FOR MAKING MOVEMENT BETTER:
+    -Moving up Y value for black notes.
+    -Look-ahead of some kind. 
+        -Either attach a 'next note' property, for each finger, so you know the next note as the info comes in. Or... 
+        -Delay the sound, so that the piano and the fingers move in sync better. 
+    -Making thumb lower than the rest of the fingers, so it looks more like it moves under. 
+
+*/
+
+var RightThumb = module.exports.RightThumb = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
+  var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
+  var thumbPosition = new THREE.Vector3(0, 0.30, 0.6);
+  this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
+  this.model.position.copy(thumbPosition);
+  this.originalY = thumbPosition.y;
+  var distances = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX,newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX,newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX,newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, newNote) {
+    if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
+      return;
+    } else { //definitely move
+      this.moveToNote(newNote - 7);
+    }
+  };
+  this.ringRules = function(delta, curX, newNote) {
+    if ( delta > distances[4] && delta < distances[9] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > distances[2] && delta < distances[7] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 4);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > 0 && delta < distances[4] ) {
+      return;
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      return;
+    }else {
+      this.moveToNote(newNote-2);
+    }
+  };
+};
+
+module.exports.Thumb.prototype = Object.create(Finger.prototype);
+module.exports.Thumb.prototype.constructor = Thumb;
+
+},{"../Finger.js":9}],24:[function(require,module,exports){
 var PianoKey = require("./PianoKey.js").PianoKey;
 
 module.exports.Keyboard = function(keyboardDesign) {
@@ -1504,7 +1968,7 @@ module.exports.Keyboard = function(keyboardDesign) {
     }
   };
 };
-},{"./PianoKey.js":21}],20:[function(require,module,exports){
+},{"./PianoKey.js":26}],25:[function(require,module,exports){
 module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
@@ -1635,7 +2099,7 @@ module.exports.KeyboardDesign = function() {
 
 
 
-},{}],21:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   //set up some convenience vars
   var Black                    = boardInfo.KeyType.Black;
@@ -1682,7 +2146,7 @@ PianoKey.prototype.update = function() {
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
 };
-},{}],22:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports.Scene = function(container) {
   var $container = $(container);
   var width = $container.width();
