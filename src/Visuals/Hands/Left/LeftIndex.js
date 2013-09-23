@@ -30,28 +30,28 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[-8] && delta < distances[-4]) { //this is like the 'stretch' zone
+    if ( delta >= distances[-8] && delta <= distances[-4]) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
       this.moveToNote(newNote + 5);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[-7] && delta < distances[-3] ) {
+    if ( delta >= distances[-6] && delta <= distances[-4] ) {
       return;
     }else {
       this.moveToNote(newNote + 3);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[-5] && delta < distances[-2] ) {
+    if ( delta >= distances[-5] && delta <= distances[-2] ) {
       return;
     }else {
       this.moveToNote(newNote + 4);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > 0 && delta < distances[3]) {
+    if ( delta > 0 && delta <= distances[4]) {
       return;
     }else if (delta > distances[-3] && delta < 0) {
       var _this = this;

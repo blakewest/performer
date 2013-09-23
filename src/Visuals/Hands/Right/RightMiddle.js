@@ -12,7 +12,6 @@ var RightMiddle = module.exports.RightMiddle = function(handInfo) {
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
-    console.log('right middle is moving as needed');
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
     switch (finger) {

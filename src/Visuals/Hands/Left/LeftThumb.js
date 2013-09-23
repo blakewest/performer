@@ -12,6 +12,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
+    debugger;
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
     switch (finger) {
@@ -30,7 +31,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[-12] && delta < distances[-5]) { //this is like the 'stretch' zone
+    if ( delta >= distances[-12] && delta < distances[-5]) { //this is like the 'stretch' zone
       return;
     } else if (delta > 0 && delta < distances[1]) { //this is when the pinky crosses over thumb
       var _this = this;
@@ -40,7 +41,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[-9] && delta < distances[-4] ) {
+    if ( delta >= distances[-9] && delta < distances[-4] ) {
       return;
     }else if (delta > 0 && delta < distances[2]) { //this is when the ring crosses over thumb
       var _this = this;
@@ -50,7 +51,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[-7] && delta < distances[-2] ) {
+    if ( delta >= distances[-7] && delta < distances[-2] ) {
       return;
     }else if (delta > 0 && delta < distances[4]) { //this is when the middle crosses over thumb
       var _this = this;
@@ -60,7 +61,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
     }
   };
   this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-4] && delta < 0 ) {
+    if ( delta >= distances[-4] && delta < 0 ) {
       return;
     }else if (delta > 0 && delta < distances[2]) { //this is when the index crosses over thumb
       var _this = this;

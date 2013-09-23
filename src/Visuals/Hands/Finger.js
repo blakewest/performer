@@ -6,14 +6,13 @@ module.exports.Finger = function(Keyboard) {
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
-  this.currentNote = 0;
   // this.newX = this.model.position.x;
   // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
   this.distances = params(keyboard);
 
   this.press = function(note) {
-    // this.moveToNote(note);
+    this.moveToNote(note);
     this.model.position.y = this.pressedY;
     this.isPressed = true;
   };
@@ -22,35 +21,30 @@ module.exports.Finger = function(Keyboard) {
   };
 
   this.moveToNote = function(noteNum) {
-    console.log('moveToNote is getting called');
     this.currentPos.x = this.model.position.x;
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
     //logic about checking to see if neighbor is already on the note you want to play. 
+    debugger;
     var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
     var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
-    debugger;
-    if (noteNum > this.currentNote) {
+    if (noteNum > this.model.currentNote) {
       if (aboveNeighbor === noteNum) {
-        console.log('inside above neighbor === currentNote')
-        this.setNewPos(noteNum-1);
+        this.model.currentNote = noteNum-1;
       }else {
-        console.log('inside above neighbor !== currentNote')
-        this.setNewPos(noteNum);
+        this.model.currentNote = noteNum;
       }
     }
-    else if (noteNum < this.currentNote) {
+    else if (noteNum < this.model.currentNote) {
       if(belowNeighbor === noteNum) {
-        console.log('inside below neighbor === currentNote')
-        this.setNewPos(noteNum+1);
+        this.model.currentNote = noteNum+1;
       }else {
-        console.log('inside above neighbor === currentNote')
-        this.setNewPos(noteNum);
+        this.model.currentNote = noteNum;
       }
     }
 
-    
-    this.model.currentNote = noteNum;
+    this.setNewPos(this.model.currentNote);
+    console.log('Finger: ' + this.number + '/ Note: ' + this.model.currentNote);
     this.setUpNewTween();
   };
 

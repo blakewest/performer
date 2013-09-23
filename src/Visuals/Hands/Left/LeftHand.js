@@ -28,23 +28,23 @@ module.exports.LeftHand = function(keyboard) {
 
   this.model.add(thumb.model);
   this.fingers.push(thumb);
-  thumb.currentNote = 1;
+  thumb.model.currentNote = 1;
 
   this.model.add(index.model);
   this.fingers.push(index);
-  index.currentNote = 1;
+  index.model.currentNote = 1;
 
   this.model.add(middle.model);
   this.fingers.push(middle);
-  middle.currentNote = 1;
+  middle.model.currentNote = 1;
 
   this.model.add(ring.model);
   this.fingers.push(ring);
-  ring.currentNote = 1;
+  ring.model.currentNote = 1;
 
   this.model.add(pinky.model);
   this.fingers.push(pinky);
-  pinky.currentNote = 1;
+  pinky.model.currentNote = 1;
 
   this.model.add(dummy2.model);
   dummy2.model.currentNote = 110;
@@ -62,13 +62,15 @@ module.exports.LeftHand = function(keyboard) {
 
   this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
-    console.log('the left' + finger + ' finger is trying to press');
+    console.log('the left ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
+    debugger;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
         _this.fingers[i].press(noteNum);
+      }else{
+        _this.fingers[i].moveAsNeeded(finger, newPosition, noteNum);
       }
-      _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
     }
   };
 
