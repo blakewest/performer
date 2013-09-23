@@ -27,6 +27,7 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
       break;
     case 1:
       this.thumbRules(delta, curX, curNote, newNote);
+      break;
     }
   };
 
@@ -45,7 +46,7 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
     }
   };
   this.middleRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote-5) && delta <= dist.get(curNote, curNote-2) ) {
+    if ( delta >= dist.get(curNote, curNote-5) && delta <= dist.get(curNote, curNote-1) ) {
       return;
     }else {
       this.moveToNote(newNote + 4);

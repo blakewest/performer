@@ -51,7 +51,7 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
       this.moveToNote(newNote - 3);
     }
   };
-  this.thumbRules = function(delta, curX, newNote) {
+  this.thumbRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta < dist.get(curNote, curNote + 8) ) {
       return;
     } else if (delta > dist.get(curNote, curNote -2) && delta < 0) {             //this is thumb crossing under

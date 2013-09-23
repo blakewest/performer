@@ -1198,7 +1198,6 @@ module.exports.LeftHand = function(keyboard) {
     finger = Math.abs(finger);
     console.log('the left ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
-    debugger;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
         _this.fingers[i].press(noteNum);
@@ -1267,6 +1266,7 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
       break;
     case 1:
       this.thumbRules(delta, curX, curNote, newNote);
+      break;
     }
   };
 
@@ -1285,7 +1285,7 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
     }
   };
   this.middleRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote-5) && delta <= dist.get(curNote, curNote-2) ) {
+    if ( delta >= dist.get(curNote, curNote-5) && delta <= dist.get(curNote, curNote-1) ) {
       return;
     }else {
       this.moveToNote(newNote + 4);
@@ -1391,12 +1391,12 @@ var LeftPinky = module.exports.LeftPinky = function(handInfo) {
   this.number = 5;
   var dist = this.distances;
 
-  this.moveAsNeeded = function(finger, newPosition, curNote, newNote) {
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
     var curNote = this.model.currentNote;
     switch (finger) {
-    case 5:
+    case 4:
       this.ringRules(delta, curX, curNote, newNote);
       break;
     case 3:
@@ -1411,30 +1411,31 @@ var LeftPinky = module.exports.LeftPinky = function(handInfo) {
   };
 
   this.ringRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta < dist.get(curNote, curNote+3)) { //this is like the 'stretch' zone
+    debugger;
+    if ( delta > 0 && delta <= dist.get(curNote, curNote+3)) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
       this.moveToNote(newNote - 2);
     }
   };
   this.middleRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta < dist.get(curNote, curNote + 5) ) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 5) ) {
       return;
     }else {
       this.moveToNote(newNote - 3);
     }
   };
   this.indexRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta < dist.get(curNote, curNote + 7) ) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 7) ) {
       return;
     }else {
       this.moveToNote(newNote - 5);
     }
   };
   this.thumbRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta < dist.get(curNote, curNote + 12) ) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 12) ) {
       return;
-    } else if (delta > 0 && delta < dist.get(curNote, curNote + 1) ) {
+    } else if (delta > 0 && delta <= dist.get(curNote, curNote + 1) ) {
       var _this = this;
       setTimeout(_this.moveToNote(newNote-7), 100);
     }
@@ -1517,7 +1518,7 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
       this.moveToNote(newNote - 3);
     }
   };
-  this.thumbRules = function(delta, curX, newNote) {
+  this.thumbRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta < dist.get(curNote, curNote + 8) ) {
       return;
     } else if (delta > dist.get(curNote, curNote -2) && delta < 0) {             //this is thumb crossing under
@@ -1548,7 +1549,6 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
-    debugger;
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
     var curNote = this.model.currentNote;
@@ -1570,7 +1570,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   this.pinkyRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote-12) && delta <= dist.get(curNote, curNote-5) )  { //this is like the 'stretch' zone
       return;
-    } else if (delta > 0 && delta < distances[1]) { //this is when the pinky crosses over thumb
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) { //this is when the pinky crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 7), 100);
     }else { //definitely move
@@ -1726,51 +1726,52 @@ var RightIndex = module.exports.RightIndex = function(handInfo) {
   this.model.position.copy(indexFingerPosition);
   this.originalY = indexFingerPosition.y;
   this.number = 2;
-  var distances = this.distances;
+  var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
     switch (finger) {
     case 5:
-      this.pinkyRules(delta, curX, newNote);
+      this.pinkyRules(delta, curX, curNote, newNote);
       break;
     case 4:
-      this.ringRules(delta,curX,newNote);
+      this.ringRules(delta,curX, curNote, newNote);
       break;
     case 3:
-      this.middleRules(delta,curX,newNote);
+      this.middleRules(delta,curX, curNote, newNote);
       break;
     case 1:
-      this.thumbRules(delta,curX,newNote);
+      this.thumbRules(delta,curX, curNote, newNote);
     }
   };
 
-  this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[4] && delta < distances[8]) { //this is like the 'stretch' zone
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+4) && delta < dist.get(curNote, curNote+8)) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
       this.moveToNote(newNote - 5);
     }
   };
-  this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[3] && delta < distances[7] ) {
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+3) && delta < dist.get(curNote, curNote+7) ) {
       return;
     }else {
-      this.moveToNote(newNote - 3);
+      this.moveToNote(newNote-3);
     }
   };
-  this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[2] && delta < distances[5] ) {
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+2) && delta < dist.get(curNote, curNote+5) ) {
       return;
     }else {
-      this.moveToNote(newNote - 2);
+      this.moveToNote(newNote-2);
     }
   };
-  this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < 0) {
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0) {
       return;
-    }else if (delta > 0 && delta < distances[3]) {
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+3)) {
       var _this = this;
       setTimeout(_this.moveToNote(newNote+2), 100);
     }
@@ -1795,51 +1796,52 @@ var RightMiddle = module.exports.RightMiddle = function(handInfo) {
   this.model.position.copy(middleFingerPosition);
   this.originalY = middleFingerPosition.y;
   this.number = 3;
-  var distances = this.distances;
+  var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
     switch (finger) {
     case 5:
-      this.pinkyRules(delta, curX, newNote);
+      this.pinkyRules(delta, curX, curNote, newNote);
       break;
     case 4:
-      this.ringRules(delta,curX,newNote);
+      this.ringRules(delta,curX, curNote, newNote);
       break;
     case 2:
-      this.indexRules(delta,curX,newNote);
+      this.indexRules(delta,curX, curNote, newNote);
       break;
     case 1:
-      this.thumbRules(delta,curX,newNote);
+      this.thumbRules(delta,curX, curNote, newNote);
     }
   };
 
-  this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[3] && delta < distances[5]) { //this is like the 'stretch' zone
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+3) && delta <= dist.get(curNote, curNote+5)) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
       this.moveToNote(newNote - 3);
     }
   };
-  this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[1] && delta < distances[4] ) {
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+1) && delta <= dist.get(curNote, curNote+4) ) {
       return;
     }else {
       this.moveToNote(newNote - 2);
     }
   };
-  this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < distances[-1] ) {
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-3) && delta <= dist.get(curNote, curNote-1) ) {
       return;
     }else {
       this.moveToNote(newNote + 2);
     }
   };
-  this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-6] && delta < 0 ) {
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-6) && delta < 0 ) {
       return;
-    } else if (delta > 0 && delta < distances[4]) {
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+4)) {
       var _this = this;
       setTimeout(_this.moveToNote(newNote+3), 100);
     }
@@ -1864,51 +1866,52 @@ var RightPinky = module.exports.RightPinky = function(handInfo) {
   this.model.position.copy(pinkyPosition);
   this.originalY = pinkyPosition.y;
   this.number = 5;
-  var distances = this.distances;
+  var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
     switch (finger) {
     case 5:
-      this.ringRules(delta, curX, newNote);
+      this.ringRules(delta, curX, curNote, newNote);
       break;
     case 3:
-      this.middleRules(delta,curX,newNote);
+      this.middleRules(delta,curX, curNote, newNote);
       break;
     case 2:
-      this.indexRules(delta,curX,newNote);
+      this.indexRules(delta,curX, curNote, newNote);
       break;
     case 1:
-      this.thumbRules(delta,curX,newNote);
+      this.thumbRules(delta,curX, curNote, newNote);
     }
   };
 
-  this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < 0) { //this is like the 'stretch' zone
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
       this.moveToNote(newNote + 2);
     }
   };
-  this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[-5] && delta < 0 ) {
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-5) && delta < 0 ) {
       return;
     }else {
       this.moveToNote(newNote + 3);
     }
   };
-  this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-7] && delta < 0 ) {
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-7) && delta < 0 ) {
       return;
     }else {
       this.moveToNote(newNote + 5);
     }
   };
-  this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-12] && delta < 0 ) {
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-12) && delta < 0 ) {
       return;
-    } else if (delta > 0 && delta < distances[1]) {
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) {
       var _this = this;
       setTimeout(_this.moveToNote(newNote+7), 100);
     }
@@ -1949,51 +1952,52 @@ var RightRing = module.exports.RightRing = function(handInfo) {
   this.model.position.copy(ringFingerPosition);
   this.originalY = ringFingerPosition.y;
   this.number = 4;
-  var distances = this.distances;
+  var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
     switch (finger) {
     case 5:
-      this.pinkyRules(delta, curX, newNote);
+      this.pinkyRules(delta, curX, curNote, newNote);
       break;
     case 3:
-      this.middleRules(delta,curX,newNote);
+      this.middleRules(delta,curX, curNote, newNote);
       break;
     case 2:
-      this.indexRules(delta,curX,newNote);
+      this.indexRules(delta,curX, curNote, newNote);
       break;
     case 1:
-      this.thumbRules(delta,curX,newNote);
+      this.thumbRules(delta,curX, curNote, newNote);
     }
   };
 
-  this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[2] && delta < distances[3]) { //this is like the 'stretch' zone
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+2) && delta < dist.get(curNote, curNote+3)) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
       this.moveToNote(newNote - 2);
     }
   };
-  this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < 0 ) {
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0 ) {
       return;
     }else {
       this.moveToNote(newNote + 2);
     }
   };
-  this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-5] && delta < 0 ) {
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-5) && delta < 0 ) {
       return;
     }else {
       this.moveToNote(newNote + 3);
     }
   };
-  this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-8] && delta < 0 ) {
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-8) && delta < 0 ) {
       return;
-    } else if (delta > 0 && delta < distances[2]) {
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+2)) {
       var _this = this;
       setTimeout(_this.moveToNote(newNote+5), 100);
     }
@@ -2040,8 +2044,7 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    debugger;
-    if ( delta >= dist.get(curNote, curNote + 5) && delta < dist.get(curNote, curNote + 12) ) { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { //this is like the 'stretch' zone
       return;
     }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
       var _this = this;
@@ -2065,13 +2068,13 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
       return;
     }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { //this is when the index lightly crosses over thumb
       var _this = this;
-      setTimeout(_this.moveToNote(newNote - 4), 100);
+      setTimeout(_this.moveToNote(newNote-4), 100);
     }else {
       this.moveToNote(newNote - 4);
     }
   };
   this.indexRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta <= dist.get(curNote, curNote+ 4) ) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote+4) ) {
       return;
     }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
       var _this = this;

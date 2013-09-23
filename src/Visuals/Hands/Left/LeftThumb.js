@@ -12,7 +12,6 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
-    debugger;
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
     var curNote = this.model.currentNote;
@@ -34,7 +33,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   this.pinkyRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote-12) && delta <= dist.get(curNote, curNote-5) )  { //this is like the 'stretch' zone
       return;
-    } else if (delta > 0 && delta < distances[1]) { //this is when the pinky crosses over thumb
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) { //this is when the pinky crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 7), 100);
     }else { //definitely move

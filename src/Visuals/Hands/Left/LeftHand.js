@@ -64,7 +64,6 @@ module.exports.LeftHand = function(keyboard) {
     finger = Math.abs(finger);
     console.log('the left ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
-    debugger;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
         _this.fingers[i].press(noteNum);

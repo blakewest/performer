@@ -31,8 +31,7 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    debugger;
-    if ( delta >= dist.get(curNote, curNote + 5) && delta < dist.get(curNote, curNote + 12) ) { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { //this is like the 'stretch' zone
       return;
     }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
       var _this = this;
@@ -56,13 +55,13 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
       return;
     }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { //this is when the index lightly crosses over thumb
       var _this = this;
-      setTimeout(_this.moveToNote(newNote - 4), 100);
+      setTimeout(_this.moveToNote(newNote-4), 100);
     }else {
       this.moveToNote(newNote - 4);
     }
   };
   this.indexRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta <= dist.get(curNote, curNote+ 4) ) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote+4) ) {
       return;
     }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
       var _this = this;
