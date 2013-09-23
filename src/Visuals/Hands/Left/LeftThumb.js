@@ -1,16 +1,5 @@
 var Finger = require('../Finger.js').Finger;
 
-
-/*
-BIGGEST THINGS TO IMPLEMENT FOR MAKING MOVEMENT BETTER:
-    -Moving up Y value for black notes.
-    -Look-ahead of some kind. 
-        -Either attach a 'next note' property, for each finger, so you know the next note as the info comes in. Or... 
-        -Delay the sound, so that the piano and the fingers move in sync better. 
-    -Making thumb lower than the rest of the fingers, so it looks more like it moves under. 
-
-*/
-
 var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
@@ -19,6 +8,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
+  this.number = 1;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
@@ -78,6 +68,22 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
     }else {
       this.moveToNote(newNote + 2);
     }
+  };
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y + 0.1
+      _this.model.position.z = _this.currentPos.z + 0.2;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
   };
 };
 

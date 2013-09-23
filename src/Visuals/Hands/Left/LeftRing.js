@@ -8,6 +8,7 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
   this.model = new THREE.Mesh(ringFingerGeometry, ringFingerMaterial);
   this.model.position.copy(ringFingerPosition);
   this.originalY = ringFingerPosition.y;
+  this.number = 4;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {

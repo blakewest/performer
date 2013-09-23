@@ -8,6 +8,7 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
   this.model.position.copy(middleFingerPosition);
   this.originalY = middleFingerPosition.y;
+  this.number = 3;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
@@ -39,7 +40,7 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
     if ( delta > distances[-4] && delta < distances[-1] ) {
       return;
     }else {
-      this.moveToNote(newNote - 2);
+      this.moveToNote(newNote + 2);
     }
   };
   this.indexRules = function(delta, curX, newNote) {

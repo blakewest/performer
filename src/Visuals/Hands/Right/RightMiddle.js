@@ -8,9 +8,11 @@ var RightMiddle = module.exports.RightMiddle = function(handInfo) {
   this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
   this.model.position.copy(middleFingerPosition);
   this.originalY = middleFingerPosition.y;
+  this.number = 3;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
+    console.log('right middle is moving as needed');
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
     switch (finger) {

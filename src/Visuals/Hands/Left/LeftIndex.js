@@ -8,6 +8,7 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
   this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
   this.model.position.copy(indexFingerPosition);
   this.originalY = indexFingerPosition.y;
+  this.number = 2;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {

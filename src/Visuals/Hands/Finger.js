@@ -6,7 +6,7 @@ module.exports.Finger = function(Keyboard) {
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
-  this.currentNote = 60;
+  this.currentNote = 0;
   // this.newX = this.model.position.x;
   // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
@@ -22,13 +22,35 @@ module.exports.Finger = function(Keyboard) {
   };
 
   this.moveToNote = function(noteNum) {
+    console.log('moveToNote is getting called');
     this.currentPos.x = this.model.position.x;
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
-    this.newPos.x = keyboard.keys[noteNum].model.position.x;
-    this.newPos.y = keyboard.keys[noteNum].model.position.y + this.originalY;
-    this.newPos.z = keyboard.keys[noteNum].model.position.z;
-    this.currentNote = noteNum;
+    //logic about checking to see if neighbor is already on the note you want to play. 
+    var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
+    var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
+    debugger;
+    if (noteNum > this.currentNote) {
+      if (aboveNeighbor === noteNum) {
+        console.log('inside above neighbor === currentNote')
+        this.setNewPos(noteNum-1);
+      }else {
+        console.log('inside above neighbor !== currentNote')
+        this.setNewPos(noteNum);
+      }
+    }
+    else if (noteNum < this.currentNote) {
+      if(belowNeighbor === noteNum) {
+        console.log('inside below neighbor === currentNote')
+        this.setNewPos(noteNum+1);
+      }else {
+        console.log('inside above neighbor === currentNote')
+        this.setNewPos(noteNum);
+      }
+    }
+
+    
+    this.model.currentNote = noteNum;
     this.setUpNewTween();
   };
 
@@ -52,11 +74,17 @@ module.exports.Finger = function(Keyboard) {
     z: 0
   };
 
+  this.setNewPos = function(noteNum) {
+    this.newPos.x = keyboard.keys[noteNum].model.position.x;
+    this.newPos.y = keyboard.keys[noteNum].model.position.y + this.originalY;
+    this.newPos.z = keyboard.keys[noteNum].model.position.z + 0.5;
+  };
+
   this.setUpNewTween = function() {
     var _this = this;
     var update = function() {
       _this.model.position.x = _this.currentPos.x;
-      _this.model.position.y = _this.currentPos.y;
+      _this.model.position.y = _this.currentPos.y+0.1;
       _this.model.position.z = _this.currentPos.z;
     };
     var easing = TWEEN.Easing.Quadratic.Out;

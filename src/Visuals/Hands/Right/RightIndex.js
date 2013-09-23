@@ -8,6 +8,7 @@ var RightIndex = module.exports.RightIndex = function(handInfo) {
   this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
   this.model.position.copy(indexFingerPosition);
   this.originalY = indexFingerPosition.y;
+  this.number = 2;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
@@ -46,7 +47,7 @@ var RightIndex = module.exports.RightIndex = function(handInfo) {
     if ( delta > distances[2] && delta < distances[5] ) {
       return;
     }else {
-      this.moveToNote(newNote - 4);
+      this.moveToNote(newNote - 2);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {

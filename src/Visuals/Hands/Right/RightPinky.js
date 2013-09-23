@@ -8,6 +8,7 @@ var RightPinky = module.exports.RightPinky = function(handInfo) {
   this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
   this.model.position.copy(pinkyPosition);
   this.originalY = pinkyPosition.y;
+  this.number = 5;
   var distances = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
@@ -59,6 +60,22 @@ var RightPinky = module.exports.RightPinky = function(handInfo) {
     else {
       this.moveToNote(newNote+7);
     }
+  };
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y +0.1;
+      _this.model.position.z = _this.currentPos.z + 0.1;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
   };
 };
 
