@@ -1,19 +1,19 @@
-var Pinky = require('./RightPinky.js').Pinky;
-var RingFinger = require('./RightRing.js').RingFinger;
-var MiddleFinger = require('./RightMiddle.js').MiddleFinger;
-var IndexFinger = require('./RightIndex.js').IndexFinger;
-var Thumb = require('./RightThumb.js').Thumb;
+var RightPinky = require('./RightPinky.js').RightPinky;
+var RightRing = require('./RightRing.js').RightRing;
+var RightMiddle = require('./RightMiddle.js').RightMiddle;
+var RightIndex = require('./RightIndex.js').RightIndex;
+var RightThumb = require('./RightThumb.js').RightThumb;
 var HandDesign = require('../HandDesign.js').HandDesign;
 
 module.exports.RightHand = function(keyboard) {
   var _this = this;
   //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
   var handDesign = new HandDesign(keyboard); 
-  var pinky = new Pinky(handDesign, 'right');
-  var ring = new RingFinger(handDesign, 'right');
-  var middle = new MiddleFinger(handDesign, 'right');
-  var index = new IndexFinger(handDesign, 'right');
-  var thumb = new Thumb(handDesign, 'right');
+  var pinky = new RightPinky(handDesign, 'right');
+  var ring = new RightRing(handDesign, 'right');
+  var middle = new RightMiddle(handDesign, 'right');
+  var index = new RightIndex(handDesign, 'right');
+  var thumb = new RightThumb(handDesign, 'right');
 
   this.fingers = [];
   this.model = new THREE.Object3D();

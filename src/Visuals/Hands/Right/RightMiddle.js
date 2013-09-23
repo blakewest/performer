@@ -1,6 +1,6 @@
 var Finger = require('../Finger.js').Finger;
 
-var MiddleFinger = module.exports.RightMiddle = function(handInfo) {
+var RightMiddle = module.exports.RightMiddle = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
   var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
@@ -62,5 +62,5 @@ var MiddleFinger = module.exports.RightMiddle = function(handInfo) {
   };
 };
 
-MiddleFinger.prototype = Object.create(Finger.prototype);
-MiddleFinger.prototype.constructor = MiddleFinger;
+RightMiddle.prototype = Object.create(Finger.prototype);
+RightMiddle.prototype.constructor = RightMiddle;

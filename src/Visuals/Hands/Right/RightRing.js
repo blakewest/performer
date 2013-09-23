@@ -62,5 +62,5 @@ var RightRing = module.exports.RightRing = function(handInfo) {
   };
 };
 
-RingFinger.prototype = Object.create(Finger.prototype);
-RingFinger.prototype.constructor = RingFinger;
+RightRing.prototype = Object.create(Finger.prototype);
+RightRing.prototype.constructor = RightRing;

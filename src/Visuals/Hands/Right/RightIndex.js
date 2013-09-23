@@ -1,6 +1,6 @@
 var Finger = require('../Finger.js').Finger;
 
-var IndexFinger = module.exports.RightIndex = function(handInfo) {
+var RightIndex = module.exports.RightIndex = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
   var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
@@ -62,5 +62,5 @@ var IndexFinger = module.exports.RightIndex = function(handInfo) {
   };
 };
 
-IndexFinger.prototype = Object.create(Finger.prototype);
-IndexFinger.prototype.constructor = IndexFinger;
+RightIndex.prototype = Object.create(Finger.prototype);
+RightIndex.prototype.constructor = RightIndex;

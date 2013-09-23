@@ -1,6 +1,6 @@
 var Finger = require('../Finger.js').Finger;
 
-var Pinky = module.exports.RightPinky = function(handInfo) {
+var RightPinky = module.exports.RightPinky = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
   var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
@@ -62,5 +62,5 @@ var Pinky = module.exports.RightPinky = function(handInfo) {
   };
 };
 
-Pinky.prototype = Object.create(Finger.prototype);
-Pinky.prototype.constructor = Pinky;
+RightPinky.prototype = Object.create(Finger.prototype);
+RightPinky.prototype.constructor = RightPinky;

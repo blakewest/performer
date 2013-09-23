@@ -40,36 +40,46 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
+    if ( delta > distances[-12] && delta < distances[-5]) { //this is like the 'stretch' zone
       return;
-    } else { //definitely move
-      this.moveToNote(newNote - 7);
+    } else if (delta > 0 && delta < distances[1]) { //this is when the pinky crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 7), 100);
+    }else { //definitely move
+      this.moveToNote(newNote + 7);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[4] && delta < distances[9] ) {
+    if ( delta > distances[-9] && delta < distances[-4] ) {
       return;
+    }else if (delta > 0 && delta < distances[2]) { //this is when the ring crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 5), 100);
     }else {
-      this.moveToNote(newNote - 5);
+      this.moveToNote(newNote + 5);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[2] && delta < distances[7] ) {
+    if ( delta > distances[-7] && delta < distances[-2] ) {
       return;
+    }else if (delta > 0 && delta < distances[4]) { //this is when the middle crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 4), 100);
     }else {
-      this.moveToNote(newNote - 4);
+      this.moveToNote(newNote + 4);
     }
   };
   this.indexRules = function(delta, curX, newNote) {
-    if ( delta > 0 && delta < distances[4] ) {
+    if ( delta > distances[-4] && delta < 0 ) {
       return;
-    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
-      return;
+    }else if (delta > 0 && delta < distances[2]) { //this is when the index crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 2), 100);
     }else {
-      this.moveToNote(newNote-2);
+      this.moveToNote(newNote + 2);
     }
   };
 };
 
-module.exports.Thumb.prototype = Object.create(Finger.prototype);
-module.exports.Thumb.prototype.constructor = Thumb;
+LeftThumb.prototype = Object.create(Finger.prototype);
+LeftThumb.prototype.constructor = LeftThumb;

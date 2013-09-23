@@ -1,6 +1,6 @@
 var Finger = require('../Finger.js').Finger;
 
-var MiddleFinger = module.exports.LeftMiddle = function(handInfo) {
+var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
   var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
@@ -29,38 +29,38 @@ var MiddleFinger = module.exports.LeftMiddle = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[3] && delta < distances[5]) { //this is like the 'stretch' zone
+    if ( delta > distances[-5] && delta < distances[-3]) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
-      this.moveToNote(newNote - 3);
+      this.moveToNote(newNote + 3);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[1] && delta < distances[4] ) {
+    if ( delta > distances[-4] && delta < distances[-1] ) {
       return;
     }else {
       this.moveToNote(newNote - 2);
     }
   };
   this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < distances[-1] ) {
+    if ( delta > distances[1] && delta < distances[3] ) {
       return;
     }else {
-      this.moveToNote(newNote + 2);
+      this.moveToNote(newNote - 2);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-6] && delta < 0 ) {
+    if ( delta > 0 && delta < distances[6] ) {
       return;
-    } else if (delta > 0 && delta < distances[4]) {
+    } else if (delta > distances[-4] && delta < 0) {    //this is the thumb crossing under
       var _this = this;
-      setTimeout(_this.moveToNote(newNote+3), 100);
+      setTimeout(_this.moveToNote(newNote-3), 100);
     }
     else {
-      this.moveToNote(newNote+3);
+      this.moveToNote(newNote-3);
     }
   };
 };
 
-MiddleFinger.prototype = Object.create(Finger.prototype);
-MiddleFinger.prototype.constructor = MiddleFinger;
+LeftMiddle.prototype = Object.create(Finger.prototype);
+LeftMiddle.prototype.constructor = LeftMiddle;

@@ -42,13 +42,19 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.pinkyRules = function(delta, curX, newNote) {
     if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
       return;
-    } else { //definitely move
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-7), 100);
+    }else { //definitely move
       this.moveToNote(newNote - 7);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
     if ( delta > distances[4] && delta < distances[9] ) {
       return;
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-5), 100);
     }else {
       this.moveToNote(newNote - 5);
     }
@@ -56,6 +62,9 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.middleRules = function(delta, curX, newNote) {
     if ( delta > distances[2] && delta < distances[7] ) {
       return;
+    }else if (delta > distances[-3] && delta < 0) { //this is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote - 4), 100);
     }else {
       this.moveToNote(newNote - 4);
     }
@@ -64,12 +73,13 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
     if ( delta > 0 && delta < distances[4] ) {
       return;
     }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
-      return;
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-2), 100);
     }else {
       this.moveToNote(newNote-2);
     }
   };
 };
 
-module.exports.Thumb.prototype = Object.create(Finger.prototype);
-module.exports.Thumb.prototype.constructor = Thumb;
+RightThumb.prototype = Object.create(Finger.prototype);
+RightThumb.prototype.constructor = RightThumb;

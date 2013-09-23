@@ -1078,22 +1078,22 @@ module.exports.HandDesign = function(keyboard) {
   this.keyboardHeight = 0.22;
 };
 },{}],12:[function(require,module,exports){
-var Pinky = require('./LeftPinky.js').Pinky;
-var RingFinger = require('./LeftRing.js').RingFinger;
-var MiddleFinger = require('./LeftMiddle.js').MiddleFinger;
-var IndexFinger = require('./LeftIndex.js').IndexFinger;
-var Thumb = require('./LeftThumb.js').Thumb;
+var LeftPinky = require('./LeftPinky.js').LeftPinky;
+var LeftRing = require('./LeftRing.js').LeftRing;
+var LeftMiddle = require('./LeftMiddle.js').LeftMiddle;
+var LeftIndex = require('./LeftIndex.js').LeftIndex;
+var LeftThumb = require('./LeftThumb.js').LeftThumb;
 var HandDesign = require('../HandDesign.js').HandDesign;
 
 module.exports.LeftHand = function(keyboard) {
   var _this = this;
   //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
   var handDesign = new HandDesign(keyboard);
-  var pinky = new Pinky(handDesign, 'left');
-  var ring = new RingFinger(handDesign, 'left');
-  var middle = new MiddleFinger(handDesign, 'left');
-  var index = new IndexFinger(handDesign, 'left');
-  var thumb = new Thumb(handDesign, 'left');
+  var pinky = new LeftPinky(handDesign, 'left');
+  var ring = new LeftRing(handDesign, 'left');
+  var middle = new LeftMiddle(handDesign, 'left');
+  var index = new LeftIndex(handDesign, 'left');
+  var thumb = new LeftThumb(handDesign, 'left');
 
   this.fingers = [];
   this.model = new THREE.Object3D();
@@ -1170,7 +1170,7 @@ module.exports.LeftHand = function(keyboard) {
 },{"../HandDesign.js":11,"./LeftIndex.js":13,"./LeftMiddle.js":14,"./LeftPinky.js":15,"./LeftRing.js":16,"./LeftThumb.js":17}],13:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var IndexFinger = module.exports.LeftIndex = function(handInfo) {
+var LeftIndex = module.exports.LeftIndex = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
   var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
@@ -1199,46 +1199,46 @@ var IndexFinger = module.exports.LeftIndex = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[4] && delta < distances[8]) { //this is like the 'stretch' zone
+    if ( delta > distances[-8] && delta < distances[-4]) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
-      this.moveToNote(newNote - 5);
+      this.moveToNote(newNote + 5);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[3] && delta < distances[7] ) {
+    if ( delta > distances[-7] && delta < distances[-3] ) {
       return;
     }else {
-      this.moveToNote(newNote - 3);
+      this.moveToNote(newNote + 3);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[2] && delta < distances[5] ) {
+    if ( delta > distances[-5] && delta < distances[-2] ) {
       return;
     }else {
-      this.moveToNote(newNote - 4);
+      this.moveToNote(newNote + 4);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < 0) {
+    if ( delta > 0 && delta < distances[3]) {
       return;
-    }else if (delta > 0 && delta < distances[3]) {
+    }else if (delta > distances[-3] && delta < 0) {
       var _this = this;
-      setTimeout(_this.moveToNote(newNote+2), 100);
+      setTimeout(_this.moveToNote(newNote - 2), 100);
     }
     else {
-      this.moveToNote(newNote+2);
+      this.moveToNote(newNote - 2);
     }
   };
 };
 
-IndexFinger.prototype = Object.create(Finger.prototype);
-IndexFinger.prototype.constructor = IndexFinger;
+LeftIndex.prototype = Object.create(Finger.prototype);
+LeftIndex.prototype.constructor = LeftIndex;
 
 },{"../Finger.js":9}],14:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var MiddleFinger = module.exports.LeftMiddle = function(handInfo) {
+var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
   var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
@@ -1267,46 +1267,46 @@ var MiddleFinger = module.exports.LeftMiddle = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[3] && delta < distances[5]) { //this is like the 'stretch' zone
+    if ( delta > distances[-5] && delta < distances[-3]) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
-      this.moveToNote(newNote - 3);
+      this.moveToNote(newNote + 3);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[1] && delta < distances[4] ) {
+    if ( delta > distances[-4] && delta < distances[-1] ) {
       return;
     }else {
       this.moveToNote(newNote - 2);
     }
   };
   this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < distances[-1] ) {
+    if ( delta > distances[1] && delta < distances[3] ) {
       return;
     }else {
-      this.moveToNote(newNote + 2);
+      this.moveToNote(newNote - 2);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-6] && delta < 0 ) {
+    if ( delta > 0 && delta < distances[6] ) {
       return;
-    } else if (delta > 0 && delta < distances[4]) {
+    } else if (delta > distances[-4] && delta < 0) {    //this is the thumb crossing under
       var _this = this;
-      setTimeout(_this.moveToNote(newNote+3), 100);
+      setTimeout(_this.moveToNote(newNote-3), 100);
     }
     else {
-      this.moveToNote(newNote+3);
+      this.moveToNote(newNote-3);
     }
   };
 };
 
-MiddleFinger.prototype = Object.create(Finger.prototype);
-MiddleFinger.prototype.constructor = MiddleFinger;
+LeftMiddle.prototype = Object.create(Finger.prototype);
+LeftMiddle.prototype.constructor = LeftMiddle;
 
 },{"../Finger.js":9}],15:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var Pinky = module.exports.LeftPinky = function(handInfo) {
+var LeftPinky = module.exports.LeftPinky = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
   var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
@@ -1335,46 +1335,46 @@ var Pinky = module.exports.LeftPinky = function(handInfo) {
   };
 
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < 0) { //this is like the 'stretch' zone
+    if ( delta > 0 && delta < distances[3]) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
-      this.moveToNote(newNote + 2);
+      this.moveToNote(newNote - 2);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[-5] && delta < 0 ) {
+    if ( delta > 0 && delta < distances[5] ) {
       return;
     }else {
-      this.moveToNote(newNote + 3);
+      this.moveToNote(newNote - 3);
     }
   };
   this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-7] && delta < 0 ) {
+    if ( delta > 0 && delta < distances[7] ) {
       return;
     }else {
-      this.moveToNote(newNote + 5);
+      this.moveToNote(newNote - 5);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-12] && delta < 0 ) {
+    if ( delta > 0 && delta < distances[12] ) {
       return;
     } else if (delta > 0 && delta < distances[1]) {
       var _this = this;
-      setTimeout(_this.moveToNote(newNote+7), 100);
+      setTimeout(_this.moveToNote(newNote-7), 100);
     }
     else {
-      this.moveToNote(newNote+7);
+      this.moveToNote(newNote-7);
     }
   };
 };
 
-Pinky.prototype = Object.create(Finger.prototype);
-Pinky.prototype.constructor = Pinky;
+LeftPinky.prototype = Object.create(Finger.prototype);
+LeftPinky.prototype.constructor = LeftPinky;
 
 },{"../Finger.js":9}],16:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var RightRing = module.exports.LeftRing = function(handInfo) {
+var LeftRing = module.exports.LeftRing = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
   var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});
@@ -1403,41 +1403,41 @@ var RightRing = module.exports.LeftRing = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[2] && delta < distances[3]) { //this is like the 'stretch' zone
+    if ( delta > distances[-3] && delta < distances[-2]) { //this is like the 'stretch' zone
       return;
     } else { //definitely move
-      this.moveToNote(newNote - 2);
-    }
-  };
-  this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[-3] && delta < 0 ) {
-      return;
-    }else {
       this.moveToNote(newNote + 2);
     }
   };
-  this.indexRules = function(delta, curX, newNote) {
-    if ( delta > distances[-5] && delta < 0 ) {
+  this.middleRules = function(delta, curX, newNote) {
+    if ( delta > 0 && delta < distances[3] ) {
       return;
     }else {
-      this.moveToNote(newNote + 3);
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.indexRules = function(delta, curX, newNote) {
+    if ( delta > 0 && delta < distances[5] ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 3);
     }
   };
   this.thumbRules = function(delta, curX, newNote) {
-    if ( delta > distances[-8] && delta < 0 ) {
+    if ( delta > 0 && delta < distances[8] ) {
       return;
-    } else if (delta > 0 && delta < distances[2]) {
+    } else if (delta > distances[-2] && delta < 0) {             //this is thumb crossing under
       var _this = this;
-      setTimeout(_this.moveToNote(newNote+5), 100);
+      setTimeout(_this.moveToNote(newNote - 5), 100);
     }
     else {
-      this.moveToNote(newNote+5);
+      this.moveToNote(newNote - 5);
     }
   };
 };
 
-RingFinger.prototype = Object.create(Finger.prototype);
-RingFinger.prototype.constructor = RingFinger;
+LeftRing.prototype = Object.create(Finger.prototype);
+LeftRing.prototype.constructor = LeftRing;
 
 },{"../Finger.js":9}],17:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
@@ -1482,57 +1482,67 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
+    if ( delta > distances[-12] && delta < distances[-5]) { //this is like the 'stretch' zone
       return;
-    } else { //definitely move
-      this.moveToNote(newNote - 7);
+    } else if (delta > 0 && delta < distances[1]) { //this is when the pinky crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 7), 100);
+    }else { //definitely move
+      this.moveToNote(newNote + 7);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
-    if ( delta > distances[4] && delta < distances[9] ) {
+    if ( delta > distances[-9] && delta < distances[-4] ) {
       return;
+    }else if (delta > 0 && delta < distances[2]) { //this is when the ring crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 5), 100);
     }else {
-      this.moveToNote(newNote - 5);
+      this.moveToNote(newNote + 5);
     }
   };
   this.middleRules = function(delta, curX, newNote) {
-    if ( delta > distances[2] && delta < distances[7] ) {
+    if ( delta > distances[-7] && delta < distances[-2] ) {
       return;
+    }else if (delta > 0 && delta < distances[4]) { //this is when the middle crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 4), 100);
     }else {
-      this.moveToNote(newNote - 4);
+      this.moveToNote(newNote + 4);
     }
   };
   this.indexRules = function(delta, curX, newNote) {
-    if ( delta > 0 && delta < distances[4] ) {
+    if ( delta > distances[-4] && delta < 0 ) {
       return;
-    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
-      return;
+    }else if (delta > 0 && delta < distances[2]) { //this is when the index crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 2), 100);
     }else {
-      this.moveToNote(newNote-2);
+      this.moveToNote(newNote + 2);
     }
   };
 };
 
-module.exports.Thumb.prototype = Object.create(Finger.prototype);
-module.exports.Thumb.prototype.constructor = Thumb;
+LeftThumb.prototype = Object.create(Finger.prototype);
+LeftThumb.prototype.constructor = LeftThumb;
 
 },{"../Finger.js":9}],18:[function(require,module,exports){
-var Pinky = require('./RightPinky.js').Pinky;
-var RingFinger = require('./RightRing.js').RingFinger;
-var MiddleFinger = require('./RightMiddle.js').MiddleFinger;
-var IndexFinger = require('./RightIndex.js').IndexFinger;
-var Thumb = require('./RightThumb.js').Thumb;
+var RightPinky = require('./RightPinky.js').RightPinky;
+var RightRing = require('./RightRing.js').RightRing;
+var RightMiddle = require('./RightMiddle.js').RightMiddle;
+var RightIndex = require('./RightIndex.js').RightIndex;
+var RightThumb = require('./RightThumb.js').RightThumb;
 var HandDesign = require('../HandDesign.js').HandDesign;
 
 module.exports.RightHand = function(keyboard) {
   var _this = this;
   //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
   var handDesign = new HandDesign(keyboard); 
-  var pinky = new Pinky(handDesign, 'right');
-  var ring = new RingFinger(handDesign, 'right');
-  var middle = new MiddleFinger(handDesign, 'right');
-  var index = new IndexFinger(handDesign, 'right');
-  var thumb = new Thumb(handDesign, 'right');
+  var pinky = new RightPinky(handDesign, 'right');
+  var ring = new RightRing(handDesign, 'right');
+  var middle = new RightMiddle(handDesign, 'right');
+  var index = new RightIndex(handDesign, 'right');
+  var thumb = new RightThumb(handDesign, 'right');
 
   this.fingers = [];
   this.model = new THREE.Object3D();
@@ -1587,7 +1597,7 @@ module.exports.RightHand = function(keyboard) {
 },{"../HandDesign.js":11,"./RightIndex.js":19,"./RightMiddle.js":20,"./RightPinky.js":21,"./RightRing.js":22,"./RightThumb.js":23}],19:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var IndexFinger = module.exports.RightIndex = function(handInfo) {
+var RightIndex = module.exports.RightIndex = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
   var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
@@ -1649,13 +1659,13 @@ var IndexFinger = module.exports.RightIndex = function(handInfo) {
   };
 };
 
-IndexFinger.prototype = Object.create(Finger.prototype);
-IndexFinger.prototype.constructor = IndexFinger;
+RightIndex.prototype = Object.create(Finger.prototype);
+RightIndex.prototype.constructor = RightIndex;
 
 },{"../Finger.js":9}],20:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var MiddleFinger = module.exports.RightMiddle = function(handInfo) {
+var RightMiddle = module.exports.RightMiddle = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
   var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
@@ -1717,13 +1727,13 @@ var MiddleFinger = module.exports.RightMiddle = function(handInfo) {
   };
 };
 
-MiddleFinger.prototype = Object.create(Finger.prototype);
-MiddleFinger.prototype.constructor = MiddleFinger;
+RightMiddle.prototype = Object.create(Finger.prototype);
+RightMiddle.prototype.constructor = RightMiddle;
 
 },{"../Finger.js":9}],21:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
 
-var Pinky = module.exports.RightPinky = function(handInfo) {
+var RightPinky = module.exports.RightPinky = function(handInfo) {
   Finger.call(this, handInfo.keyboard);
   var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
   var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
@@ -1785,8 +1795,8 @@ var Pinky = module.exports.RightPinky = function(handInfo) {
   };
 };
 
-Pinky.prototype = Object.create(Finger.prototype);
-Pinky.prototype.constructor = Pinky;
+RightPinky.prototype = Object.create(Finger.prototype);
+RightPinky.prototype.constructor = RightPinky;
 
 },{"../Finger.js":9}],22:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
@@ -1853,8 +1863,8 @@ var RightRing = module.exports.RightRing = function(handInfo) {
   };
 };
 
-RingFinger.prototype = Object.create(Finger.prototype);
-RingFinger.prototype.constructor = RingFinger;
+RightRing.prototype = Object.create(Finger.prototype);
+RightRing.prototype.constructor = RightRing;
 
 },{"../Finger.js":9}],23:[function(require,module,exports){
 var Finger = require('../Finger.js').Finger;
@@ -1901,13 +1911,19 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.pinkyRules = function(delta, curX, newNote) {
     if ( delta > distances[5] && delta < distances[12]) { //this is like the 'stretch' zone
       return;
-    } else { //definitely move
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-7), 100);
+    }else { //definitely move
       this.moveToNote(newNote - 7);
     }
   };
   this.ringRules = function(delta, curX, newNote) {
     if ( delta > distances[4] && delta < distances[9] ) {
       return;
+    }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-5), 100);
     }else {
       this.moveToNote(newNote - 5);
     }
@@ -1915,6 +1931,9 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.middleRules = function(delta, curX, newNote) {
     if ( delta > distances[2] && delta < distances[7] ) {
       return;
+    }else if (delta > distances[-3] && delta < 0) { //this is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote - 4), 100);
     }else {
       this.moveToNote(newNote - 4);
     }
@@ -1923,15 +1942,16 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
     if ( delta > 0 && delta < distances[4] ) {
       return;
     }else if (delta > distances[-2] && delta < 0) { //this is when the index lightly crosses over thumb
-      return;
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-2), 100);
     }else {
       this.moveToNote(newNote-2);
     }
   };
 };
 
-module.exports.Thumb.prototype = Object.create(Finger.prototype);
-module.exports.Thumb.prototype.constructor = Thumb;
+RightThumb.prototype = Object.create(Finger.prototype);
+RightThumb.prototype.constructor = RightThumb;
 
 },{"../Finger.js":9}],24:[function(require,module,exports){
 var PianoKey = require("./PianoKey.js").PianoKey;
