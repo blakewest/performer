@@ -26,7 +26,8 @@ module.exports.params = function(keyboard) {
   distances[11] = keyboard.keys[11].model.position.x - keyboard.keys[0].model.position.x;
   distances[12] = keyboard.keys[12].model.position.x - keyboard.keys[0].model.position.x;
   distances.get = function(note1, note2) {
-    return keyboard.keys[note1].model.position.x - keyboard.keys[note2].model.position.x;
+    var res = keyboard.keys[note2].model.position.x - keyboard.keys[note1].model.position.x;
+    return res;
   }
   return distances;
 };

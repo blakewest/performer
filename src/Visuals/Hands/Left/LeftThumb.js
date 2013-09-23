@@ -9,29 +9,30 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   this.model.position.copy(thumbPosition);
   this.originalY = thumbPosition.y;
   this.number = 1;
-  var distances = this.distances;
+  var dist = this.distances;
 
   this.moveAsNeeded = function(finger, newPosition, newNote) {
     debugger;
     var curX = this.currentPos.x;
     var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
     switch (finger) {
     case 5:
-      this.pinkyRules(delta, curX, newNote);
+      this.pinkyRules(delta, curX, curNote, newNote);
       break;
     case 4:
-      this.ringRules(delta,curX,newNote);
+      this.ringRules(delta, curX, curNote, newNote);
       break;
     case 3:
-      this.middleRules(delta,curX,newNote);
+      this.middleRules(delta, curX, curNote, newNote);
       break;
     case 2:
-      this.indexRules(delta,curX,newNote);
+      this.indexRules(delta, curX, curNote, newNote);
     }
   };
 
-  this.pinkyRules = function(delta, curX, newNote) {
-    if ( delta >= distances[-12] && delta < distances[-5]) { //this is like the 'stretch' zone
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-12) && delta <= dist.get(curNote, curNote-5) )  { //this is like the 'stretch' zone
       return;
     } else if (delta > 0 && delta < distances[1]) { //this is when the pinky crosses over thumb
       var _this = this;
@@ -40,30 +41,30 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
       this.moveToNote(newNote + 7);
     }
   };
-  this.ringRules = function(delta, curX, newNote) {
-    if ( delta >= distances[-9] && delta < distances[-4] ) {
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-9) && delta <= dist.get(curNote, curNote-4)) {
       return;
-    }else if (delta > 0 && delta < distances[2]) { //this is when the ring crosses over thumb
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { //this is when the ring crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 5), 100);
     }else {
       this.moveToNote(newNote + 5);
     }
   };
-  this.middleRules = function(delta, curX, newNote) {
-    if ( delta >= distances[-7] && delta < distances[-2] ) {
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-7) && delta <= dist.get(curNote, curNote-2)) {
       return;
-    }else if (delta > 0 && delta < distances[4]) { //this is when the middle crosses over thumb
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+4)) { //this is when the middle crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 4), 100);
     }else {
       this.moveToNote(newNote + 4);
     }
   };
-  this.indexRules = function(delta, curX, newNote) {
-    if ( delta >= distances[-4] && delta < 0 ) {
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-4) && delta < 0 ) {
       return;
-    }else if (delta > 0 && delta < distances[2]) { //this is when the index crosses over thumb
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { //this is when the index crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 2), 100);
     }else {
