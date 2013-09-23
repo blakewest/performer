@@ -23,7 +23,11 @@ module.exports.Finger = function(Keyboard) {
 
   this.moveToNote = function(noteNum) {
     this.currentPos.x = this.model.position.x;
+    this.currentPos.y = this.model.position.y;
+    this.currentPos.z = this.model.position.z;
     this.newPos.x = keyboard.keys[noteNum].model.position.x;
+    this.newPos.y = keyboard.keys[noteNum].model.position.y + this.originalY;
+    this.newPos.z = keyboard.keys[noteNum].model.position.z;
     this.currentNote = noteNum;
     this.setUpNewTween();
   };
@@ -52,11 +56,13 @@ module.exports.Finger = function(Keyboard) {
     var _this = this;
     var update = function() {
       _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y;
+      _this.model.position.z = _this.currentPos.z;
     };
     var easing = TWEEN.Easing.Quadratic.Out;
 
     var tween = new TWEEN.Tween(this.currentPos)
-      .to(this.newPos, 300)
+      .to(this.newPos, 150)
       .easing(easing)
       .onUpdate(update);
 
