@@ -8,3 +8,7 @@
   position: fixed;  
   top: 0;
 }
+
+.player-pauseBtn {
+  display: none;
+}

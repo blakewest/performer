@@ -18,7 +18,7 @@ module.exports.PlayControls = function(container, app) {
     if (_this.current === 'paused') {
       _this.resume();
     }else {
-      _this.paused();
+      _this.play();
     }
   });
   $pauseBtn.click(function() {
@@ -44,12 +44,17 @@ module.exports.PlayControls = function(container, app) {
       event.stopPropagation();
   });
 
-  this.start = function() {
+  this.play = function() {
+    $playBtn.hide();
+    $pauseBtn.show();
+    _this.current = 'playing';
     app.player.start();
     app.playing = true;
   };
 
   this.resume = function() {
+    $playBtn.hide();
+    $pauseBtn.show();
     app.player.currentTime += 1e-6;
     app.player.resume();
     app.playing = true;
@@ -62,6 +67,9 @@ module.exports.PlayControls = function(container, app) {
 
   this.pause = function() {
     console.log('pause function getting called');
+    _this.current = 'paused';
+    $playBtn.show();
+    $pauseBtn.hide();
     app.player.pause();
     app.playing = false;
   };
