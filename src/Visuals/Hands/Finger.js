@@ -24,6 +24,7 @@ module.exports.Finger = function(Keyboard) {
     this.currentPos.x = this.model.position.x;
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
+    
     //logic about checking to see if neighbor is already on the note you want to play. 
     var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
     var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
