@@ -40,7 +40,6 @@ PianoKey.prototype.press = function() {
 
 PianoKey.prototype.release = function() {
   this.isPressed = false;
-  debugger;
   this.newColor = this.originalColor;
   this.setUpNewTween();
 };
