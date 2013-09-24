@@ -56,7 +56,12 @@ module.exports.LeftHand = function(keyboard) {
   pinky.moveToNote(48);
 
   //set position of hand
-  this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.position.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+
+  this.model.traverse(function(object) {
+    object.position.x -= 4.1;
+  });
+
 
   this.offSet = 0.2222;
 

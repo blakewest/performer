@@ -938,7 +938,7 @@ var Dummy = module.exports.Dummy = function() {
 var params = require('./FingerMoveParams.js').params;
 
 module.exports.Finger = function(Keyboard) {
-  var pressAmount = 0.08; 
+  var pressAmount = 0.6;
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
@@ -962,7 +962,7 @@ module.exports.Finger = function(Keyboard) {
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
     //logic about checking to see if neighbor is already on the note you want to play. 
-    // debugger;
+    debugger;
     var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
     var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
     if (noteNum > this.model.currentNote) {
@@ -1006,7 +1006,7 @@ module.exports.Finger = function(Keyboard) {
   };
 
   this.setNewPos = function(noteNum) {
-    this.newPos.x = keyboard.keys[noteNum].model.position.x;
+    this.newPos.x = keyboard.model.children[noteNum-21].position.x;
     this.newPos.y = keyboard.keys[noteNum].model.position.y + this.originalY;
     this.newPos.z = keyboard.keys[noteNum].model.position.z + 0.5;
   };
@@ -1026,6 +1026,9 @@ module.exports.Finger = function(Keyboard) {
       .onUpdate(update);
 
     tween.start();
+  };
+  this.setUpPressReleaseTween = function() {
+    //TO DO
   };
 };
 
@@ -1063,34 +1066,11 @@ module.exports.Finger = function(Keyboard) {
 module.exports.params = function(keyboard) {
   //should contain distance from one note to another, in half steps;
   var distances = {};
-  distances[-12] = keyboard.keys[12].model.position.x - keyboard.keys[24].model.position.x;
-  distances[-11] = keyboard.keys[12].model.position.x - keyboard.keys[23].model.position.x;
-  distances[-10] = keyboard.keys[12].model.position.x - keyboard.keys[22].model.position.x;
-  distances[-9] = keyboard.keys[12].model.position.x - keyboard.keys[21].model.position.x;
-  distances[-8] = keyboard.keys[12].model.position.x - keyboard.keys[20].model.position.x;
-  distances[-7] = keyboard.keys[12].model.position.x - keyboard.keys[19].model.position.x;
-  distances[-6] = keyboard.keys[12].model.position.x - keyboard.keys[18].model.position.x;
-  distances[-5] = keyboard.keys[12].model.position.x - keyboard.keys[17].model.position.x;
-  distances[-4] = keyboard.keys[12].model.position.x - keyboard.keys[16].model.position.x;
-  distances[-3] = keyboard.keys[12].model.position.x - keyboard.keys[15].model.position.x;
-  distances[-2] = keyboard.keys[12].model.position.x - keyboard.keys[14].model.position.x;
-  distances[-1] = keyboard.keys[12].model.position.x - keyboard.keys[13].model.position.x;
-  distances[1] = keyboard.keys[1].model.position.x - keyboard.keys[0].model.position.x;
-  distances[2] = keyboard.keys[2].model.position.x - keyboard.keys[0].model.position.x;
-  distances[3] = keyboard.keys[3].model.position.x - keyboard.keys[0].model.position.x;
-  distances[4] = keyboard.keys[4].model.position.x - keyboard.keys[0].model.position.x;
-  distances[5] = keyboard.keys[5].model.position.x - keyboard.keys[0].model.position.x;
-  distances[6] = keyboard.keys[6].model.position.x - keyboard.keys[0].model.position.x;
-  distances[7] = keyboard.keys[7].model.position.x - keyboard.keys[0].model.position.x;
-  distances[8] = keyboard.keys[8].model.position.x - keyboard.keys[0].model.position.x;
-  distances[9] = keyboard.keys[9].model.position.x - keyboard.keys[0].model.position.x;
-  distances[10] = keyboard.keys[10].model.position.x - keyboard.keys[0].model.position.x;
-  distances[11] = keyboard.keys[11].model.position.x - keyboard.keys[0].model.position.x;
-  distances[12] = keyboard.keys[12].model.position.x - keyboard.keys[0].model.position.x;
   distances.get = function(note1, note2) {
-    var res = keyboard.keys[note2].model.position.x - keyboard.keys[note1].model.position.x;
-    return res;
-  }
+    //we add in the +21 to offset the fact that the notes got stripped to an 88 key keyboard, and yet, MIDI notes act as if note 0 on the keyboard
+    //is note no. 21
+    return keyboard.model.children[note2-21].position.x - keyboard.model.children[note1-21].position.x;
+  };
   return distances;
 };
 
@@ -1190,7 +1170,12 @@ module.exports.LeftHand = function(keyboard) {
   pinky.moveToNote(48);
 
   //set position of hand
-  this.model.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.position.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+
+  this.model.traverse(function(object) {
+    object.position.x -= 4.1;
+  });
+
 
   this.offSet = 0.2222;
 
@@ -1687,7 +1672,10 @@ module.exports.RightHand = function(keyboard) {
   ring.moveToNote(65);
   pinky.moveToNote(67);
 
-  this.model.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.position.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.traverse(function(object) {
+    object.position.x -= 4.1;
+  });
 
   console.log('RH object: ', this.model);
 
@@ -2122,6 +2110,8 @@ module.exports.Keyboard = function(keyboardDesign) {
     }
   }
   this.model.position.y -= keyboardDesign.whiteKeyHeight / 2;
+  // this.model.translateX(-2.1);
+  //this centers the keyboard infront of the camera.
   this.model.traverse(function(object) {
     object.position.x -= 4.1;
   });

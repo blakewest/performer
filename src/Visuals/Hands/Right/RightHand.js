@@ -56,7 +56,10 @@ module.exports.RightHand = function(keyboard) {
   ring.moveToNote(65);
   pinky.moveToNote(67);
 
-  this.model.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.position.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.traverse(function(object) {
+    object.position.x -= 4.1;
+  });
 
   console.log('RH object: ', this.model);
 

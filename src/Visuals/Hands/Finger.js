@@ -1,7 +1,7 @@
 var params = require('./FingerMoveParams.js').params;
 
 module.exports.Finger = function(Keyboard) {
-  var pressAmount = 0.08; 
+  var pressAmount = 0.6;
   this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
@@ -25,7 +25,7 @@ module.exports.Finger = function(Keyboard) {
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
     //logic about checking to see if neighbor is already on the note you want to play. 
-    // debugger;
+    debugger;
     var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
     var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
     if (noteNum > this.model.currentNote) {
@@ -69,7 +69,7 @@ module.exports.Finger = function(Keyboard) {
   };
 
   this.setNewPos = function(noteNum) {
-    this.newPos.x = keyboard.keys[noteNum].model.position.x;
+    this.newPos.x = keyboard.model.children[noteNum-21].position.x;
     this.newPos.y = keyboard.keys[noteNum].model.position.y + this.originalY;
     this.newPos.z = keyboard.keys[noteNum].model.position.z + 0.5;
   };
@@ -89,6 +89,9 @@ module.exports.Finger = function(Keyboard) {
       .onUpdate(update);
 
     tween.start();
+  };
+  this.setUpPressReleaseTween = function() {
+    //TO DO
   };
 };
 
