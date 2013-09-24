@@ -23,6 +23,7 @@
     "grunt": "~0.4.1",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-browserify": "~1.2.4"
+    "grunt-browserify": "~1.2.4",
+    "grunt-contrib-stylus": "~0.8.0"
   }
 }
