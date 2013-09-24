@@ -14,7 +14,10 @@ module.exports.Keyboard = function(keyboardDesign) {
       this.model.add(key.model);
     }
   }
-  this.model.y -= keyboardDesign.whiteKeyHeight / 2;
+  this.model.position.y -= keyboardDesign.whiteKeyHeight / 2;
+  this.model.traverse(function(object) {
+    object.position.x -= 4.1;
+  });
 
   this.press = function(note) {
     _this.keys[note].press();
