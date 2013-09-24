@@ -795,9 +795,7 @@ module.exports.App = function() {
   this.loadMidiFile = function(midiFile, callback) {
     var _this = this;
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
-    this.player.loadFile(midiFile, function() {
-      _this.player.resume();
-    });
+    this.player.loadFile(midiFile);
   };
 
   this.upload = function(file) {
@@ -1429,7 +1427,7 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
     }
   };
   this.indexRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote+1) && delta < dist.get(curNote, curNote+3) ) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote+3) ) {
       return;
     }else {
       this.moveToNote(newNote-2);

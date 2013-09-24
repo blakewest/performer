@@ -50,9 +50,7 @@ module.exports.App = function() {
   this.loadMidiFile = function(midiFile, callback) {
     var _this = this;
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
-    this.player.loadFile(midiFile, function() {
-      _this.player.resume();
-    });
+    this.player.loadFile(midiFile);
   };
 
   this.upload = function(file) {
