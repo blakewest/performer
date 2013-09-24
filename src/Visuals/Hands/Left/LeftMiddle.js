@@ -45,7 +45,7 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
     }
   };
   this.indexRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote+1) && delta < dist.get(curNote, curNote+3) ) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote+3) ) {
       return;
     }else {
       this.moveToNote(newNote-2);
