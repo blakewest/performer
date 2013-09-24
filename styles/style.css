@@ -2,3 +2,9 @@
   height: 800px;
   width: 800px;
 }
+
+.playerArea {
+  width: 800px;
+  position: fixed;  
+  top: 0;
+}

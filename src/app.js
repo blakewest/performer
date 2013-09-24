@@ -5,6 +5,7 @@ var LeftHand = require('./Visuals/Hands/Left/LeftHand.js').LeftHand;
 var Scene = require('./Visuals/Scene.js').Scene;
 var createDb = require('./Algorithms/CostAlgorithm').createCostDatabase;
 var fingeringAlgo = require('./Algorithms/FingeringAlgorithm.js').FingeringAlgorithm;
+var PlayControls = require('./PlayControls.js').PlayControls;
 
 module.exports.App = function() {
   //instantiate piano and hand
@@ -13,8 +14,7 @@ module.exports.App = function() {
   console.log(this.keyboard);
   this.rightHand = new RightHand(this.keyboard);
   this.leftHand = new LeftHand(this.keyboard);
-
-  this.player = MIDI.Player;
+  this.player = MIDI.Player
 
   //maintains proper binding if later function gets called outside this scope
   var _this = this;
@@ -93,37 +93,8 @@ module.exports.App = function() {
     }
   };
 
-  this.start = function() {
-    this.player.start();
-    this.playing = true;
-  };
-
-  this.resume = function() {
-    this.player.currentTime += 1e-6;
-    this.player.resume();
-    this.playing = true;
-  };
-
-  this.stop = function() {
-    this.player.stop();
-    this.playing = false;
-  };
-
-  this.pause = function() {
-    this.player.pause();
-    this.playing = false;
-  };
-
-  this.getEndTime = function() {
-    return this.player.endTime;
-  };
-
-  this.setCurrentTIme = function(currentTime) {
-    this.player.pause();
-    this.player.currentTime = currentTime;
-    if (this.playing) {
-      this.player.resume();
-    }
+  this.initPlayControls = function(container, app) {
+    new PlayControls(container, app);
   };
 
   this.fingeringAlgorithm = function() {

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+ <!DOCTYPE HTML>
 <head>
     <link rel="stylesheet" href="styles/style.css">
     <body>
@@ -17,6 +17,13 @@
       <p>Upload MIDI here!</p>
       <input type="file" id='filereader' onchange='app.upload(this.files[0])'>
 
-      <div id="canvas"></div>
+      <div id="canvas">
+        <div class='player'>
+          <div class='player-playBtn'>play</div>
+          <div class='player-pauseBtn'>pause</div>
+          <div class='player-prevBtn'>prev</div>
+          <div class='player-nextBtn'>next</div>
+        </div>
+      </div>
   </body>
 </head>
