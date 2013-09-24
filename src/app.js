@@ -41,9 +41,10 @@ module.exports.App = function() {
   this.player.setAnimation({
     delay: 20,
     callback: function(data) {
-      //data has 'now' and 'end' events that may be useful for update function.
-      // this.rightHand.update();
-      // _this.keyboard.update();
+      console.log('set animation getting called');
+      var current = data.now;
+      var total = data.end;
+      _this.playControls.displayProgress(current, total);
     }
   });
 
@@ -92,7 +93,7 @@ module.exports.App = function() {
   };
 
   this.initPlayControls = function(container, app) {
-    new PlayControls(container, app);
+    _this.playControls = new PlayControls(container, app);
   };
 
   this.fingeringAlgorithm = function() {

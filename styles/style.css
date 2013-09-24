@@ -12,3 +12,15 @@
 .player-pauseBtn {
   display: none;
 }
+
+.player-progress-container {
+  width: 200px;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+
+.player-progress-bar {
+  height: 10px;
+  width: 1px;
+  background-color: red;
+}

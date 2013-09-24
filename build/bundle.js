@@ -786,9 +786,10 @@ module.exports.App = function() {
   this.player.setAnimation({
     delay: 20,
     callback: function(data) {
-      //data has 'now' and 'end' events that may be useful for update function.
-      // this.rightHand.update();
-      // _this.keyboard.update();
+      console.log('set animation getting called');
+      var current = data.now;
+      var total = data.end;
+      _this.playControls.displayProgress(current, total);
     }
   });
 
@@ -837,7 +838,7 @@ module.exports.App = function() {
   };
 
   this.initPlayControls = function(container, app) {
-    new PlayControls(container, app);
+    _this.playControls = new PlayControls(container, app);
   };
 
   this.fingeringAlgorithm = function() {
@@ -897,10 +898,13 @@ module.exports.PlayControls = function(container, app) {
   var $songListContainer = $('.player-songListContainer', this.$container);
   var $controlsContainer = $('.player-controls', this.$container);
   var $progressContainer = $('.player-progress-container', this.$container);
-  
-  var $progressBar = $('player-progress-bar', this.$container);
-  var $progressText = $('player-progress-text', this.$container);
+  console.log($progressContainer);
+
+  var $progressBar = $('.player-progress-bar', this.$container);
+  var $progressText = $('.player-progress-text', this.$container);
   var $songList = $('.player-songList', this.$container);
+
+  console.log($progressBar);
 
   var $playBtn = $('.player-playBtn', this.$container);
   var $pauseBtn = $('.player-pauseBtn', this.$container);
@@ -960,7 +964,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.pause = function() {
-    console.log('pause function getting called');
     _this.current = 'paused';
     $playBtn.show();
     $pauseBtn.hide();
@@ -970,6 +973,13 @@ module.exports.PlayControls = function(container, app) {
 
   this.getEndTime = function() {
     return app.player.endTime;
+  };
+
+  this.displayProgress = function(current, total) {
+    debugger;
+    var percent = current/total;
+    var newWidth = Math.floor(percent*$progressContainer.width());
+    $progressBar.width(newWidth);
   };
 
   this.setCurrentTIme = function(currentTime) {
@@ -1483,7 +1493,6 @@ var LeftPinky = module.exports.LeftPinky = function(handInfo) {
   };
 
   this.ringRules = function(delta, curX, curNote, newNote) {
-    debugger;
     if ( delta > 0 && delta <= dist.get(curNote, curNote+3)) { //this is like the 'stretch' zone
       return;
     } else { //definitely move

@@ -3,10 +3,13 @@ module.exports.PlayControls = function(container, app) {
   var $songListContainer = $('.player-songListContainer', this.$container);
   var $controlsContainer = $('.player-controls', this.$container);
   var $progressContainer = $('.player-progress-container', this.$container);
-  
-  var $progressBar = $('player-progress-bar', this.$container);
-  var $progressText = $('player-progress-text', this.$container);
+  console.log($progressContainer);
+
+  var $progressBar = $('.player-progress-bar', this.$container);
+  var $progressText = $('.player-progress-text', this.$container);
   var $songList = $('.player-songList', this.$container);
+
+  console.log($progressBar);
 
   var $playBtn = $('.player-playBtn', this.$container);
   var $pauseBtn = $('.player-pauseBtn', this.$container);
@@ -66,7 +69,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.pause = function() {
-    console.log('pause function getting called');
     _this.current = 'paused';
     $playBtn.show();
     $pauseBtn.hide();
@@ -76,6 +78,13 @@ module.exports.PlayControls = function(container, app) {
 
   this.getEndTime = function() {
     return app.player.endTime;
+  };
+
+  this.displayProgress = function(current, total) {
+    debugger;
+    var percent = current/total;
+    var newWidth = Math.floor(percent*$progressContainer.width());
+    $progressBar.width(newWidth);
   };
 
   this.setCurrentTIme = function(currentTime) {
