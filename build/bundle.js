@@ -392,8 +392,6 @@ module.exports.FingeringAlgorithm = function(midiData) {
       
     }
   }
-  console.log('note Trellis: ', noteTrellis);
-
   /*Now we need to go backwards and collect the best path.
   the currentNode variable is initialized to be the lowest score of the final layer.*/
   var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
@@ -2348,7 +2346,7 @@ module.exports.Scene = function(container) {
   var view_angle = 90;
   var aspect = width/height;
   var near = 0.001;
-  var far = 100;
+  var far = 1000;
   var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
   // camera.lookAt(new THREE.Vector3());
   camera.position.set(0, 7, 6);

@@ -11,7 +11,7 @@ module.exports.Scene = function(container) {
   var view_angle = 90;
   var aspect = width/height;
   var near = 0.001;
-  var far = 100;
+  var far = 1000;
   var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
   // camera.lookAt(new THREE.Vector3());
   camera.position.set(0, 7, 6);
