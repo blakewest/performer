@@ -8,15 +8,27 @@ module.exports = function(grunt) {
         }
       }
     },
+    stylus: {
+      compile: {
+        files: {
+          'styles/style.css' : 'styles/style.styl'
+        }
+      }
+    },
     watch: {
       scripts: {
-        files: 'src/**/*.js',
+        files: ['src/**/*.js'],
         tasks: ['browserify']
+      },
+      css: {
+        files: ['styles/style.styl'],
+        tasks: ['stylus']
       }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-contrib-stylus');
 
   grunt.registerTask('default', 'watch');
 };
