@@ -2165,8 +2165,8 @@ module.exports.KeyboardDesign = function() {
   this.blackKeyPosZ                   = -0.24;
   this.noteDropPosZ4WhiteKey  = 0.25;
   this.noteDropPosZ4BlackKey  = 0.75;
-  this.whiteKeyColor                  = 0xffffff;
-  this.blackKeyColor                  = 0x111111;
+  this.whiteKeyColor                  = 'rgb(0.99,0.99,0.99)';
+  this.blackKeyColor                  = 'rgb(0.5,0.5,0.5)';
   this.keyDip                             = 0.08;
   this.keyUpSpeed                     = 0.03;
   this.keyInfo                            = [] ;// an array holding each key's type and position
@@ -2282,12 +2282,14 @@ var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
   var geometry, material, position;
   if (keyType === Black) {
     geometry = new THREE.CubeGeometry(boardInfo.blackKeyWidth, boardInfo.blackKeyHeight, boardInfo.blackKeyLength);
-    material   = new THREE.MeshPhongMaterial(boardInfo.blackKeyColor);
+    material   = new THREE.MeshPhongMaterial({color: boardInfo.blackKeyColor});
     position   = new THREE.Vector3(keyCenterPosX, boardInfo.blackKeyPosY, boardInfo.blackKeyPosZ);
+    this.originalColor = {r: 0, g: 0, b: 0};
   }else {
     geometry = new THREE.CubeGeometry(boardInfo.whiteKeyWidth, boardInfo.whiteKeyHeight, boardInfo.whiteKeyLength);
     material   = new THREE.MeshPhongMaterial( {color: boardInfo.whiteKeyColor, emissive: 0x111111} );
     position   = new THREE.Vector3(keyCenterPosX, boardInfo.whiteKeyPosY, boardInfo.whiteKeyPosZ);
+    this.originalColor = {r: 1, g: 1, b: 1};
   }
 
   //make the key Mesh
@@ -2302,11 +2304,13 @@ var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
 
 PianoKey.prototype.press = function() {
   this.model.position.y = this.pressedY;
+  this.model.material.color.setRGB(0.5,0.3,0.9);
   this.isPressed = true;
 };
 
 PianoKey.prototype.release = function() {
   this.isPressed = false;
+  this.model.material.color.setRGB(this.originalColor.r,this.originalColor.g,this.originalColor.b);
 };
 
 PianoKey.prototype.update = function() {
