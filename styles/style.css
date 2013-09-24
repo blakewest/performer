@@ -1,26 +1,5 @@
-#canvas {
-  height: 800px;
-  width: 800px;
-}
-
-.playerArea {
-  width: 800px;
-  position: fixed;  
-  top: 0;
-}
-
-.player-pauseBtn {
-  display: none;
-}
-
-.player-progress-container {
-  width: 200px;
-  border: 2px solid black;
-  border-radius: 3px;
-}
-
-.player-progress-bar {
-  height: 10px;
-  width: 1px;
-  background-color: red;
-}
+body{background-color:#f00}
+#canvas{width:800px;height:800px}
+.playerArea{width:200px;height:100px;position:fixed;top:0;left:0}
+.player-pauseBtn{display:none}
+.player-progress-container{width:200px;height:100px;position:fixed;top:100px;left:0}
