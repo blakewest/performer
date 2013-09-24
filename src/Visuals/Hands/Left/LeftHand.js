@@ -67,7 +67,7 @@ module.exports.LeftHand = function(keyboard) {
 
   this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
-    console.log('the left ' + finger + ' finger is trying to press');
+    // console.log('the left ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
@@ -80,7 +80,7 @@ module.exports.LeftHand = function(keyboard) {
 
   this.release = function(finger) {
     finger = Math.abs(finger);
-      _this.fingers[finger].release('left');
+      _this.fingers[finger].release();
   };
 
   this.update = function() {
