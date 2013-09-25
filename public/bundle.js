@@ -976,7 +976,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.displayProgress = function(current, total) {
-    debugger;
     var percent = current/total;
     var newWidth = Math.floor(percent*$progressContainer.width());
     $progressBar.width(newWidth);
