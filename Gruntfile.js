@@ -18,9 +18,10 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [
-          {expand: true, src: ['index.html'], dest: 'public/'},
-          {expand: true, cwd: 'lib/', src: ['**'], dest: 'public/lib/'},
-          {expand: true, cwd: 'lib/MIDI.js/soundfont/', src: ['**'], dest: 'public/soundfont'}
+          {expand: true, cwd: 'client/', src: ['index.html', 'bundle.js'], dest: 'public/'},
+          {expand: true, cwd: 'client/styles/', src: ['style.css'], dest: 'public/styles/'},
+          {expand: true, cwd: 'client/lib/', src: ['**'], dest: 'public/lib/'},
+          {expand: true, cwd: 'client/lib/MIDI.js/soundfont/', src: ['**'], dest: 'public/soundfont'}
           // {expand: true, src: ['lib/*'], dest: 'public/'}
           // {expand: true, src: ['lib/MIDI.js/**'], dest: 'public/'}
           // {expand: true, src: ['lib/MIDI.js/inc/jasmid/*'], dest: 'public/lib/MIDI.js/inc/jasmid', flatten: true, filter: 'isFile'},
