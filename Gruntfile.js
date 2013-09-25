@@ -4,15 +4,29 @@ module.exports = function(grunt) {
     browserify: {
       dist: {
         files: {
-          'build/bundle.js' : ['src/Main.js']
+          'public/bundle.js' : ['src/Main.js']
         }
       }
     },
     stylus: {
       compile: {
         files: {
-          'styles/style.css' : 'styles/style.styl'
+          'public/styles/style.css' : 'styles/style.styl'
         }
+      }
+    },
+    copy: {
+      main: {
+        files: [
+          {expand: true, src: ['index.html'], dest: 'public/'},
+          {expand: true, cwd: 'lib/', src: ['**'], dest: 'public/lib/'},
+          {expand: true, cwd: 'lib/MIDI.js/soundfont/', src: ['**'], dest: 'public/soundfont'}
+          // {expand: true, src: ['lib/*'], dest: 'public/'}
+          // {expand: true, src: ['lib/MIDI.js/**'], dest: 'public/'}
+          // {expand: true, src: ['lib/MIDI.js/inc/jasmid/*'], dest: 'public/lib/MIDI.js/inc/jasmid', flatten: true, filter: 'isFile'},
+          // {expand: true, src: ['lib/MIDI.js/inc/base64binary.js'], dest: 'public/lib/MIDI.js/inc/base64binary.js', flatten: true, filter: 'isFile'},
+          // {expand: true, src: ['lib/MIDI.js/inc/SoundManager2/*'], dest: 'public/lib/MIDI.js/inc/SoundManager2', flatten: true, filter: 'isFile'}
+        ]
       }
     },
     watch: {
@@ -29,6 +43,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-stylus');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask('default', 'watch');
 };
