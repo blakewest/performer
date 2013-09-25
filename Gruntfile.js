@@ -4,14 +4,14 @@ module.exports = function(grunt) {
     browserify: {
       dist: {
         files: {
-          'public/bundle.js' : ['src/Main.js']
+          'client/bundle.js' : ['src/Main.js']
         }
       }
     },
     stylus: {
       compile: {
         files: {
-          'public/styles/style.css' : 'styles/style.styl'
+          'client/styles/style.css' : 'styles/style.styl'
         }
       }
     },
