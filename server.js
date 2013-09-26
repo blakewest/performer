@@ -27,5 +27,6 @@ require('./routes.js').routes(server, config);
   //with a copy of the data. then just manually add a name/artist property later. *do it the dumb way for now*
 
 var port = process.env.PORT || config.port || 3000;
+
 console.log('server is listening on port ', port);
 server.listen(port);
