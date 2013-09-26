@@ -19,7 +19,7 @@ module.exports.PlayControls = function(container, app) {
   var _this = this;
 
   $playBtn.click(function() {
-    if (_this.current === 'paused') {
+    if (_this.playing === false) {
       _this.resume();
     }else {
       _this.play();
@@ -36,71 +36,63 @@ module.exports.PlayControls = function(container, app) {
   });
 
   $songList.click(function(event) {
-    // var $target = $(event.target);
-    // if ($target.is('li')) {
-    //   var $songList = $('li', _this.songList);
-    //   var trackNo = $songList.index($target);
-    //   _this.setTrack(trackNo);
-    // }
+    var $target = $(event.target);
+    if ($target.is('li')) {
+      // var $songList = $('li', _this.songList);
+      var trackName = $target.text();
+      app.player.stop();
+      _this.playing === false;
+      app.currentSong = trackName;
+      $.ajax({
+        url: '/songs/'+trackName,
+        dataType: 'text',
+        success: function(data) {
+          app.loadMidiFile(data);
+        }
+      });
+    }
+    // var trackNo = $songList.index($target);
+    // _this.setTrack(trackNo);
     console.log('songlist click getting called');
-    $.ajax({
-      url: '/songname',
-      // dataType: 'text',
-      success: function(data) {
-        // app.loadMidiFile(data);
-        var parsedData = JSON.parse(data);
-        console.log('data after GET request...', parsedData);
-        var parsedSong = parsedData[0];
-        // var parsedReplayer = parsedData[1];
-        // app.player.data = parsedSong;
-        // app.player.replayer = parsedReplayer;
-        app.preComputed.push(parsedSong);
-      }
-    });
+  
   });
 
-  $song.click(function(event) {
-    console.log('songlist click getting called');
-    $.ajax({
-      url: '/songname2',
-      dataType: 'text',
-      success: function(data) {
-        app.loadMidiFile(data);
-      }
-    });
+  $progressContainer.click(function(event){
+    console.log('progress container is getting clicked');
+    var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
+    console.log(progressPercent);
+    _this.setCurrentTIme(progressPercent);
   });
 
-  $container.on('mousewheel', function(event) {
-      event.stopPropagation();
-    });
+  // $container.on('mousewheel', function(event) {
+  //     event.stopPropagation();
+  //   });
 
   this.play = function() {
     $playBtn.hide();
     $pauseBtn.show();
-    _this.current = 'playing';
-    app.player.resume();
-    app.playing = true;
+    _this.playing = true;
+    app.player.start();
   };
 
   this.resume = function() {
     $playBtn.hide();
     $pauseBtn.show();
-    app.player.currentTime += 1e-6;
+    app.player.currentTime += 1e-6; //fixed bug in MIDI.js
+    _this.playing = true;
     app.player.resume();
-    app.playing = true;
   };
 
   this.stop = function() {
     app.player.stop();
-    app.playing = false;
+    _this.playing = false;
   };
 
   this.pause = function() {
-    _this.current = 'paused';
+    _this.playing = false;
     $playBtn.show();
     $pauseBtn.hide();
     app.player.pause();
-    app.playing = false;
   };
 
   this.getEndTime = function() {
@@ -113,11 +105,11 @@ module.exports.PlayControls = function(container, app) {
     $progressBar.width(newWidth);
   };
 
-  this.setCurrentTIme = function(currentTime) {
-    app.player.pause();
+  this.setCurrentTIme = function(progressPercent) {
+    var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
-    if (app.playing) {
-      app.player.resume();
+    if (_this.playing === true) {
+      _this.resume();
     }
   };
 };
