@@ -2,6 +2,10 @@ var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
+  if (app.preComputed) {
+    app.player.data = app.preComputed[0];
+    return;
+  }
   var dataWithStarts = helpers.addStartTimes(midiData);
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 

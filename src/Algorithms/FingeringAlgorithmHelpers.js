@@ -173,12 +173,14 @@ mod.distributePath = function(bestPathObj, midiData) {
   title = title || 'untitled'
   artist = artist || 'unknown artist'
   var songData = midiData;
+  var replayerData = app.player.replayer;
 
   $.post('http://localhost:3000/upload',
     {
       title: title,
       artist: artist,
       songData: songData,
+      replayerData: replayerData
     });
 };
 

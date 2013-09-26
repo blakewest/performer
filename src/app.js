@@ -99,6 +99,8 @@ module.exports.App = function() {
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
   };
+  
+  this.preComputed = [];
 };
 
 

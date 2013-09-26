@@ -334,6 +334,10 @@ var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
+  if (app.preComputed) {
+    app.player.data = app.preComputed[0];
+    return;
+  }
   var dataWithStarts = helpers.addStartTimes(midiData);
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
@@ -610,12 +614,14 @@ mod.distributePath = function(bestPathObj, midiData) {
   title = title || 'untitled'
   artist = artist || 'unknown artist'
   var songData = midiData;
+  var replayerData = app.player.replayer;
 
   $.post('http://localhost:3000/upload',
     {
       title: title,
       artist: artist,
       songData: songData,
+      replayerData: replayerData
     });
 };
 
@@ -860,6 +866,8 @@ module.exports.App = function() {
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
   };
+  
+  this.preComputed = [];
 };
 
 
@@ -919,6 +927,7 @@ module.exports.PlayControls = function(container, app) {
   var $progressBar = $('.player-progress-bar', this.$container);
   var $progressText = $('.player-progress-text', this.$container);
   var $songList = $('.player-songList', this.$container);
+  var $song = $('.song', this.$container);
 
   console.log($progressBar);
 
@@ -955,6 +964,24 @@ module.exports.PlayControls = function(container, app) {
     console.log('songlist click getting called');
     $.ajax({
       url: '/songname',
+      // dataType: 'text',
+      success: function(data) {
+        // app.loadMidiFile(data);
+        var parsedData = JSON.parse(data);
+        console.log('data after GET request...', parsedData);
+        var parsedSong = parsedData[0];
+        // var parsedReplayer = parsedData[1];
+        // app.player.data = parsedSong;
+        // app.player.replayer = parsedReplayer;
+        app.preComputed.push(parsedSong);
+      }
+    });
+  });
+
+  $song.click(function(event) {
+    console.log('songlist click getting called');
+    $.ajax({
+      url: '/songname2',
       dataType: 'text',
       success: function(data) {
         app.loadMidiFile(data);
@@ -970,7 +997,7 @@ module.exports.PlayControls = function(container, app) {
     $playBtn.hide();
     $pauseBtn.show();
     _this.current = 'playing';
-    app.player.start();
+    app.player.resume();
     app.playing = true;
   };
 
