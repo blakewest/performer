@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var express = require('express');
+var fs = require('fs');
 
 module.exports.routes = function(server, config) {
   require('./config/db.js').db(server, config);
@@ -9,26 +10,40 @@ module.exports.routes = function(server, config) {
   server.post('/upload', function(req,res) {
     //TO DO: 
     //put the song data in the database
+    console.log('replayer data at upload time is... ', JSON.stringify(req.body.replayerData));
     res.writeHead(200);
-    var jsonSongData = JSON.stringify(req.body.songData);
     var newSong = new Song({
       title: req.body.title,
       artist: req.body.artist,
-      songData: jsonSongData
+      songData: JSON.stringify(req.body.songData),
+      replayerData: JSON.stringify(req.body.replayerData)
     });
     newSong.save();
     console.log('we theoretically just added a new song');
     res.end();
   });
 
+  server.get('/bwv784.mid', function(req,res) {
+    res.writeHead(200);
+    fs.readFile('./TestMidiFiles/bwv784.mid', function(err, data) {
+      // var stringified = data.toString();
+      res.end(data);
+    });
+  });
+
   server.get('/songname', function(req,res) {
     //TO DO:
     //send song data back from the database
-    Song.findOne({title: 'Hey Now'}, function(err, data) {
-      var obj = JSON.parse(data.songData);
-      console.log(obj.test);
+    console.log('songname GET is called');
+    res.writeHead(200, {
+      'Content-Type' : 'text/plain'
     });
-    res.writeHead(200);
-    res.end();
+    res.end('bwv784.mid');
+    // Song.findOne({title: 'Grand Piano'}, function(err, data) {
+    //   var info = [data.songData, data.replayerData]
+    //   var result = JSON.stringify(info);
+    //   res.write(result);
+    //   res.end();
+    // });
   });
 };
