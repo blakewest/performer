@@ -605,15 +605,17 @@ mod.distributePath = function(bestPathObj, midiData) {
       title = eventData.text;
     }
   }
+
   //the following uploads the computed data to the server
   title = title || 'untitled'
   artist = artist || 'unknown artist'
   var songData = midiData;
+
   $.post('http://localhost:3000/upload',
     {
       title: title,
       artist: artist,
-      songData: songData
+      songData: songData,
     });
 };
 
@@ -944,17 +946,25 @@ module.exports.PlayControls = function(container, app) {
   });
 
   $songList.click(function(event) {
-    var $target = $(event.target);
-    if ($target.is('li')) {
-      var $songList = $('li', _this.songList);
-      var trackNo = $songList.index($target);
-      _this.setTrack(trackNo);
-    }
+    // var $target = $(event.target);
+    // if ($target.is('li')) {
+    //   var $songList = $('li', _this.songList);
+    //   var trackNo = $songList.index($target);
+    //   _this.setTrack(trackNo);
+    // }
+    console.log('songlist click getting called');
+    $.ajax({
+      url: '/songname',
+      dataType: 'text',
+      success: function(data) {
+        app.loadMidiFile(data);
+      }
+    });
   });
 
   $container.on('mousewheel', function(event) {
       event.stopPropagation();
-  });
+    });
 
   this.play = function() {
     $playBtn.hide();
@@ -1002,36 +1012,6 @@ module.exports.PlayControls = function(container, app) {
       app.player.resume();
     }
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 };
 },{}],10:[function(require,module,exports){
 //this is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.

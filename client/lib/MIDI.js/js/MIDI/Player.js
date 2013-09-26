@@ -106,7 +106,6 @@ root.loadMidiFile = function() { // reads midi into javascript array of events
 
 root.loadFile = function (file, callback) {
 	console.log('loadFile called');
-	console.log('file', file);
 	root.stop();
 	if (file.indexOf("base64,") !== -1) {
 		var data = window.atob(file.split(",")[1]);
@@ -192,7 +191,6 @@ var getLength = function() {
 };
 
 var startAudio = function (currentTime, fromCache) {
-	console.log('start audio is called');
 	if (!root.replayer) return;
 	if (!fromCache) {
 		if (typeof (currentTime) === "undefined") currentTime = root.restart;
