@@ -35,17 +35,25 @@ module.exports.PlayControls = function(container, app) {
   });
 
   $songList.click(function(event) {
-    var $target = $(event.target);
-    if ($target.is('li')) {
-      var $songList = $('li', _this.songList);
-      var trackNo = $songList.index($target);
-      _this.setTrack(trackNo);
-    }
+    // var $target = $(event.target);
+    // if ($target.is('li')) {
+    //   var $songList = $('li', _this.songList);
+    //   var trackNo = $songList.index($target);
+    //   _this.setTrack(trackNo);
+    // }
+    console.log('songlist click getting called');
+    $.ajax({
+      url: '/songname',
+      dataType: 'text',
+      success: function(data) {
+        app.loadMidiFile(data);
+      }
+    });
   });
 
   $container.on('mousewheel', function(event) {
       event.stopPropagation();
-  });
+    });
 
   this.play = function() {
     $playBtn.hide();
@@ -93,34 +101,4 @@ module.exports.PlayControls = function(container, app) {
       app.player.resume();
     }
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 };
