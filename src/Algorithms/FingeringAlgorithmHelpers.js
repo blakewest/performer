@@ -149,7 +149,9 @@ mod.findMin = function(layer) {
 
 mod.distributePath = function(bestPathObj, midiData) {
   var nowPlaying = {};
-  var title, artist;
+  for (var each in bestPathObj) {
+    bestPathObj[each] = +bestPathObj[each];
+  }
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
@@ -164,24 +166,7 @@ mod.distributePath = function(bestPathObj, midiData) {
     if (eventData.subtype === 'noteOff') {
       eventData.finger = nowPlaying[note]; //this gets the same finger from the noteOn event that 'caused' this noteOff event.
     }
-    if (eventData.subtype === 'trackName') {
-      title = eventData.text;
-    }
   }
-
-  //the following uploads the computed data to the server
-  title = title || 'untitled'
-  artist = artist || 'unknown artist'
-  var songData = midiData;
-  var replayerData = app.player.replayer;
-
-  $.post('http://localhost:3000/upload',
-    {
-      title: title,
-      artist: artist,
-      songData: songData,
-      replayerData: replayerData
-    });
 };
 
 mod.addStartTimes = function(midiData) {
