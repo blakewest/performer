@@ -4,14 +4,16 @@ module.exports = function(grunt) {
     browserify: {
       dist: {
         files: {
-          'client/bundle.js' : ['src/Main.js']
+          'client/bundle.js' : ['src/Main.js'],
+          'public/bundle.js' : ['src/Main.js']
         }
       }
     },
     stylus: {
       compile: {
         files: {
-          'client/styles/style.css' : 'styles/style.styl'
+          'client/styles/style.css' : 'styles/style.styl',
+          'public/styles/style.css' : 'styles/style.styl'
         }
       }
     },
@@ -22,11 +24,6 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'client/styles/', src: ['style.css'], dest: 'public/styles/'},
           {expand: true, cwd: 'client/lib/', src: ['**'], dest: 'public/lib/'},
           {expand: true, cwd: 'client/lib/MIDI.js/soundfont/', src: ['**'], dest: 'public/soundfont'}
-          // {expand: true, src: ['lib/*'], dest: 'public/'}
-          // {expand: true, src: ['lib/MIDI.js/**'], dest: 'public/'}
-          // {expand: true, src: ['lib/MIDI.js/inc/jasmid/*'], dest: 'public/lib/MIDI.js/inc/jasmid', flatten: true, filter: 'isFile'},
-          // {expand: true, src: ['lib/MIDI.js/inc/base64binary.js'], dest: 'public/lib/MIDI.js/inc/base64binary.js', flatten: true, filter: 'isFile'},
-          // {expand: true, src: ['lib/MIDI.js/inc/SoundManager2/*'], dest: 'public/lib/MIDI.js/inc/SoundManager2', flatten: true, filter: 'isFile'}
         ]
       }
     },
