@@ -7,7 +7,7 @@ module.exports.db = function(server, config) {
   var songSchema = new Schema({
     title: String,
     artist: String,
-    songData: String
+    songData: String,
   });
 
   var Song = mongoose.model('Song', songSchema);
