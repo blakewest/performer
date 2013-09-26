@@ -2,17 +2,22 @@ var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
-  if (app.preComputed) {
-    app.player.data = app.preComputed[0];
-    return;
-  }
+
   var dataWithStarts = helpers.addStartTimes(midiData);
+  //this checks if we already have the best path data for that song on the client.
+  for (var i = 0; i < app.preComputed.length; i++) {
+    if (app.preComputed[i].title === app.currentSong) {
+      var bestPath = app.preComputed[i].BestPathObj;
+      helpers.distributePath(bestPath, dataWithStarts);
+      return;
+    }
+  }
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
   //traversing forward, computing costs and leaving our best path trail
   for (var layer = 1; layer < noteTrellis.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
     for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               //go through each node in each layer
-      var min = Infinity;                 
+      var min = Infinity;
       for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               //go through each node in prev layer.
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
@@ -87,6 +92,14 @@ module.exports.FingeringAlgorithm = function(midiData) {
     }
     currentNode = nodeObj.bestPrev;
   }
+    
+  // $.post('http://localhost:3000/upload',
+  // {
+  //   title: 'The Tempest',
+  //   artist: 'Ludwig Van Beethoven',
+  //   BestPathObj: bestPathObj,
+  // });
+
   helpers.distributePath(bestPathObj, dataWithStarts);
 };
 
