@@ -19,9 +19,12 @@
 
       <div id="canvas">
         <div class='player-area'>
-          <div class='player-progress-container'>
+          <ul class='playerControls'>
+            <li><a class='player-playBtn' href=#>Play</a></li>
+            <li class='player-pauseBtn'>pause</li>
+            <li class='player-progress-container'></li>
+          </ul>
             <div class='player-progress-bar'></div>
-          </div>
             <div class='tempoChanger'>
               <header>Change The Speed</header>
               <button data-timeWarp='4'>1/4</button>
@@ -29,10 +32,6 @@
               <button data-timeWarp='1.333'>3/4</button>
               <button data-timeWarp='1'>100%</button>
             </div>
-            <div class='player-playBtn'>play</div>
-            <div class='player-pauseBtn'>pause</div>
-            <div class='player-prevBtn'>prev</div>
-            <div class='player-nextBtn'>next</div>
             <div class='player-songList'>
               <li>Invention No. 13</li>
               <li>The Tempest</li>
