@@ -3,14 +3,12 @@ module.exports.PlayControls = function(container, app) {
   var $songListContainer = $('.player-songListContainer', this.$container);
   var $controlsContainer = $('.player-controls', this.$container);
   var $progressContainer = $('.player-progress-container', this.$container);
-  console.log($progressContainer);
 
   var $progressBar = $('.player-progress-bar', this.$container);
   var $progressText = $('.player-progress-text', this.$container);
   var $songList = $('.player-songList', this.$container);
   var $song = $('.song', this.$container);
-
-  console.log($progressBar);
+  var $tempoChanger = $('.tempoChanger', this.$container);
 
   var $playBtn = $('.player-playBtn', this.$container);
   var $pauseBtn = $('.player-pauseBtn', this.$container);
@@ -40,14 +38,15 @@ module.exports.PlayControls = function(container, app) {
     if ($target.is('li')) {
       // var $songList = $('li', _this.songList);
       var trackName = $target.text();
-      app.player.stop();
+      // app.player.stop();
       _this.playing === false;
       app.currentSong = trackName;
+      console.log(app.currentSong);
       $.ajax({
         url: '/songs/'+trackName,
         dataType: 'text',
         success: function(data) {
-          app.loadMidiFile(data);
+          app.loadMidiFile(data, 0);
         }
       });
     }
@@ -64,15 +63,30 @@ module.exports.PlayControls = function(container, app) {
     _this.setCurrentTIme(progressPercent);
   });
 
+  $tempoChanger.click(function() {
+    console.log('timewarp function getting called');
+    app.player.timeWarp = 2;
+    var trackName = app.currentSong;
+    $.ajax({
+      url: '/songs/'+trackName,
+      dataType: 'text',
+      success: function(data) {
+        var currentPercent = app.player.currentTime/app.player.endTime;
+        app.loadMidiFile(data, ($progressBar.width() / $progressContainer.width()) );
+      }
+    });
+  })
+
   // $container.on('mousewheel', function(event) {
   //     event.stopPropagation();
   //   });
 
   this.play = function() {
+    console.log('play is getting called');
     $playBtn.hide();
     $pauseBtn.show();
     _this.playing = true;
-    app.player.start();
+    app.player.resume();
   };
 
   this.resume = function() {
@@ -109,6 +123,7 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.setCurrentTIme = function(progressPercent) {
+    console.log('set current time is getting called');
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
     setTimeout(app.player.resume, 10);

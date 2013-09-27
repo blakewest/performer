@@ -47,11 +47,11 @@ module.exports.App = function() {
     }
   });
 
-  this.loadMidiFile = function(midiFile, callback) {
+  this.loadMidiFile = function(midiFile, newStartPercent) {
     var _this = this;
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
     this.player.loadFile(midiFile, function() {
-      _this.playControls.play();
+      _this.playControls.setCurrentTIme(newStartPercent);
     });
   };
 
@@ -100,8 +100,6 @@ module.exports.App = function() {
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
   };
-
-  this.preComputed = [];
 };
 
 
