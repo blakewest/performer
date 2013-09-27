@@ -4,6 +4,9 @@ btnBgColor = #002222
 defaultMargin = 1em
 linkColor = black
 
+body
+  font-family 'Oxygen', sans-serif
+
 #canvas
   width 100%
   height 800px
@@ -48,6 +51,7 @@ linkColor = black
       color #09B492
 
 .tempo-changer
+  margin-bottom 5px
   display block
   position relative
 
@@ -74,16 +78,12 @@ linkColor = black
   width 0px
   height 20px 
 
-ul #player-songList
-  position absolute
-  // left 50px
-  // width 125px
-  list-style-type none
-  background-color red
-  visibility hidden
+.player-songList
+  margin-bottom 5px
+  position relative
 
-ul #song-menu li:hover #player-songList
-  visibility visible
+.upload-area
+  margin-top 5px
 
 
 
