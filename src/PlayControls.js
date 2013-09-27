@@ -80,6 +80,7 @@ module.exports.PlayControls = function(container, app) {
     $pauseBtn.show();
     app.player.currentTime += 1e-6; //fixed bug in MIDI.js
     _this.playing = true;
+    console.log('resume is getting called');
     app.player.resume();
   };
 
@@ -89,10 +90,12 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.pause = function() {
+    console.log('pause is getting called');
     _this.playing = false;
     $playBtn.show();
     $pauseBtn.hide();
     app.player.pause();
+    _this.resume();
   };
 
   this.getEndTime = function() {
@@ -108,8 +111,7 @@ module.exports.PlayControls = function(container, app) {
   this.setCurrentTIme = function(progressPercent) {
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
-    if (_this.playing === true) {
-      _this.resume();
-    }
+    setTimeout(app.player.resume, 10);
+    app.player.pause();
   };
 };
