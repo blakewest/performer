@@ -63,16 +63,17 @@ module.exports.PlayControls = function(container, app) {
     _this.setCurrentTIme(progressPercent);
   });
 
-  $tempoChanger.click(function() {
-    console.log('timewarp function getting called');
-    app.player.timeWarp = 2;
+  $tempoChanger.click(function(event) {
+    var $target = $(event.target);
+    var timeWarp = $target.attr('data-timeWarp');
+    app.player.timeWarp = timeWarp;
     var trackName = app.currentSong;
     $.ajax({
       url: '/songs/'+trackName,
       dataType: 'text',
       success: function(data) {
-        var currentPercent = app.player.currentTime/app.player.endTime;
-        app.loadMidiFile(data, ($progressBar.width() / $progressContainer.width()) );
+        var currentProgress = $progressBar.width()/$progressContainer.width();
+        app.loadMidiFile(data,  currentProgress);
       }
     });
   })
