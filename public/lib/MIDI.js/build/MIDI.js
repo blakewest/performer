@@ -880,7 +880,7 @@ root.pause = function () {
 };
 
 root.stop = function () {
-	stopAudio();
+	// stopAudio();
 	root.restart = 0;
 	root.currentTime = 0;
 };
@@ -952,6 +952,7 @@ root.loadMidiFile = function() { // reads midi into javascript array of events
 root.loadFile = function (file, callback) {
 	console.log('loadFile called');
 	root.stop();
+	console.log('made it past the stop call');
 	if (file.indexOf("base64,") !== -1) {
 		var data = window.atob(file.split(",")[1]);
 		root.currentData = data;

@@ -35,7 +35,7 @@ root.pause = function () {
 };
 
 root.stop = function () {
-	stopAudio();
+	// stopAudio();
 	root.restart = 0;
 	root.currentTime = 0;
 };
