@@ -334,17 +334,22 @@ var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
  //this whole thing is an example of Viterbi's algorithm, if you're curious.
-  if (app.preComputed) {
-    app.player.data = app.preComputed[0];
-    return;
-  }
+
   var dataWithStarts = helpers.addStartTimes(midiData);
+  //this checks if we already have the best path data for that song on the client.
+  for (var i = 0; i < app.preComputed.length; i++) {
+    if (app.preComputed[i].title === app.currentSong) {
+      var bestPath = app.preComputed[i].BestPathObj;
+      helpers.distributePath(bestPath, dataWithStarts);
+      return;
+    }
+  }
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
   //traversing forward, computing costs and leaving our best path trail
   for (var layer = 1; layer < noteTrellis.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
     for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               //go through each node in each layer
-      var min = Infinity;                 
+      var min = Infinity;
       for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               //go through each node in prev layer.
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
@@ -419,6 +424,14 @@ module.exports.FingeringAlgorithm = function(midiData) {
     }
     currentNode = nodeObj.bestPrev;
   }
+    
+  // $.post('http://localhost:3000/upload',
+  // {
+  //   title: 'The Tempest',
+  //   artist: 'Ludwig Van Beethoven',
+  //   BestPathObj: bestPathObj,
+  // });
+
   helpers.distributePath(bestPathObj, dataWithStarts);
 };
 
@@ -590,7 +603,9 @@ mod.findMin = function(layer) {
 
 mod.distributePath = function(bestPathObj, midiData) {
   var nowPlaying = {};
-  var title, artist;
+  for (var each in bestPathObj) {
+    bestPathObj[each] = +bestPathObj[each];
+  }
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
     var note = eventData.noteNumber;
@@ -605,24 +620,7 @@ mod.distributePath = function(bestPathObj, midiData) {
     if (eventData.subtype === 'noteOff') {
       eventData.finger = nowPlaying[note]; //this gets the same finger from the noteOn event that 'caused' this noteOff event.
     }
-    if (eventData.subtype === 'trackName') {
-      title = eventData.text;
-    }
   }
-
-  //the following uploads the computed data to the server
-  title = title || 'untitled'
-  artist = artist || 'unknown artist'
-  var songData = midiData;
-  var replayerData = app.player.replayer;
-
-  $.post('http://localhost:3000/upload',
-    {
-      title: title,
-      artist: artist,
-      songData: songData,
-      replayerData: replayerData
-    });
 };
 
 mod.addStartTimes = function(midiData) {
@@ -808,7 +806,6 @@ module.exports.App = function() {
   this.player.setAnimation({
     delay: 20,
     callback: function(data) {
-      console.log('set animation getting called');
       var current = data.now;
       var total = data.end;
       _this.playControls.displayProgress(current, total);
@@ -818,7 +815,9 @@ module.exports.App = function() {
   this.loadMidiFile = function(midiFile, callback) {
     var _this = this;
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
-    this.player.loadFile(midiFile);
+    this.player.loadFile(midiFile, function() {
+      _this.playControls.play();
+    });
   };
 
   this.upload = function(file) {
@@ -866,7 +865,7 @@ module.exports.App = function() {
   this.fingeringAlgorithm = function() {
     fingeringAlgo(_this.player.data);
   };
-  
+
   this.preComputed = [];
 };
 
@@ -909,6 +908,16 @@ module.exports.App = function() {
 var App = require('./App.js').App;
 $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
+  $.ajax({
+    url: '/getAllPaths',
+    // dataType: 'text',
+    success: function(data) {
+      var allPaths = JSON.parse(data);
+      console.log('data after GET request...', allPaths);
+      app.preComputed = allPaths;
+    }
+  });
+  console.log('app Pre Computed = ', app.preComputed);
   app.initScene();
   app.initMIDI();
   app.initPlayControls($('.playerArea'), app);
@@ -938,7 +947,7 @@ module.exports.PlayControls = function(container, app) {
   var _this = this;
 
   $playBtn.click(function() {
-    if (_this.current === 'paused') {
+    if (_this.playing === false) {
       _this.resume();
     }else {
       _this.play();
@@ -955,71 +964,63 @@ module.exports.PlayControls = function(container, app) {
   });
 
   $songList.click(function(event) {
-    // var $target = $(event.target);
-    // if ($target.is('li')) {
-    //   var $songList = $('li', _this.songList);
-    //   var trackNo = $songList.index($target);
-    //   _this.setTrack(trackNo);
-    // }
+    var $target = $(event.target);
+    if ($target.is('li')) {
+      // var $songList = $('li', _this.songList);
+      var trackName = $target.text();
+      app.player.stop();
+      _this.playing === false;
+      app.currentSong = trackName;
+      $.ajax({
+        url: '/songs/'+trackName,
+        dataType: 'text',
+        success: function(data) {
+          app.loadMidiFile(data);
+        }
+      });
+    }
+    // var trackNo = $songList.index($target);
+    // _this.setTrack(trackNo);
     console.log('songlist click getting called');
-    $.ajax({
-      url: '/songname',
-      // dataType: 'text',
-      success: function(data) {
-        // app.loadMidiFile(data);
-        var parsedData = JSON.parse(data);
-        console.log('data after GET request...', parsedData);
-        var parsedSong = parsedData[0];
-        // var parsedReplayer = parsedData[1];
-        // app.player.data = parsedSong;
-        // app.player.replayer = parsedReplayer;
-        app.preComputed.push(parsedSong);
-      }
-    });
+  
   });
 
-  $song.click(function(event) {
-    console.log('songlist click getting called');
-    $.ajax({
-      url: '/songname2',
-      dataType: 'text',
-      success: function(data) {
-        app.loadMidiFile(data);
-      }
-    });
+  $progressContainer.click(function(event){
+    console.log('progress container is getting clicked');
+    var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
+    console.log(progressPercent);
+    _this.setCurrentTIme(progressPercent);
   });
 
-  $container.on('mousewheel', function(event) {
-      event.stopPropagation();
-    });
+  // $container.on('mousewheel', function(event) {
+  //     event.stopPropagation();
+  //   });
 
   this.play = function() {
     $playBtn.hide();
     $pauseBtn.show();
-    _this.current = 'playing';
-    app.player.resume();
-    app.playing = true;
+    _this.playing = true;
+    app.player.start();
   };
 
   this.resume = function() {
     $playBtn.hide();
     $pauseBtn.show();
-    app.player.currentTime += 1e-6;
+    app.player.currentTime += 1e-6; //fixed bug in MIDI.js
+    _this.playing = true;
     app.player.resume();
-    app.playing = true;
   };
 
   this.stop = function() {
     app.player.stop();
-    app.playing = false;
+    _this.playing = false;
   };
 
   this.pause = function() {
-    _this.current = 'paused';
+    _this.playing = false;
     $playBtn.show();
     $pauseBtn.hide();
     app.player.pause();
-    app.playing = false;
   };
 
   this.getEndTime = function() {
@@ -1032,11 +1033,11 @@ module.exports.PlayControls = function(container, app) {
     $progressBar.width(newWidth);
   };
 
-  this.setCurrentTIme = function(currentTime) {
-    app.player.pause();
+  this.setCurrentTIme = function(progressPercent) {
+    var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
-    if (app.playing) {
-      app.player.resume();
+    if (_this.playing === true) {
+      _this.resume();
     }
   };
 };
