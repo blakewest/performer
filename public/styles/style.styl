@@ -29,11 +29,14 @@ linkColor = black
   overflow hidden
   -webkit-padding-start 0px
   margin 0px
-  li, a
+  li
     float: left
     display block
     width 30px
+    cursor pointer
     margin-left 5px
+    // border 2px solid #099DAA
+    // border-radius 30px
     transition text-shadow .3s 
     text-decoration none
     color #09B492
@@ -61,8 +64,61 @@ linkColor = black
   vertical-align top
   margin-top 2px
 
+#song-menu
+  position relative
+  list-style-type none
+
 
 .player-progress-bar
   background-color #9D304F
   width 0px
   height 20px 
+
+ul #player-songList
+  position absolute
+  // left 50px
+  // width 125px
+  list-style-type none
+  background-color red
+  visibility hidden
+
+ul #song-menu li:hover #player-songList
+  visibility visible
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

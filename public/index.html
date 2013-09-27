@@ -10,19 +10,15 @@
       <script src="lib/three.min.js"></script>
       <script src="lib/tween.min.js"></script>
       <script src="http://codeorigin.jquery.com/jquery-1.10.2.min.js"></script>
-      <script src="http://threejs.org/examples/js/controls/TrackballControls.js"></script>
+      <script src="lib/TrackballControls.js"></script>
       <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
       <script src="bundle.js"></script>
-
-
-      <p>Upload MIDI here!</p>
-      <input type="file" id='filereader' onchange='app.upload(this.files[0])'>
 
       <div id="canvas">
         <div class='player-area'>
           <ul class='player-controls'>
-            <li><a class='player-playBtn' href='#'><i class='icon-play icon-large'></i></a></li>
-            <li><a class='player-pauseBtn' href='#' style="display:none"><i class='icon-pause icon-large'></i></a></li>
+            <li class='player-playBtn'><i class='icon-play icon-large'></i></li>
+            <li a class='player-pauseBtn' style="display:none"><i class='icon-pause icon-large'></i></li>
           </ul>
             <div class='player-progress-container'>
               <div class='player-progress-bar'></div>
@@ -34,11 +30,13 @@
               <button data-timeWarp='1.333'>3/4</button>
               <button data-timeWarp='1'>100%</button>
             </div>
-            <div class='player-songList'>
-              <li>Invention No. 13</li>
-              <li>The Tempest</li>
-            </div>
-          </div>
+            <p>Choose Song</p>
+              <select class ='player-songList'>
+                  <option>Invention No. 13</option>
+                  <option>The Tempest</option>
+              </select>
+            <p>Or Upload Your Own MIDI!</p>
+            <input type="file" id='filereader' onchange='app.upload(this.files[0])'>
         </div>
       </div>
   </body>

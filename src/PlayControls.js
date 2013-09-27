@@ -8,7 +8,7 @@ module.exports.PlayControls = function(container, app) {
   var $progressText = $('.player-progress-text', this.$container);
   var $songList = $('.player-songList', this.$container);
   var $song = $('.song', this.$container);
-  var $tempoChanger = $('.tempoChanger', this.$container);
+  var $tempoChanger = $('.tempo-changer', this.$container);
 
   var $playBtn = $('.player-playBtn', this.$container);
   var $pauseBtn = $('.player-pauseBtn', this.$container);
@@ -33,27 +33,24 @@ module.exports.PlayControls = function(container, app) {
     _this.onNext();
   });
 
-  $songList.click(function(event) {
-    var $target = $(event.target);
-    if ($target.is('li')) {
+  $songList.on('change', function(event) {
       // var $songList = $('li', _this.songList);
-      var trackName = $target.text();
-      // app.player.stop();
-      _this.playing === false;
-      app.currentSong = trackName;
-      console.log(app.currentSong);
-      $.ajax({
-        url: '/songs/'+trackName,
-        dataType: 'text',
-        success: function(data) {
-          app.loadMidiFile(data, 0);
-        }
-      });
-    }
+    var trackName = $(this).val();
+    $(this).mouseup();
+    // app.player.stop();
+    _this.playing = false;
+    app.currentSong = trackName;
+    console.log(app.currentSong);
+    $.ajax({
+      url: '/songs/'+trackName,
+      dataType: 'text',
+      success: function(data) {
+        app.loadMidiFile(data, 0);
+      }
+    });
     // var trackNo = $songList.index($target);
     // _this.setTrack(trackNo);
     console.log('songlist click getting called');
-  
   });
 
   $progressContainer.click(function(event){
@@ -66,6 +63,7 @@ module.exports.PlayControls = function(container, app) {
   $tempoChanger.click(function(event) {
     var $target = $(event.target);
     var timeWarp = $target.attr('data-timeWarp');
+    console.log(timeWarp);
     app.player.timeWarp = timeWarp;
     var trackName = app.currentSong;
     $.ajax({
