@@ -864,7 +864,7 @@ root.currentTime = 0;
 root.endTime = 0; 
 root.restart = 0; 
 root.playing = false;
-root.timeWarp = 1;
+root.timeWarp = 0.5;
 
 //
 root.start =
