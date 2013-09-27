@@ -11,7 +11,7 @@ module.exports = function(grunt) {
     stylus: {
       compile: {
         files: {
-          'public/styles/style.css' : 'styles/style.styl'
+          'public/styles/style.css' : 'public/styles/style.styl'
         }
       }
     },
@@ -21,7 +21,7 @@ module.exports = function(grunt) {
         tasks: ['browserify']
       },
       css: {
-        files: ['styles/style.styl'],
+        files: ['public/styles/style.styl'],
         tasks: ['stylus']
       }
     }
