@@ -11,6 +11,7 @@
       <script src="lib/tween.min.js"></script>
       <script src="http://codeorigin.jquery.com/jquery-1.10.2.min.js"></script>
       <script src="http://threejs.org/examples/js/controls/TrackballControls.js"></script>
+      <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
       <script src="bundle.js"></script>
 
 
@@ -19,13 +20,14 @@
 
       <div id="canvas">
         <div class='player-area'>
-          <ul class='playerControls'>
-            <li><a class='player-playBtn' href=#>Play</a></li>
-            <li class='player-pauseBtn'>pause</li>
-            <li class='player-progress-container'></li>
+          <ul class='player-controls'>
+            <li><a class='player-playBtn' href='#'><i class='icon-play icon-large'></i></a></li>
+            <li><a class='player-pauseBtn' href='#' style="display:none"><i class='icon-pause icon-large'></i></a></li>
           </ul>
-            <div class='player-progress-bar'></div>
-            <div class='tempoChanger'>
+            <div class='player-progress-container'>
+              <div class='player-progress-bar'></div>
+            </div>
+            <div class='tempo-changer'>
               <header>Change The Speed</header>
               <button data-timeWarp='4'>1/4</button>
               <button data-timeWarp='2'>1/2</button>
