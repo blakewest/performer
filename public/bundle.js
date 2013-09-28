@@ -915,9 +915,9 @@ $(document).on('ready', function() {
     }
   });
   console.log('app Pre Computed = ', app.preComputed);
-  app.initScene();
   app.initMIDI();
   app.initPlayControls($('.main-container'), app);
+  app.initScene();
 });
 
 
@@ -954,12 +954,9 @@ module.exports.PlayControls = function(container, app) {
   });
 
   $songList.on('click', function(event) {
-      // var $songList = $('li', _this.songList);
     var $target = $(event.target);
     var trackName = $target.text();
     $currentSong.text(trackName);
-    // $(this).mouseup();
-    // app.player.stop();
     _this.playing = false;
     app.currentSong = trackName;
     console.log(app.currentSong);

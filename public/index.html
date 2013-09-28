@@ -22,7 +22,7 @@
 
 
       <div class='main-container'>
-        <div class='player-area'>
+        <div class='first-level-area'>
           <div class="icons"><i class='icon-time icon-large'></i>
              <div class="speed-options icons-drop-up ">
                <div class='tempo-changer'>
@@ -45,11 +45,6 @@
            </div>
          </div>
 
-         <ul class='player-controls'>
-           <li class='player-playBtn'><i class='icon-play-circle icon-large'></i></li>
-           <li a class='player-pauseBtn' style="display:none"><i class='icon-pause icon-large'></i></li>
-         </ul>
-
           <div class='info-container'>
             <div class='icons'><i class='icon-question-sign icon-large'></i>
               <div class='info-box icons-drop-up'>     
@@ -63,31 +58,36 @@
 
         </div>
 
-     <div class='song-progress-container'>
-       <div class='player-progress-container'>
-         <div class='player-progress-bar'></div>
+      <div class='second-level-area'>
+        <ul class='player-controls'>
+          <li class='player-playBtn'><i class='icon-play-circle icon-large'></i></li>
+          <li a class='player-pauseBtn' style="display:none"><i class='icon-pause icon-large'></i></li>
+        </ul>
+        <div class='player-progress-container'>
+          <div class='player-progress-bar'></div>
+        </div>
+      </div>
+
+      <div class='third-level-area'>
+        <div class='third-level-content'>
+          <div class='icons'><i class='icon-chevron-sign-down icon-large'></i>
+            <div class='icons-drop-up'>
+              <ul class='player-songList'>
+                <li>Invention No. 13</li>
+                <li>The Tempest</li>
+                <li>
+                  <div class='upload-area'>
+                    <header>...Or Upload Your Own MIDI</header>
+                    <input type="file" id='filereader' onchange='app.upload(this.files[0])'>
+                  </div>
+                </li>
+             </ul>
+           </div>
+          </div>
+       <div class='current-song'>The Tempest</div>
        </div>
      </div>
-
-       <div class='icons'><i class='icon-chevron-sign-down icon-large'></i>
-         <div class='icons-drop-up'>
-           <ul class='player-songList'>
-               <li>Invention No. 13</li>
-               <li>The Tempest</li>
-               <li>
-                 <div class='upload-area'>
-                   <header>...Or Upload Your Own MIDI</header>
-                   <input type="file" id='filereader' onchange='app.upload(this.files[0])'>
-                 </div>
-               </li>
-           </ul>
-       </div>
-     </div>
-
-     <div class='current-song'>
-        The Tempest
-     </div>
-   </div>
+    </div>
 
 </body>
 
