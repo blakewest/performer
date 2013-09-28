@@ -16,7 +16,7 @@ $(document).on('ready', function() {
   app.initScene();
   setTimeout(function() {
     $($('.player-songList > li')[0]).trigger('click');
-  }, 1000);
+  }, 1500);
 });
 
 
