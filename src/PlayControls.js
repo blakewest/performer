@@ -29,12 +29,9 @@ module.exports.PlayControls = function(container, app) {
   });
 
   $songList.on('click', function(event) {
-      // var $songList = $('li', _this.songList);
     var $target = $(event.target);
     var trackName = $target.text();
     $currentSong.text(trackName);
-    // $(this).mouseup();
-    // app.player.stop();
     _this.playing = false;
     app.currentSong = trackName;
     console.log(app.currentSong);
