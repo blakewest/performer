@@ -4,22 +4,22 @@ btnBgColor = #002222
 defaultMargin = 1em
 linkColor = black
 
-// body
-//   font-family 'Oxygen', sans-serif
+p 
+  font-family source-sans-pro, sans-serif
 
 #canvas
   width 100%
-  height 800px
+  height 600px
 
 .player-area
   width 260px
-  height 200px
-  background-color #E8E8E8
+  height 60px
   position relative
   top 0
   left 0
   padding 10px
   border-radius 5px
+  margin auto
 
 .player-controls
   position relative
@@ -38,11 +38,8 @@ linkColor = black
     width 30px
     cursor pointer
     margin-left 5px
-    // border 2px solid #099DAA
-    // border-radius 30px
     transition text-shadow .3s 
     text-decoration none
-    color #09B492
     :hover
       color black
       text-shadow 0px 0px 20px
@@ -54,6 +51,10 @@ linkColor = black
   margin-bottom 5px
   display block
   position relative
+
+.info-container
+  position relative
+  float right
 
 .player-pauseBtn
   display none
@@ -85,6 +86,43 @@ linkColor = black
 .upload-area
   margin-top 5px
 
+.icons
+  display inline-block
+  height 20px
+  margin: 0 0 0 50px
+  position relative
+  width 20px
+
+  .icons-drop-up
+    background-color: gray
+    bottom: 60px
+    color: black
+    margin: 0 0 -10px -50px
+    opacity: 0
+    position: absolute
+    vertical-align: bottom
+    visibility: hidden
+    transition margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0.2s
+
+  .icons-drop-up:after
+    border-left 10px solid transparent
+    border-right 10px solid transparent
+    border-top 10px solid gray
+    content: ""
+    left: 50%
+    margin: 0 0 -10px -10px
+    position: absolute
+    bottom: 0px
+
+.icons:hover .icons-drop-up
+  margin: 0 0 0 -50px
+  opacity: 1
+  visibility: visible
+  transition: margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s
+
+.speed-options
+  width 175px
+  right -55px
 
 
 
