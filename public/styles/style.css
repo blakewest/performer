@@ -1,4 +1,4 @@
-p{font-family:source-sans-pro,sans-serif}
+.main-container{font-family:source-sans-pro,sans-serif}
 #canvas{width:100%;height:600px}
 .player-area{width:260px;height:60px;position:relative;top:0;left:0;padding:10px;-webkit-border-radius:5px;border-radius:5px;margin:auto}
 .player-controls{position:relative;display:inline-block;line-height:30px;list-style:none;z-index:4;width:40px;padding-left:10px;overflow:hidden;-webkit-padding-start:0;margin:0;}
@@ -11,7 +11,7 @@ p{font-family:source-sans-pro,sans-serif}
 .player-progress-container{width:200px;height:20px;position:relative;border:2px solid #09b492;-webkit-border-radius:2px;border-radius:2px;display:inline-block;vertical-align:top;margin-top:2px}
 #song-menu{position:relative;list-style-type:none}
 .player-progress-bar{background-color:#9d304f;display:inline-block;width:0;height:20px}
-.player-songList{margin-bottom:5px;position:relative}
+.player-songList{margin-bottom:5px;position:relative;list-style:none}
 .upload-area{margin-top:5px}
 .icons{display:inline-block;height:20px;margin:0 0 0 22px;position:relative;width:20px;}
 .icons .icons-drop-up{background-color:#808080;bottom:60px;color:#000;margin:0 0 -10px -20px;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";filter:alpha(opacity=0);position:absolute;vertical-align:bottom;visibility:hidden;-webkit-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0.2s;-moz-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0.2s;-o-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0.2s;-ms-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0.2s;transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0.2s}
@@ -20,3 +20,4 @@ p{font-family:source-sans-pro,sans-serif}
 .speed-options{width:175px;right:-55px}
 .info-box{width:300px;height:300px}
 .song-progress-container{width:260px;height:60px;margin:auto}
+.current-song{margin:auto}
