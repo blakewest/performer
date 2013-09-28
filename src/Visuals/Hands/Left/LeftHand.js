@@ -59,7 +59,7 @@ module.exports.LeftHand = function(keyboard) {
   this.model.position.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
 
   this.model.traverse(function(object) {
-    object.position.x -= 4.1;
+    object.position.x -= 4.45;
   });
 
 

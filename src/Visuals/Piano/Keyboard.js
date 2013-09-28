@@ -18,7 +18,7 @@ module.exports.Keyboard = function(keyboardDesign) {
   // this.model.translateX(-2.1);
   //this centers the keyboard infront of the camera.
   this.model.traverse(function(object) {
-    object.position.x -= 4.1;
+    object.position.x -= 4.45;
   });
 
   this.press = function(note) {

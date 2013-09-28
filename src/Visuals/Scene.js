@@ -8,13 +8,13 @@ module.exports.Scene = function(container) {
   var scene = new THREE.Scene();
 
   //create camera
-  var view_angle = 90;
+  var view_angle = 85;
   var aspect = width/height;
   var near = 0.001;
   var far = 1000;
   var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
   // camera.lookAt(new THREE.Vector3());
-  camera.position.set(0, 7, 6);
+  camera.position.set(0, 3.0, 1.2);
   camera.lookAt(new THREE.Vector3(10,50,5));
   // camera.rotation.y = 0 * Math.PI / 180;
   // camera.rotation.x = -30 * Math.PI / 180;
