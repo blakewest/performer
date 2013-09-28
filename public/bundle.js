@@ -918,6 +918,9 @@ $(document).on('ready', function() {
   app.initMIDI();
   app.initPlayControls($('.main-container'), app);
   app.initScene();
+  setTimeout(function() {
+    $($('.player-songList > li')[0]).trigger('click');
+  }, 1000);
 });
 
 
