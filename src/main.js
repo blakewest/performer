@@ -13,7 +13,7 @@ $(document).on('ready', function() {
   console.log('app Pre Computed = ', app.preComputed);
   app.initScene();
   app.initMIDI();
-  app.initPlayControls($('.playerArea'), app);
+  app.initPlayControls($('.main-container'), app);
 });
 
 
