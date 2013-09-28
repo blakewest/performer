@@ -11,9 +11,9 @@ $(document).on('ready', function() {
     }
   });
   console.log('app Pre Computed = ', app.preComputed);
-  app.initScene();
   app.initMIDI();
   app.initPlayControls($('.main-container'), app);
+  app.initScene();
 });
 
 
