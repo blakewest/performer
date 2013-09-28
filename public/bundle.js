@@ -917,7 +917,7 @@ $(document).on('ready', function() {
   console.log('app Pre Computed = ', app.preComputed);
   app.initScene();
   app.initMIDI();
-  app.initPlayControls($('.playerArea'), app);
+  app.initPlayControls($('.main-container'), app);
 });
 
 
@@ -937,8 +937,9 @@ module.exports.PlayControls = function(container, app) {
 
   var $playBtn = $('.player-playBtn', this.$container);
   var $pauseBtn = $('.player-pauseBtn', this.$container);
-  var $prevBtn = $('.player-prevBtn', this.$container);
-  var $nextBtn = $('.player-nextBtn', this.$container);
+
+  var $currentSong = $('.current-song')
+
   var _this = this;
 
   $playBtn.click(function() {
@@ -951,17 +952,13 @@ module.exports.PlayControls = function(container, app) {
   $pauseBtn.click(function() {
     _this.pause();
   });
-  $prevBtn.click(function() {
-    _this.onPrev();
-  });
-  $nextBtn.click(function() {
-    _this.onNext();
-  });
 
-  $songList.on('change', function(event) {
+  $songList.on('click', function(event) {
       // var $songList = $('li', _this.songList);
-    var trackName = $(this).val();
-    $(this).mouseup();
+    var $target = $(event.target);
+    var trackName = $target.text();
+    $currentSong.text(trackName);
+    // $(this).mouseup();
     // app.player.stop();
     _this.playing = false;
     app.currentSong = trackName;
@@ -973,8 +970,6 @@ module.exports.PlayControls = function(container, app) {
         app.loadMidiFile(data, 0);
       }
     });
-    // var trackNo = $songList.index($target);
-    // _this.setTrack(trackNo);
     console.log('songlist click getting called');
   });
 
@@ -1050,7 +1045,7 @@ module.exports.PlayControls = function(container, app) {
     console.log('set current time is getting called');
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
-    setTimeout(app.player.resume, 10);
+    setTimeout(_this.resume, 10);
     app.player.pause();
   };
 };
