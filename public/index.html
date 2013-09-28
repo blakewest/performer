@@ -1,8 +1,8 @@
  <!DOCTYPE HTML>
 <head>
     <link rel="stylesheet" href="styles/style.css">
-    <link rel="stylesheet" type = 'text/css' href="styles/topcoat-desktop-light.css">
-
+    <link rel="stylesheet" href="styles/bootstrap.min.css" media="screen">
+</head>
     <body>
       <script src="lib/MIDI.js/inc/jasmid/midifile.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/stream.js"></script>
@@ -12,10 +12,10 @@
       <script src="lib/three.min.js"></script>
       <script src="lib/tween.min.js"></script>
       <script src="http://codeorigin.jquery.com/jquery-1.10.2.min.js"></script>
+      <script src="lib/bootstrap.min.js"></script>
       <script src="lib/TrackballControls.js"></script>
       <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-      <!-- <link href='http://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'> -->
-      <link href='http://fonts.googleapis.com/css?family=Oxygen:700' rel='stylesheet' type='text/css'>
+      <link href='http://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
       <script src="bundle.js"></script>
 
       <div id="canvas">
@@ -29,24 +29,34 @@
             </div>
             <div class='tempo-changer'>
               <header>Change The Speed</header>
-              <div class='topcoat-tab-bar'>
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary">
+                  <input type="radio" name="options" id='4' data-timeWarp='4'> 1/4
+                </label>
+                <label class="btn btn-primary">
+                  <input type="radio" name="options" id='2' data-timeWarp='2'> 1/2
+                </label>
+                <label class="btn btn-primary">
+                  <input type="radio" name="options" id='1.333' data-timeWarp='1.333'> 3/4
+                </label>
+                <label class="btn btn-primary">
+                  <input type="radio" name="options" id='1' data-timeWarp='1'> 1
+                </label>
+              </div>
+<!--               <div class='topcoat-tab-bar'>
                   <label class='topcoat-tab-bar__item'>
-                      <input type='radio' name='tab-bar'>
-                      <button class='topcoat-tab-bar__button' data-timeWarp='4'>1/4</button>
+                      <input type='radio' name='tab-bar' data-timeWarp='4'>1/4
                   </label>
                   <label class='topcoat-tab-bar__item'>
-                      <input type='radio' name='tab-bar'>
-                      <button class='topcoat-tab-bar__button' data-timeWarp='2'>1/2</button>
+                      <input type='radio' name='tab-bar' data-timeWarp='2'> 1/2
                   </label>
                   <label class='topcoat-tab-bar__item'>
-                      <input type='radio' name='tab-bar'>
-                      <button class='topcoat-tab-bar__button' data-timeWarp='1.333'>3/4</button>
+                      <input type='radio' name='tab-bar' data-timeWarp='1.333'> 3/4
                   </label>
                   <div class='topcoat-tab-bar__item'>
-                      <input type='radio' name='tab-bar'>
-                      <button class='topcoat-tab-bar__button' data-timeWarp='1'>1</button>
+                      <input type='radio' name='tab-bar' data-timeWarp='1'>1
                   </div>
-              </div>
+              </div> -->
             </div>
               <header>Choose Song</header>
               <select class='player-songList'>
@@ -59,5 +69,4 @@
           </div>
         </div>
       </div>
-  </body>
-</head>
+</body>

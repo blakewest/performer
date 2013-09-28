@@ -62,7 +62,7 @@ module.exports.PlayControls = function(container, app) {
 
   $tempoChanger.click(function(event) {
     var $target = $(event.target);
-    var timeWarp = $target.attr('data-timeWarp');
+    var timeWarp = $target.find('input').attr('data-timeWarp');
     console.log(timeWarp);
     app.player.timeWarp = timeWarp;
     var trackName = app.currentSong;

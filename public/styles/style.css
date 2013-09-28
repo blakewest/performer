@@ -1,4 +1,3 @@
-body{font-family:'Oxygen',sans-serif}
 #canvas{width:100%;height:800px}
 .player-area{width:260px;height:200px;background-color:#e8e8e8;position:relative;top:0;left:0;padding:10px;-webkit-border-radius:5px;border-radius:5px}
 .player-controls{position:relative;display:inline-block;line-height:30px;list-style:none;z-index:4;width:40px;padding-left:10px;overflow:hidden;-webkit-padding-start:0;margin:0;}
