@@ -19,7 +19,8 @@
   "bugs": {
     "url": "https://github.com/bwest87/performer/issues"
   },
-  "devDependencies": {
+  "dependencies": {
+    "express": "~3.4.0",
     "grunt": "~0.4.1",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-browserify": "~1.2.4",
@@ -27,7 +28,6 @@
     "grunt-contrib-copy": "~0.4.1",
     "mongojs": "~0.9.6",
     "nib": "~1.0.0",
-    "stylus": "~0.38.0",
-    "express": "~3.4.0"
+    "stylus": "~0.38.0"
   }
 }
