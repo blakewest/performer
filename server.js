@@ -14,5 +14,6 @@ require('./routes.js').routes(server, config);
 
 var port = process.env.PORT || config.port || 3000;
 
-console.log('server is listening on port ', port);
-server.listen(port);
+server.listen(port, function() {
+  console.log('server is listening on port ', port);
+});
