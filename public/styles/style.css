@@ -20,7 +20,7 @@
 .icons .icons-drop-up2:after{border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:10px solid #808080;content:"";right:0;margin:0 -10px 0 0;position:absolute;bottom:25px}
 .icons:hover .icons-drop-up{margin:0 0 0 -50px;opacity:1;-ms-filter:none;filter:none;visibility:visible;-webkit-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-moz-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-o-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-ms-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s}
 .icons:hover .icons-drop-up2{margin:0 0 0 -50px;opacity:1;-ms-filter:none;filter:none;visibility:visible;-webkit-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-moz-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-o-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-ms-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s}
-.speed-options{width:175px;left:-30px;-webkit-border-radius:3px;border-radius:3px;padding:5px}
+.speed-options{width:180px;left:-30px;-webkit-border-radius:3px;border-radius:3px;padding:5px}
 .info-box{width:450px;height:470px;-webkit-border-radius:3px;border-radius:3px;padding:10px;left:-167px}
 .second-level-area{width:250px;height:35px;margin:auto}
 .current-song{margin-left:17px;font-size:18px;display:inline}
