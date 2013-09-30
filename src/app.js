@@ -11,7 +11,6 @@ module.exports.App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
-  console.log(this.keyboard);
   this.rightHand = new RightHand(this.keyboard);
   this.leftHand = new LeftHand(this.keyboard);
   this.player = MIDI.Player
