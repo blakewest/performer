@@ -34,7 +34,6 @@ module.exports.PlayControls = function(container, app) {
     $currentSong.text(trackName);
     _this.playing = false;
     app.currentSong = trackName;
-    console.log(app.currentSong);
     $.ajax({
       url: '/songs/'+trackName,
       dataType: 'text',
@@ -42,11 +41,9 @@ module.exports.PlayControls = function(container, app) {
         app.loadMidiFile(data, 0);
       }
     });
-    console.log('songlist click getting called');
   });
 
   $progressContainer.click(function(event){
-    console.log('progress container is getting clicked');
     var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
     console.log(progressPercent);
     _this.setCurrentTIme(progressPercent);
@@ -68,12 +65,7 @@ module.exports.PlayControls = function(container, app) {
     });
   })
 
-  // $container.on('mousewheel', function(event) {
-  //     event.stopPropagation();
-  //   });
-
   this.play = function() {
-    console.log('play is getting called');
     $playBtn.hide();
     $pauseBtn.show();
     _this.playing = true;
@@ -85,7 +77,6 @@ module.exports.PlayControls = function(container, app) {
     $pauseBtn.show();
     app.player.currentTime += 1e-6; //fixed bug in MIDI.js
     _this.playing = true;
-    console.log('resume is getting called');
     app.player.resume();
   };
 
@@ -95,7 +86,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.pause = function() {
-    console.log('pause is getting called');
     _this.playing = false;
     $playBtn.show();
     $pauseBtn.hide();
@@ -114,7 +104,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.setCurrentTIme = function(progressPercent) {
-    console.log('set current time is getting called');
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
     setTimeout(_this.resume, 10);

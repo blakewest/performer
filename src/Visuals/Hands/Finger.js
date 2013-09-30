@@ -6,8 +6,6 @@ module.exports.Finger = function(Keyboard) {
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
-  // this.newX = this.model.position.x;
-  // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
   this.distances = params(keyboard);
 
@@ -44,7 +42,6 @@ module.exports.Finger = function(Keyboard) {
     }
 
     this.setNewPos(this.model.currentNote);
-    console.log('Finger: ' + this.number + '/ Note: ' + this.model.currentNote);
     this.setUpNewTween();
   };
 

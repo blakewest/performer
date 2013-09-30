@@ -61,8 +61,6 @@ module.exports.RightHand = function(keyboard) {
     object.position.x -= 4.45;
   });
 
-  console.log('RH object: ', this.model);
-
   this.press = function(finger, noteNum) {
     // console.log('the right ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
