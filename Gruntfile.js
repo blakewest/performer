@@ -37,8 +37,8 @@ module.exports = function(grunt) {
         separator: ';'
       },
       dist: {
-        src: ['public/lib/MIDI.js/inc/base64binary.js', 'public/lib/MIDI.js/inc/jasmid/midifile.js', 'public/lib/MIDI.js/inc/jasmid/stream.js',
-                'public/lib/MIDI.js/inc/jasmid/replayer.js', 'public/lib/MIDI.js/build/MIDI.min.js', 'public/lib/three.min.js', 'public/lib/Detector.js',
+        src: ['public/lib/MIDI.js/build/MIDI.min.js', 'public/lib/MIDI.js/inc/base64binary.js', 'public/lib/MIDI.js/inc/jasmid/midifile.js', 'public/lib/MIDI.js/inc/jasmid/stream.js',
+                'public/lib/MIDI.js/inc/jasmid/replayer.js', 'public/lib/three.min.js', 'public/lib/Detector.js',
                 'public/bundle.min.js', 'public/lib/tween.min.js', 'public/lib/bootstrap.min.js', 'public/lib/TrackballControls.js'],
         dest: 'public/build.js'
       }
