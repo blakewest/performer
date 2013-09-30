@@ -942,7 +942,6 @@ root.setAnimation = function(config) {
 // helpers
 
 root.loadMidiFile = function() { // reads midi into javascript array of events
-	console.log('load Midi File called');
 	root.replayer = new Replayer(MidiFile(root.currentData), root.timeWarp);
 	root.data = root.replayer.getData();
 	app.fingeringAlgorithm(); //this alters root.data object to add the appropriate finger property.
@@ -950,9 +949,7 @@ root.loadMidiFile = function() { // reads midi into javascript array of events
 };
 
 root.loadFile = function (file, callback) {
-	console.log('loadFile called');
 	root.stop();
-	console.log('made it past the stop call');
 	if (file.indexOf("base64,") !== -1) {
 		var data = window.atob(file.split(",")[1]);
 		root.currentData = data;

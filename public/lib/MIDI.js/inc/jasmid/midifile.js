@@ -3,7 +3,6 @@ class to parse the .mid file format
 (depends on stream.js)
 */
 function MidiFile(data) {
-	console.log(' parse MidiFile called');
 	function readChunk(stream) {
 		var id = stream.read(4);
 		var length = stream.readInt32();
