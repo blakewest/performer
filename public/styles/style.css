@@ -21,9 +21,11 @@
 .icons:hover .icons-drop-up{margin:0 0 0 -50px;opacity:1;-ms-filter:none;filter:none;visibility:visible;-webkit-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-moz-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-o-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-ms-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s}
 .icons:hover .icons-drop-up2{margin:0 0 0 -50px;opacity:1;-ms-filter:none;filter:none;visibility:visible;-webkit-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-moz-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-o-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;-ms-transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s;transition:margin 0.2s ease, opacity 0.2s ease, visibility 0s ease 0s}
 .speed-options{width:175px;left:-30px;-webkit-border-radius:3px;border-radius:3px;padding:5px}
-.info-box{width:400px;height:400px;-webkit-border-radius:3px;border-radius:3px;padding:10px;left:-142px}
+.info-box{width:450px;height:470px;-webkit-border-radius:3px;border-radius:3px;padding:10px;left:-167px}
 .second-level-area{width:250px;height:35px;margin:auto}
 .current-song{margin-left:17px;font-size:18px;display:inline}
 .third-level-content{margin:0 auto;width:250px}
 .song-list-box{right:35px;width:270px}
-#app-title{margin-left:25%;display:inline-block;font-size:20px;color:#ff0238}
+#app-title{margin-left:25%;display:inline-block;font-size:20px;color:#ff0238;font-weight:bold}
+.song-item{cursor:pointer}
+.song-item:hover{color:#25bfda}
