@@ -29,5 +29,8 @@
     "mongojs": "~0.9.6",
     "nib": "~1.0.0",
     "stylus": "~0.38.0"
+  },
+  "devDependencies": {
+    "grunt-contrib-uglify": "~0.2.4"
   }
 }
