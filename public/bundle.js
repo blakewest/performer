@@ -404,13 +404,12 @@ module.exports.FingeringAlgorithm = function(midiData) {
   the currentNode variable is initialized to be the lowest score of the final layer.*/
   var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
 
-  /*from this point, we put the finger for that node in the array, then we track back to it's
+  /*From this point, we put the finger for that node in the array, then we track back to it's
   best previous node, record it's finger, and repeat till we get to the end.
-  also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
+  We set the continuation condition to be greater than zero, because we don't actually want zero, 
   since zero is just our start object.*/
   var bestPathObj = {};
   for (var j = noteTrellis.length-1; j > 0; j--) {
-    // debugger;
     var nodeObj = noteTrellis[j][currentNode];
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
@@ -426,8 +425,8 @@ module.exports.FingeringAlgorithm = function(midiData) {
     
   // $.post('http://localhost:3000/upload',
   // {
-  //   title: 'The Tempest',
-  //   artist: 'Ludwig Van Beethoven',
+  //   title: 'Yesterday',
+  //   artist: 'The Beatles',
   //   BestPathObj: bestPathObj,
   // });
 
@@ -612,7 +611,6 @@ mod.distributePath = function(bestPathObj, midiData) {
       var startTime = eventData.startTime;
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
-      console.log('Note: ' + note + '/ Finger: ' + finger);
       eventData.finger = finger;
       nowPlaying[note] = finger;//adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
     }
@@ -775,7 +773,6 @@ module.exports.App = function() {
   //instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
-  console.log(this.keyboard);
   this.rightHand = new RightHand(this.keyboard);
   this.leftHand = new LeftHand(this.keyboard);
   this.player = MIDI.Player
@@ -907,20 +904,18 @@ $(document).on('ready', function() {
   var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
   $.ajax({
     url: '/getAllPaths',
-    // dataType: 'text',
     success: function(data) {
       var allPaths = JSON.parse(data);
-      console.log('data after GET request...', allPaths);
       app.preComputed = allPaths;
     }
   });
-  console.log('app Pre Computed = ', app.preComputed);
   app.initMIDI();
   app.initPlayControls($('.main-container'), app);
   app.initScene();
+  //Sound takes a while to load, so we use the setTimeout to ensure it's ready.
   setTimeout(function() {
     $($('.player-songList > li')[0]).trigger('click');
-  }, 1500);
+  }, 2000);
 });
 
 
@@ -962,7 +957,6 @@ module.exports.PlayControls = function(container, app) {
     $currentSong.text(trackName);
     _this.playing = false;
     app.currentSong = trackName;
-    console.log(app.currentSong);
     $.ajax({
       url: '/songs/'+trackName,
       dataType: 'text',
@@ -970,11 +964,9 @@ module.exports.PlayControls = function(container, app) {
         app.loadMidiFile(data, 0);
       }
     });
-    console.log('songlist click getting called');
   });
 
   $progressContainer.click(function(event){
-    console.log('progress container is getting clicked');
     var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
     console.log(progressPercent);
     _this.setCurrentTIme(progressPercent);
@@ -996,12 +988,7 @@ module.exports.PlayControls = function(container, app) {
     });
   })
 
-  // $container.on('mousewheel', function(event) {
-  //     event.stopPropagation();
-  //   });
-
   this.play = function() {
-    console.log('play is getting called');
     $playBtn.hide();
     $pauseBtn.show();
     _this.playing = true;
@@ -1013,7 +1000,6 @@ module.exports.PlayControls = function(container, app) {
     $pauseBtn.show();
     app.player.currentTime += 1e-6; //fixed bug in MIDI.js
     _this.playing = true;
-    console.log('resume is getting called');
     app.player.resume();
   };
 
@@ -1023,7 +1009,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.pause = function() {
-    console.log('pause is getting called');
     _this.playing = false;
     $playBtn.show();
     $pauseBtn.hide();
@@ -1042,7 +1027,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.setCurrentTIme = function(progressPercent) {
-    console.log('set current time is getting called');
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
     setTimeout(_this.resume, 10);
@@ -1069,8 +1053,6 @@ module.exports.Finger = function(Keyboard) {
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
-  // this.newX = this.model.position.x;
-  // this.currentX = this.model.position.x;
   var keyboard = Keyboard;
   this.distances = params(keyboard);
 
@@ -1107,7 +1089,6 @@ module.exports.Finger = function(Keyboard) {
     }
 
     this.setNewPos(this.model.currentNote);
-    console.log('Finger: ' + this.number + '/ Note: ' + this.model.currentNote);
     this.setUpNewTween();
   };
 
@@ -1801,8 +1782,6 @@ module.exports.RightHand = function(keyboard) {
   this.model.traverse(function(object) {
     object.position.x -= 4.45;
   });
-
-  console.log('RH object: ', this.model);
 
   this.press = function(finger, noteNum) {
     // console.log('the right ' + finger + ' finger is trying to press');
