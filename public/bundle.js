@@ -901,21 +901,22 @@ module.exports.App = function() {
 },{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./PlayControls.js":9,"./Visuals/Hands/Left/LeftHand.js":14,"./Visuals/Hands/Right/RightHand.js":20,"./Visuals/Piano/Keyboard.js":26,"./Visuals/Piano/KeyboardDesign.js":27,"./Visuals/Scene.js":29}],8:[function(require,module,exports){
 var App = require('./App.js').App;
 $(document).on('ready', function() {
-  var app = window.app = new App(); //maybe put the whole app in a name space(like b), then if you need to refer to it, you can  refer to app as b.app
-  app.initMIDI();
-  $.ajax({
-    url: '/getAllPaths',
-    success: function(data) {
-      var allPaths = JSON.parse(data);
-      app.preComputed = allPaths;
-    }
+  var app = window.app = new App();
+  app.initMIDI(function() {
+    app.initScene();
+    $.ajax({
+      url: '/getAllPaths',
+      success: function(data) {
+        var allPaths = JSON.parse(data);
+        app.preComputed = allPaths;
+      }
+    });
+    app.initPlayControls($('.main-container'), app);
+    //Sound takes a while to load, so we use the setTimeout to ensure it's ready.
+    setTimeout(function() {
+      $($('.player-songList > li')[0]).trigger('click');
+    }, 3000);
   });
-  app.initPlayControls($('.main-container'), app);
-  app.initScene();
-  //Sound takes a while to load, so we use the setTimeout to ensure it's ready.
-  setTimeout(function() {
-    $($('.player-songList > li')[0]).trigger('click');
-  }, 5000);
 });
 
 
