@@ -5,6 +5,14 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 </head>
     <body>
+      <div id="fb-root"></div>
+      <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));</script>
       <script src="lib/MIDI.js/inc/jasmid/midifile.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/stream.js"></script>
       <script src="lib/MIDI.js/inc/jasmid/replayer.js"></script>
@@ -105,6 +113,17 @@
            </div>
           </div>
        <div class='current-song'></div>
+       </div>
+     </div>
+     <div class='fourth-level-area'>
+       <div class='share-buttons'>
+         <div class='twitter-button'>
+           <a href="https://twitter.com/share" class="twitter-share-button" data-text="Performer.io plays any MIDI file with 3D hands, and correct fingers. Pretty cool. Check this out.">Tweet</a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+         </div>
+         <div class='facebook-button'>
+            <div class="fb-like" data-href="http://www.performer.io" data-width="107" data-show-faces="false" data-send="false"></div>
+         </div>
        </div>
      </div>
     </div>

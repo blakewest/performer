@@ -29,3 +29,6 @@
 #app-title{margin-left:25%;display:inline-block;font-size:20px;color:#ff0238;font-weight:bold}
 .song-item{cursor:pointer}
 .song-item:hover{color:#25bfda}
+.share-buttons{width:250px;height:35px;margin:10px auto}
+.twitter-button{display:inline-block}
+.facebook-button{display:inline-block;height:26px}
