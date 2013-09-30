@@ -14,7 +14,7 @@ $(document).on('ready', function() {
   //Sound takes a while to load, so we use the setTimeout to ensure it's ready.
   setTimeout(function() {
     $($('.player-songList > li')[0]).trigger('click');
-  }, 2800);
+  }, 3300);
 });
 
 
