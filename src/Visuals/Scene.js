@@ -13,12 +13,8 @@ module.exports.Scene = function(container) {
   var near = 0.001;
   var far = 1000;
   var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
-  // camera.lookAt(new THREE.Vector3());
   camera.position.set(0, 3.0, 1.2);
   camera.lookAt(new THREE.Vector3(10,50,5));
-  // camera.rotation.y = 0 * Math.PI / 180;
-  // camera.rotation.x = -30 * Math.PI / 180;
-  // camera.rotation.z = 0 * Math.PI / 180;
 
   var controls = new THREE.TrackballControls(camera);
   controls.rotateSpeed = 1.0;
@@ -34,7 +30,7 @@ module.exports.Scene = function(container) {
   controls.keys = [ 65, 83, 68 ];
 
   //create and append renderer
-  var renderer = new THREE.WebGLRenderer({antialias: true});
+  var renderer = Detector.webgl ? new THREE.WebGLRenderer({antialias: true}) : new THREE.CanvasRenderer();
   renderer.setSize(width, height);
   renderer.setClearColor(0x000000, 1);
   renderer.autoClear = false;
