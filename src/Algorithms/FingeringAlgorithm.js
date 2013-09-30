@@ -72,13 +72,12 @@ module.exports.FingeringAlgorithm = function(midiData) {
   the currentNode variable is initialized to be the lowest score of the final layer.*/
   var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
 
-  /*from this point, we put the finger for that node in the array, then we track back to it's
+  /*From this point, we put the finger for that node in the array, then we track back to it's
   best previous node, record it's finger, and repeat till we get to the end.
-  also, we set the continuation condition to be greater than zero, because we don't actually want zero, 
+  We set the continuation condition to be greater than zero, because we don't actually want zero, 
   since zero is just our start object.*/
   var bestPathObj = {};
   for (var j = noteTrellis.length-1; j > 0; j--) {
-    // debugger;
     var nodeObj = noteTrellis[j][currentNode];
     var fingers = nodeObj.fingers;
     var notes = nodeObj.notes;
@@ -94,8 +93,8 @@ module.exports.FingeringAlgorithm = function(midiData) {
     
   // $.post('http://localhost:3000/upload',
   // {
-  //   title: 'The Tempest',
-  //   artist: 'Ludwig Van Beethoven',
+  //   title: 'Yesterday',
+  //   artist: 'The Beatles',
   //   BestPathObj: bestPathObj,
   // });
 

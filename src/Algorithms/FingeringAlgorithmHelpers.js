@@ -159,7 +159,6 @@ mod.distributePath = function(bestPathObj, midiData) {
       var startTime = eventData.startTime;
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
-      console.log('Note: ' + note + '/ Finger: ' + finger);
       eventData.finger = finger;
       nowPlaying[note] = finger;//adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
     }
