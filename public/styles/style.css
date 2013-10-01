@@ -1,5 +1,5 @@
 .main-container{font-family:source-sans-pro,sans-serif}
-#canvas{width:100%;height:600px}
+#canvas{width:100%;height:450px}
 .first-level-area{width:250px;height:30px;position:relative;top:0;left:0;-webkit-border-radius:5px;border-radius:5px;margin:auto}
 .player-controls{position:relative;display:inline-block;line-height:30px;list-style:none;z-index:4;width:40px;padding-left:10px;overflow:hidden;-webkit-padding-start:0;margin:0;}
 .player-controls li{float:left;display:block;width:30px;cursor:pointer;-webkit-transition:text-shadow 0.3s;-moz-transition:text-shadow 0.3s;-o-transition:text-shadow 0.3s;-ms-transition:text-shadow 0.3s;transition:text-shadow 0.3s;text-decoration:none;}
