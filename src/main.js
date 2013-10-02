@@ -10,9 +10,10 @@ $(document).on('ready', function() {
         app.preComputed = allPaths;
         app.initPlayControls($('.main-container'), app);
         //Sound takes a while to load, so we use the setTimeout to ensure it's ready.
-        setTimeout(function() {
-          $($('.player-songList > li')[0]).trigger('click');
-        }, 3300);
+        // setTimeout(function() {
+        //   $($('.player-songList > li')[0]).trigger('click');
+        // }, 500);
+        $($('.player-songList > li')[0]).trigger('click');
       }
     });
 

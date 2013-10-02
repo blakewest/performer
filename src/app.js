@@ -86,10 +86,11 @@ module.exports.App = function() {
   this.initMIDI = function(callback) {
     MIDI.loadPlugin(function() {
       MIDI.channels[9].mute = true;
+      if (typeof callback === 'function') {
+        callback();
+      }
     });
-    if (typeof callback === 'function') {
-      callback();
-    }
+  
   };
 
   this.initPlayControls = function(container, app) {
