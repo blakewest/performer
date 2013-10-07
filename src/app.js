@@ -50,7 +50,7 @@ module.exports.App = function() {
     var _this = this;
     //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
     this.player.loadFile(midiFile, function() {
-      _this.playControls.setCurrentTIme(newStartPercent);
+      _this.playControls.setCurrentTime(newStartPercent);
     });
   };
 
