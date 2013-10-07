@@ -9,6 +9,7 @@ $(document).on('ready', function() {
       success: function(data) {
         app.preComputed = data;
         app.initPlayControls($('.main-container'), app);
+        //triggers a click for first song.
         $($('.player-songList > li')[0]).trigger('click');
       }
     });
