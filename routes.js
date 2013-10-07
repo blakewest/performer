@@ -26,8 +26,7 @@ module.exports.routes = function(server, config) {
   //send back all best path objs we have in one request, so we don't need to make multiple requests as we get new songs. 
   server.get('/getAllPaths', function(req,res) {
     collection.find(function(err, docs) {
-      var stringData = JSON.stringify(docs);
-      res.end(stringData);
+      res.json(docs);
     });
   });
 
