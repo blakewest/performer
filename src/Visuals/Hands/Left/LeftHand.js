@@ -8,7 +8,7 @@ var Dummy          = require('../Dummy.js').Dummy;
 
 module.exports.LeftHand = function(keyboard) {
   var _this = this;
-  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
+  // We're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
   var handDesign = new HandDesign(keyboard);
   var pinky = new LeftPinky(handDesign, 'left');
   var ring = new LeftRing(handDesign, 'left');
@@ -21,8 +21,8 @@ module.exports.LeftHand = function(keyboard) {
   this.fingers = [];
   this.model = new THREE.Object3D();
 
-  //add fingers to hand model
-  this.fingers.push(undefined); // these are here to make off by 1 errors go away. We want finger 1 to be thumb so that semantically it makes sense)
+  // Add fingers to hand model
+  this.fingers.push(undefined); // These are here to make off by 1 errors go away. We want finger 1 to be thumb so that semantically it makes sense)
   this.model.add(dummy1.model)
   dummy1.model.currentNote = -1;
 
@@ -67,7 +67,6 @@ module.exports.LeftHand = function(keyboard) {
 
   this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
-    // console.log('the left ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {

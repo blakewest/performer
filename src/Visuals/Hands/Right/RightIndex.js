@@ -31,9 +31,9 @@ var RightIndex = module.exports.RightIndex = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote+4) && delta < dist.get(curNote, curNote+8)) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote+4) && delta < dist.get(curNote, curNote+8)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote - 5);
     }
   };

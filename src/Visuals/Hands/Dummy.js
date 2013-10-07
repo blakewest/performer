@@ -1,4 +1,4 @@
-//this is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.
+// This is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.
 var Dummy = module.exports.Dummy = function() {
   var Geometry = new THREE.CubeGeometry(1,1,1);
   var Material = new THREE.MeshLambertMaterial({color: 0x0000});

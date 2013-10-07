@@ -53,7 +53,7 @@ module.exports.PlayControls = function(container, app) {
   this.resume = function() {
     $playBtn.hide();
     $pauseBtn.show();
-    app.player.currentTime += 1e-6; //fixed bug in MIDI.js
+    app.player.currentTime += 1e-6; // Bug fix in MIDI.js
     _this.playing = true;
     app.player.resume();
   };

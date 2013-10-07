@@ -20,27 +20,27 @@ mod.color = {
 mod.fingDistance = {
   '1,1': 0,
   '1,2': 2,
-  '1,3': 3.5, // making an allowance since this seriously is either 3 or 4 about half the time.
+  '1,3': 3.5, // Making an allowance since this seriously is either 3 or 4 about half the time.
   '1,4': 5,
   '1,5': 7,
   '2,1': 2,
   '2,2': 0,
   '2,3': 2,
-  '2,4': 3.5,  //same
+  '2,4': 3.5,  // Same
   '2,5': 5,
-  '3,1': 3.5, // same
+  '3,1': 3.5, // Same
   '3,2': 2,
   '3,3': 0,
   '3,4': 2,
-  '3,5': 3.5, //same
+  '3,5': 3.5, // Same
   '4,1': 5,
-  '4,2': 3.5, //same
+  '4,2': 3.5, // Same
   '4,3': 2,
   '4,4': 0,
   '4,5': 2,
   '5,1': 7,
   '5,2': 5,
-  '5,3': 3.5, //same
+  '5,3': 3.5, // Same
   '5,4': 2,
   '5,5': 0
 };

@@ -111,7 +111,7 @@ mod.makeNoteTrellis = function(midiData) {
   return trellis;
 };
 
-var computeRHCost = function(n1,n2,f1,f2) {
+var computeRHCost = function(n1, n2, f1, f2) {
   if (n1 === 'e' || n2 === 'e') {
     return 0;
   }
@@ -122,7 +122,7 @@ var computeRHCost = function(n1,n2,f1,f2) {
   return cost;
 };
 
-var computeLHCost = function(n1,n2,f1,f2) {
+var computeLHCost = function(n1, n2, f1, f2) {
   if (n1 === 'e' || n2 === 'e') {
     return 0;
   }
@@ -160,18 +160,15 @@ mod.distributePath = function(bestPathObj, midiData) {
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
       eventData.finger = finger;
-      nowPlaying[note] = finger;//adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
+      nowPlaying[note] = finger;// Adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
     }
     if (eventData.subtype === 'noteOff') {
-      eventData.finger = nowPlaying[note]; //this gets the same finger from the noteOn event that 'caused' this noteOff event.
+      eventData.finger = nowPlaying[note]; // This gets the same finger from the noteOn event that 'caused' this noteOff event.
     }
   }
 };
 
 mod.addStartTimes = function(midiData) {
-  //initialize counter variable at zero;
-  //set first item startTime to counter variable. 
-  //increment counter by TicksToNextEvent for either noteOn or noteOff events
   var curStartTime = 0;
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
@@ -211,22 +208,22 @@ mod.getSplitData = function(node) {
 mod.calcCost = function(curNode, prevNode, otherHandCurNode, whichHand) {
   var costFunction = whichHand === 'RH' ? computeRHCost : computeLHCost;
   var totalCost = 0;
-  //if curNode has nothing, then that means there are no immediate notes to try out for that same hand. Thus it's temporarily only right or only left.
-  //We need to return what the cost would be to move to that other note. (ie. if your left hand doens't need to play anything,
+  // If curNode has nothing, then that means there are no immediate notes to try out for that same hand. Thus it's temporarily only right or only left.
+  // We need to return what the cost would be to move to that other note. (ie. if your left hand doens't need to play anything,
   // but your right hand is playing a note 2 octaves up, we should return that cost of the left hand jumping up to play that right hand note.)
 
-  for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
-    var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
+  for (var i = 0; i < curNode.notes.length; i++) {       // Go through each note in the current Node
+    var curNote = curNode.notes[i][0];  // This grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
     var curFinger = curNode.fingers[i];
     var hasNextNote = curNode.notes[i+1] || false;
     var nextFinger = curNode.fingers[i+1];
     if(hasNextNote) {
-      //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+      // This helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
       totalCost += costFunction(curNote, hasNextNote[0], curFinger, nextFinger);
     }else {
-      totalCost += whichHand === 'RH' ? 60 - curNote : curNote - 60; //this adds a 'stateCost' for one note that helps seperate the hands where they should be.
+      totalCost += whichHand === 'RH' ? 60 - curNote : curNote - 60; // This adds a 'stateCost' for one note that helps seperate the hands where they should be.
     }
-    for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
+    for (var j = 0; j < prevNode.notes.length; j++) {   // Add up scores for each of the previous nodes notes trying to get to current node note.
       var prevNote = prevNode.notes[j][0];
       var prevFinger = prevNode.fingers[j];
 

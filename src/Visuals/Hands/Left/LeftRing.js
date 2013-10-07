@@ -31,9 +31,9 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote -3) && delta < dist.get(curNote, curNote-2)) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote -3) && delta < dist.get(curNote, curNote-2)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote + 2);
     }
   };
@@ -54,7 +54,7 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
   this.thumbRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta < dist.get(curNote, curNote + 8) ) {
       return;
-    } else if (delta > dist.get(curNote, curNote -2) && delta < 0) {             //this is thumb crossing under
+    } else if (delta > dist.get(curNote, curNote -2) && delta < 0) { //this is thumb crossing under
       var _this = this;
       setTimeout(_this.moveToNote(newNote - 5), 100);
     }

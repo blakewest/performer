@@ -31,19 +31,19 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { // This is like the 'stretch' zone
       return;
-    }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-7), 100);
-    }else { //definitely move
+    }else { // Definitely move
       this.moveToNote(newNote - 7);
     }
   };
   this.ringRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote+4) && delta <= dist.get(curNote, curNote+9)) {
       return;
-    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-5), 100);
     }else {
@@ -53,7 +53,7 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.middleRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote+2) && delta <= dist.get(curNote, curNote+7)) {
       return;
-    }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-4), 100);
     }else {
@@ -63,7 +63,7 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.indexRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta <= dist.get(curNote, curNote+4) ) {
       return;
-    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-2), 100);
     }else {

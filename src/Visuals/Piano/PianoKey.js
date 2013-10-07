@@ -1,11 +1,11 @@
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
-  //set up some convenience vars
-  var Black                    = boardInfo.KeyType.Black;
-  var keyType               = boardInfo.keyInfo[note].keyType;
-  var keyCenterPosX     = boardInfo.keyInfo[note].keyCenterPosX;
+  // Set up some convenience vars
+  var Black              = boardInfo.KeyType.Black;
+  var keyType            = boardInfo.keyInfo[note].keyType;
+  var keyCenterPosX      = boardInfo.keyInfo[note].keyCenterPosX;
   var keyUpSpeed         = boardInfo.keyUpSpeed;
 
-  //set up necessary components for making a Mesh.
+  // Set up necessary components for making a Mesh.
   var geometry, material, position;
   if (keyType === Black) {
     geometry = new THREE.CubeGeometry(boardInfo.blackKeyWidth, boardInfo.blackKeyHeight, boardInfo.blackKeyLength);
@@ -19,11 +19,11 @@ var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
     this.originalColor = {r: 0.941, g: 1, b: 1};
   }
 
-  //make the key Mesh
+  // Make the key Mesh
   this.model = new THREE.Mesh(geometry, material);
   this.model.position.copy(position);
 
-  //set helper properties
+  // Set helper properties
   this.keyUpSpeed = boardInfo.keyUpSpeed;
   this.originalY = position.y;
   this.pressedY = this.originalY - boardInfo.keyDip;
@@ -45,9 +45,9 @@ PianoKey.prototype.release = function() {
 };
 
 PianoKey.prototype.update = function() {
-  //this is really about making released notes edge up slowly, rather than quickly
+  // This is really about making released notes edge up slowly, rather than quickly
   if (this.model.position.y < this.originalY && this.isPressed === false) {
-    //offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
+    // Offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
     var offset = this.originalY - this.model.position.y;
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
@@ -59,7 +59,6 @@ PianoKey.prototype.setUpNewTween = function() {
     _this.model.material.color.setRGB(_this.currentColor.r, _this.currentColor.g, _this.currentColor.b);
   };
   var easing = TWEEN.Easing.Quadratic.Out;
-
   var tween = new TWEEN.Tween(this.currentColor)
     .to(this.newColor, 150)
     .easing(easing)

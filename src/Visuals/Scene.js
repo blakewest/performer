@@ -4,10 +4,10 @@ module.exports.Scene = function(container) {
   var height = $container.height();
   var _this = this;
 
-  //create scene
+  // Create scene
   var scene = new THREE.Scene();
 
-  //create camera
+  // Create camera
   var view_angle = 85;
   var aspect = width/height;
   var near = 0.001;
@@ -29,14 +29,14 @@ module.exports.Scene = function(container) {
 
   controls.keys = [ 65, 83, 68 ];
 
-  //create and append renderer
+  // Create and append renderer
   var renderer = Detector.webgl ? new THREE.WebGLRenderer({antialias: true}) : new THREE.CanvasRenderer();
   renderer.setSize(width, height);
   renderer.setClearColor(0x000000, 1);
   renderer.autoClear = false;
   $container.append(renderer.domElement);
 
-  //create lights
+  // Create lights
   var ambientLight = new THREE.AmbientLight(0x222222);
 
   var mainLight = new THREE.DirectionalLight(0xffffff, 0.8)
@@ -45,13 +45,13 @@ module.exports.Scene = function(container) {
   var auxLight = new THREE.DirectionalLight(0xffffff, 0.3);
   auxLight.position.set(-4,-1,-2).normalize;
 
-  //add everything to the scene
+  // Add everything to the scene
   scene.add(ambientLight);
   scene.add(mainLight);
   scene.add(auxLight);
   scene.add(camera);
 
-  //set props for return object
+  // Set props for return object
   this.camera =   camera;
   this.renderer = renderer;
   this.scene =     scene;

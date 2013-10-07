@@ -8,7 +8,7 @@ var Dummy         = require('../Dummy.js').Dummy;
 
 module.exports.RightHand = function(keyboard) {
   var _this = this;
-  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
+  // We're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
   var handDesign = new HandDesign(keyboard); 
   var pinky = new RightPinky(handDesign, 'right');
   var ring = new RightRing(handDesign, 'right');
@@ -21,9 +21,9 @@ module.exports.RightHand = function(keyboard) {
   this.fingers = [];
   this.model = new THREE.Object3D();
 
-  //add fingers to hand model
+  // Add fingers to hand model
 
-  this.fingers.push(undefined); // these are here to make the off by 1 errors go away. (We want finger 1 to be thumb so that semantically it makes sense)
+  this.fingers.push(undefined); // These are here to make the off by 1 errors go away. (We want finger 1 to be thumb so that semantically it makes sense)
   this.model.add(dummy1.model)
   dummy1.model.currentNote = -1;
 
@@ -50,19 +50,19 @@ module.exports.RightHand = function(keyboard) {
   this.model.add(dummy2.model);
   dummy2.model.currentNote = 110;
 
+  // Initializes fingers to middle C position so they have somewhere to go. Ideally change this to know starting position of current song
   thumb.moveToNote(60);
   index.moveToNote(62);
   middle.moveToNote(64);
   ring.moveToNote(65);
   pinky.moveToNote(67);
 
-  this.model.position.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.position.y -= 0.22 / 2; // The 0.22 is the keyboard height (defined in KeyboardDesign.js)
   this.model.traverse(function(object) {
     object.position.x -= 4.45;
   });
 
   this.press = function(finger, noteNum) {
-    // console.log('the right ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {

@@ -2,7 +2,7 @@ var params = require('./FingerMoveParams.js').params;
 
 module.exports.Finger = function(Keyboard) {
   var pressAmount = 0.6;
-  this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
+  this.originalY = 0.2; // This is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
@@ -23,7 +23,7 @@ module.exports.Finger = function(Keyboard) {
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
     
-    //logic about checking to see if neighbor is already on the note you want to play. 
+    // Logic about checking to see if neighbor is already on the note you want to play. 
     var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
     var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
     if (noteNum > this.model.currentNote) {
@@ -52,7 +52,7 @@ module.exports.Finger = function(Keyboard) {
     }
   };
 
-  //just initializing values here. They'll get overwritten immediately;
+  // Just initializing values here. They'll get overwritten immediately;
   this.currentPos = {
     x: 0,
     y: 0,
@@ -91,33 +91,3 @@ module.exports.Finger = function(Keyboard) {
     //TO DO
   };
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

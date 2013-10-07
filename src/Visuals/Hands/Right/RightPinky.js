@@ -31,9 +31,9 @@ var RightPinky = module.exports.RightPinky = function(handInfo) {
   };
 
   this.ringRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote-3) && delta < 0) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote + 2);
     }
   };

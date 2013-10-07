@@ -31,9 +31,9 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote-5) && delta < dist.get(curNote, curNote-3) ) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote-5) && delta < dist.get(curNote, curNote-3) ) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote+3);
     }
   };
@@ -54,9 +54,9 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   this.thumbRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta < dist.get(curNote, curNote+6) ) {
       return;
-    } else if (delta > dist.get(curNote, curNote-4) && delta < 0) {    //this is the thumb crossing under
+    } else if (delta > dist.get(curNote, curNote-4) && delta < 0) {    // This is the thumb crossing under
       var _this = this;
-      setTimeout(_this.moveToNote(newNote-3), 100); //this is so you have some delay before the fingers move back over the thumb. A tad more realistic
+      setTimeout(_this.moveToNote(newNote-3), 100); // This is so you have some delay before the fingers move back over the thumb. A tad more realistic
     }
     else {
       this.moveToNote(newNote-3);

@@ -1,29 +1,29 @@
 module.exports.HandDesign = function(keyboard) {
-  //pinky specs
+  // Pinky specs
   this.pinkyWidth = 0.14;
   this.pinkyHeight = 0.1;
   this.pinkyLength = 0.57;
   this.pinkyColor = 0xFF0000;
 
-  //ring finger specs
+  // Ring finger specs
   this.ringFingerWidth = 0.18;
   this.ringFingerHeight = 0.1;
   this.ringFingerLength = 0.61;
   this.ringFingerColor = 0x006600;
 
-  //middle finger specs
+  // Middle finger specs
   this.middleFingerWidth = 0.185;
   this.middleFingerHeight = 0.1;
   this.middleFingerLength = 0.7;
   this.middleFingerColor = 0x0033FF;
 
-  //index finger specs
+  // Index finger specs
   this.indexFingerWidth = 0.188;
   this.indexFingerHeight = 0.1;
   this.indexFingerLength = 0.60;
   this.indexFingerColor = 0xFFFF00;
 
-  //thumb specs
+  // Thumb specs
   this.thumbWidth = 0.175;
   this.thumbHeight = 0.1;
   this.thumbLength = 0.5;

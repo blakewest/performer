@@ -2,44 +2,44 @@
 var params = require('./CostAlgorithmParameters.js');
 var helpers = require('./CostAlgorithmHelpers.js');
 
-var costAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
+var costAlgorithmRouter = function(n1, n2, f1, f2, costDatabase) {
   var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
   var noteD = Math.abs(n2-n1);
-  var fingD = helpers.fingerDistance(f1,f2);
+  var fingD = helpers.fingerDistance(f1, f2);
 
-  //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
-  //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
+  // Handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  // it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
   if (Math.abs(n2 - n1) > 0 && f2-f1 === 0) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2);
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2);
   }
-  //handles ascending notes and descending fingers, but f2 isn't thumb
-  //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
+  // Handles ascending notes and descending fingers, but f2 isn't thumb
+  // means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
   else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 !== 1) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2,f1,f2);
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2, f1, f2);
   }
-  //this handles descending notes with ascending fingers where f1 isn't thumb
-  //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
+  // This handles descending notes with ascending fingers where f1 isn't thumb
+  // means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
   else if (n2 - n1 < 0 && f2-f1 > 0 && f1 !== 1){
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2,f1,f2);
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2, f1, f2);
   }
-  //this handles ascending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
-  //Thus bringing your thumb under. 
+  // This handles ascending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
+  // thus bringing your thumb under. 
   else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 === 1) {
-    costDatabase[key] = helpers.ascThumbCost(noteD,fingD,n1,n2,f1,f2);
+    costDatabase[key] = helpers.ascThumbCost(noteD, fingD, n1, n2, f1, f2);
   }
-  //this handles descending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  // This handles descending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
   else if (n2 - n1 < 0 && f1 === 1 && f2 !== 1) {
-    costDatabase[key] = helpers.descThumbCost(noteD,fingD,n1,n2,f1,f2);
+    costDatabase[key] = helpers.descThumbCost(noteD, fingD, n1, n2, f1, f2);
   }
-  //this handles ascending or same note, with ascending or same finger
-  //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 > 0 || n2-n1 <= 0 && f2-f1 < 0)
+  // This handles ascending or same note, with ascending or same finger
+  // To be clear... only remaining options are (n2-n1 >= 0 && f2-f1 > 0 || n2-n1 <= 0 && f2-f1 < 0)
   else {
-    var stretch = helpers.fingerStretch(f1,f2);
+    var stretch = helpers.fingerStretch(f1, f2);
     var x = Math.abs(noteD - fingD) / stretch;
     if (x > params.moveCutoff) {
-      costDatabase[key] = helpers.descMoveFormula(noteD,fingD,n1,n2,f1,f2);
+      costDatabase[key] = helpers.descMoveFormula(noteD, fingD, n1, n2, f1, f2);
     }else{
-      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
+      costDatabase[key] = helpers.ascDescNoCrossCost(noteD, fingD, x, n1, n2, f1, f2);
     }
   }
 
@@ -63,32 +63,33 @@ var RHcostDatabase = {};
 var params = require('./CostAlgorithmParameters.js')
 var mod = module.exports;
 
+// Got this crazy function from regressing values I wanted at about 15 points along the graph. 
 var ThumbCrossCostFunc = function(x) {
  return 0.0002185873295*Math.pow(x,7) - 0.008611946279*Math.pow(x,6) + 0.1323250066*Math.pow(x,5) - 1.002729677*Math.pow(x,4)+
  3.884106308*Math.pow(x,3) - 6.723075747*Math.pow(x,2) + 1.581196785*x + 7.711241722;
 };
 
 var colorRules = function(n1,n2,f1,f2, fingD) {
-  //if you're moving up from white to black with pinky or thumb, that's much harder than white-to-white would be. So we're adding some amount.
+  // If you're moving up from white to black with pinky or thumb, that's much harder than white-to-white would be. So we're adding some amount.
   if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
-    if (f2 === 5 || f2 === 1) {return 4;} //using thumb or pinky on black is extra expensive
-    if (fingD === 0) {return 4;} //using same finger is extra expensive
+    if (f2 === 5 || f2 === 1) {return 4;} // Using thumb or pinky on black is extra expensive
+    if (fingD === 0) {return 4;} // Using same finger is extra expensive
   }
   if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
-    if (f1 === 5 || f1 === 1) {return 4;} //moving from thumb or pinky that's already on black is extra expensive
-    if (fingD === 0) {return -1;} //moving black to white with same finger is a slide. That's easy and common. reduce slightly.
+    if (f1 === 5 || f1 === 1) {return 4;} // Moving from thumb or pinky that's already on black is extra expensive
+    if (fingD === 0) {return -1;} // Moving black to white with same finger is a slide. That's easy and common. reduce slightly.
   }
-  return 0; //if none of the rules apply, then don't add or subtract anything
+  return 0; // If none of the rules apply, then don't add or subtract anything
 };
 
 var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
-  //This is for situations where direction of notes and fingers are opposite, because either way, you want to add the distance between the fingers.
+  // This is for situations where direction of notes and fingers are opposite, because either way, you want to add the distance between the fingers.
 
-  //the Math.ceil part is so it def hits a value in our moveHash. This could be fixed if I put more resolution into the moveHash
+  // The Math.ceil part is so it def hits a value in our moveHash. This could be fixed if I put more resolution into the moveHash
   var totalD = Math.ceil(noteD + fingD);
   var cost;
 
-  //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
+  // This adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
   if (totalD > 24) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
@@ -99,11 +100,11 @@ var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
 };
 
 mod.descMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
-  //this is for situations where direction of notes and fingers is the same. You want to subtract finger distance in that case.
+  // This is for situations where direction of notes and fingers is the same. You want to subtract finger distance in that case.
   var totalD = Math.ceil(noteD - fingD);
   var cost;
 
-  //this adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
+  // This adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
   if (totalD > 24) {
     return params.moveHash[24] + ( (totalD - 24) / 5);
   }else {
@@ -113,7 +114,7 @@ mod.descMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
   }
 };
 
-//Currently assumes your on Middle C. Could potentially take into account n1 as a way to know how to handle the irregularities. Such as E-F being 1 half step, but G-A being 2.
+// Currently assumes your on Middle C. Could potentially take into account n1 as a way to know how to handle the irregularities. Such as E-F being 1 half step, but G-A being 2.
 mod.fingerDistance = function(f1,f2) {
   var key = f1.toString() + ',' + f2.toString();
   return params.fingDistance[key];
@@ -123,7 +124,7 @@ mod.ascThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
   var stretch = ascThumbStretch(f1,f2);
   var x = (noteD + fingD) / stretch;
 
-  //if it's over 10, again use the move formula
+  // If it's over 10, again use the move formula
   if (x > 10) {
     return ascMoveFormula(noteD, fingD);
   }else {
@@ -173,7 +174,7 @@ mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
   };
   var cost;
 
-  /*if it's above 6.8, but below moveCutoff, then we use an additional formula because the current one
+  /* If it's above 6.8, but below moveCutoff, then we use an additional formula because the current one
   has an odd shape to it where it goes sharply negative after 6.8  I know this appears janky, but after messing with other potential 
   regression formulas, I can't get any single one to match both the overall shape, and certainly specific Y values I want. So this seems like best option.
   */
@@ -228,27 +229,27 @@ mod.color = {
 mod.fingDistance = {
   '1,1': 0,
   '1,2': 2,
-  '1,3': 3.5, // making an allowance since this seriously is either 3 or 4 about half the time.
+  '1,3': 3.5, // Making an allowance since this seriously is either 3 or 4 about half the time.
   '1,4': 5,
   '1,5': 7,
   '2,1': 2,
   '2,2': 0,
   '2,3': 2,
-  '2,4': 3.5,  //same
+  '2,4': 3.5,  // Same
   '2,5': 5,
-  '3,1': 3.5, // same
+  '3,1': 3.5, // Same
   '3,2': 2,
   '3,3': 0,
   '3,4': 2,
-  '3,5': 3.5, //same
+  '3,5': 3.5, // Same
   '4,1': 5,
-  '4,2': 3.5, //same
+  '4,2': 3.5, // Same
   '4,3': 2,
   '4,4': 0,
   '4,5': 2,
   '5,1': 7,
   '5,2': 5,
-  '5,3': 3.5, //same
+  '5,3': 3.5, // Same
   '5,4': 2,
   '5,5': 0
 };
@@ -333,9 +334,11 @@ mod.fingStretch = {
 var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
- //this whole thing is an example of Viterbi's algorithm, if you're curious.
+ // This whole thing is an example of Viterbi's algorithm, if you're curious.
+
   var dataWithStarts = helpers.addStartTimes(midiData);
-  //this checks if we already have the best path data for that song on the client.
+  // This checks if we already have the best path data for that song on the client.
+  // Well aware this is a janky way to do it. Didn't have time to implement better back-end data response obj.
   for (var i = 0; i < app.preComputed.length; i++) {
     if (app.preComputed[i].title === app.currentSong) {
       var bestPath = app.preComputed[i].BestPathObj;
@@ -345,11 +348,11 @@ module.exports.FingeringAlgorithm = function(midiData) {
   }
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
-  //traversing forward, computing costs and leaving our best path trail
-  for (var layer = 1; layer < noteTrellis.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
-    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               //go through each node in each layer
+  // Traversing forward, computing costs and leaving our best path trail
+  for (var layer = 1; layer < noteTrellis.length; layer++) {   // Go through each layer (starting at 2nd, because first is just endCap)
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               // Go through each node in each layer
       var min = Infinity;
-      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               //go through each node in prev layer.
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               // Go through each node in prev layer.
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
@@ -358,8 +361,8 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
         var curRH = curData.right;
         var prevRH = prevData.right;
-        //if you have something in a given hand, we have to compare it with the last thing in that hand. 
-        //So if the layer directly previous has nothing, we keep tracing back till we find it.
+        // If you have something in a given hand, we have to compare it with the last thing in that hand. 
+        // So if the layer directly previous has nothing, we keep tracing back till we find it.
         if (curRH.notes.length > 0) {
           var counter = 2;
           var tempPrevNode = prevNode;
@@ -400,14 +403,15 @@ module.exports.FingeringAlgorithm = function(midiData) {
       
     }
   }
-  /*Now we need to go backwards and collect the best path.
+  /* Now we need to go backwards and collect the best path.
   the currentNode variable is initialized to be the lowest score of the final layer.*/
   var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
 
-  /*From this point, we put the finger for that node in the array, then we track back to it's
+  /* From this point, we put the finger for that node in the array, then we track back to it's
   best previous node, record it's finger, and repeat till we get to the end.
   We set the continuation condition to be greater than zero, because we don't actually want zero, 
   since zero is just our start object.*/
+  
   var bestPathObj = {};
   for (var j = noteTrellis.length-1; j > 0; j--) {
     var nodeObj = noteTrellis[j][currentNode];
@@ -422,7 +426,10 @@ module.exports.FingeringAlgorithm = function(midiData) {
     }
     currentNode = nodeObj.bestPrev;
   }
-    
+  
+  // Was using this as simple way post songs to our Database. Didn't want to write a whole form yet.
+  // and don't want to allow arbitrary songs to get posted.
+
   // $.post('http://localhost:3000/upload',
   // {
   //   title: 'Yesterday',
@@ -563,7 +570,7 @@ mod.makeNoteTrellis = function(midiData) {
   return trellis;
 };
 
-var computeRHCost = function(n1,n2,f1,f2) {
+var computeRHCost = function(n1, n2, f1, f2) {
   if (n1 === 'e' || n2 === 'e') {
     return 0;
   }
@@ -574,7 +581,7 @@ var computeRHCost = function(n1,n2,f1,f2) {
   return cost;
 };
 
-var computeLHCost = function(n1,n2,f1,f2) {
+var computeLHCost = function(n1, n2, f1, f2) {
   if (n1 === 'e' || n2 === 'e') {
     return 0;
   }
@@ -612,18 +619,15 @@ mod.distributePath = function(bestPathObj, midiData) {
       var key = note + ',' + startTime;
       var finger = bestPathObj[key];
       eventData.finger = finger;
-      nowPlaying[note] = finger;//adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
+      nowPlaying[note] = finger;// Adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
     }
     if (eventData.subtype === 'noteOff') {
-      eventData.finger = nowPlaying[note]; //this gets the same finger from the noteOn event that 'caused' this noteOff event.
+      eventData.finger = nowPlaying[note]; // This gets the same finger from the noteOn event that 'caused' this noteOff event.
     }
   }
 };
 
 mod.addStartTimes = function(midiData) {
-  //initialize counter variable at zero;
-  //set first item startTime to counter variable. 
-  //increment counter by TicksToNextEvent for either noteOn or noteOff events
   var curStartTime = 0;
   for (var pair = 0; pair < midiData.length; pair++) {
     var eventData = midiData[pair][0].event;
@@ -663,22 +667,22 @@ mod.getSplitData = function(node) {
 mod.calcCost = function(curNode, prevNode, otherHandCurNode, whichHand) {
   var costFunction = whichHand === 'RH' ? computeRHCost : computeLHCost;
   var totalCost = 0;
-  //if curNode has nothing, then that means there are no immediate notes to try out for that same hand. Thus it's temporarily only right or only left.
-  //We need to return what the cost would be to move to that other note. (ie. if your left hand doens't need to play anything,
+  // If curNode has nothing, then that means there are no immediate notes to try out for that same hand. Thus it's temporarily only right or only left.
+  // We need to return what the cost would be to move to that other note. (ie. if your left hand doens't need to play anything,
   // but your right hand is playing a note 2 octaves up, we should return that cost of the left hand jumping up to play that right hand note.)
 
-  for (var i = 0; i < curNode.notes.length; i++) {       //go through each note in the current Node
-    var curNote = curNode.notes[i][0];  //this grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
+  for (var i = 0; i < curNode.notes.length; i++) {       // Go through each note in the current Node
+    var curNote = curNode.notes[i][0];  // This grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
     var curFinger = curNode.fingers[i];
     var hasNextNote = curNode.notes[i+1] || false;
     var nextFinger = curNode.fingers[i+1];
     if(hasNextNote) {
-      //this helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+      // This helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
       totalCost += costFunction(curNote, hasNextNote[0], curFinger, nextFinger);
     }else {
-      totalCost += whichHand === 'RH' ? 60 - curNote : curNote - 60; //this adds a 'stateCost' for one note that helps seperate the hands where they should be.
+      totalCost += whichHand === 'RH' ? 60 - curNote : curNote - 60; // This adds a 'stateCost' for one note that helps seperate the hands where they should be.
     }
-    for (var j = 0; j < prevNode.notes.length; j++) {   //add up scores for each of the previous nodes notes trying to get to current node note.
+    for (var j = 0; j < prevNode.notes.length; j++) {   // Add up scores for each of the previous nodes notes trying to get to current node note.
       var prevNote = prevNode.notes[j][0];
       var prevFinger = prevNode.fingers[j];
 
@@ -704,37 +708,37 @@ mod.calcCost = function(curNode, prevNode, otherHandCurNode, whichHand) {
 var params = require('./CostAlgorithmParameters.js');
 var helpers = require('./CostAlgorithmHelpers.js');
 
-var LHcostAlgorithmRouter = function(n1,n2,f1,f2, costDatabase) {
+var LHcostAlgorithmRouter = function(n1, n2, f1, f2, costDatabase) {
   var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
   var noteD = Math.abs(n2-n1);
   var fingD = helpers.fingerDistance(f1,f2);
 
-  //handles cases where the note is ascending or descending and you're using the same finger. That's move formula
-  //it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
+  // Handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  // it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
   if (noteD > 0 && f2-f1 === 0) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD,n1,n2);
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2);
   }
-  //handles descending notes and descending fingers, but f2 isn't thumb
-  //means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
+  // Handles descending notes and descending fingers, but f2 isn't thumb
+  // means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
   else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 !== 1) {
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD);
   }
-  //this handles ascending notes with ascending fingers where f1 isn't thumb
-  //means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
+  // This handles ascending notes with ascending fingers where f1 isn't thumb
+  // means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
   else if (n2 - n1 > 0 && f2-f1 > 0 && f1 !== 1){
-    costDatabase[key] = helpers.ascMoveFormula(noteD,fingD);
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD);
   }
-  //this handles descending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
-  //Thus bringing your thumb under. 
+  // This handles descending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
+  // thus bringing your thumb under. 
   else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 === 1) {
-    costDatabase[key] = helpers.ascThumbCost(noteD,fingD,n1,n2,f1,f2);
+    costDatabase[key] = helpers.ascThumbCost(noteD, fingD, n1, n2, f1, f2);
   }
-  //this handles ascending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  // This handles ascending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
   else if (n2 - n1 >= 0 && f1 === 1 && f2 !== 1) {
-    costDatabase[key] = helpers.descThumbCost(noteD,fingD,n1,n2,f1,f2);
+    costDatabase[key] = helpers.descThumbCost(noteD, fingD, n1, n2, f1, f2);
   }
-  //this handles ascending or same note, with descending fingers or it takes descending notes with ascending fingers
-  //to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 < 0 || n2-n1 <= 0 && f2-f1 > 0)
+  // This handles ascending or same note, with descending fingers or it takes descending notes with ascending fingers
+  // to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 < 0 || n2-n1 <= 0 && f2-f1 > 0)
   else {
     var stretch = helpers.fingerStretch(f1,f2);
     var x = Math.abs(noteD - fingD) / stretch;
@@ -770,21 +774,21 @@ var fingeringAlgo = require('./Algorithms/FingeringAlgorithm.js').FingeringAlgor
 var PlayControls = require('./PlayControls.js').PlayControls;
 
 module.exports.App = function() {
-  //instantiate piano and hand
+  // Instantiate piano and hand
   this.keyboardDesign = new KeyboardDesign();
   this.keyboard = new Keyboard(this.keyboardDesign);
   this.rightHand = new RightHand(this.keyboard);
   this.leftHand = new LeftHand(this.keyboard);
-  this.player = MIDI.Player
+  this.player = MIDI.Player;
 
-  //maintains proper binding if later function gets called outside this scope
+  // Maintains proper binding if later function gets called outside this scope
   var _this = this;
 
-  //this is the callback that fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
+  // This callback fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
   this.player.addListener(function(data) {
-    var rightHand = _this.rightHand
+    var rightHand = _this.rightHand;
     var leftHand = _this.leftHand;
-    var NOTE_ON = 144
+    var NOTE_ON = 144;
     var NOTE_OFF = 128;
     var note = data.note;
     var message = data.message;
@@ -792,10 +796,18 @@ module.exports.App = function() {
 
     if (message === NOTE_ON) {
       _this.keyboard.press(note);
-      finger > 0 ? rightHand.press(finger, note) : leftHand.press(finger, note);
+      if (finger > 0) {
+        rightHand.press(finger, note);
+      }else {
+        leftHand.press(finger, note);
+      }
     }else if(message === NOTE_OFF) {
       _this.keyboard.release(note);
-      finger > 0 ? rightHand.release(finger) : leftHand.release(finger);
+      if (finger > 0) {
+        rightHand.release(finger);
+      }else {
+        leftHand.release(finger);
+      }
     }
   });
 
@@ -809,15 +821,14 @@ module.exports.App = function() {
   });
 
   this.loadMidiFile = function(midiFile, newStartPercent) {
+    // Just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
     var _this = this;
-    //just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
     this.player.loadFile(midiFile, function() {
       _this.playControls.setCurrentTime(newStartPercent);
     });
   };
 
   this.upload = function(file) {
-    // var uploadedFile = files[0];
     var _this = this;
     var reader = new FileReader();
     reader.onload = function(e) {
@@ -833,10 +844,6 @@ module.exports.App = function() {
     this.scene.add(this.keyboard.model);
     this.scene.add(this.rightHand.model);
     this.scene.add(this.leftHand.model);
-    // scene.animate(function() {
-    //   _this.keyboard.update();
-    //   _this.rightHand.update();
-    // });
     this.scene.animate(function() {
       _this.keyboard.update();
       _this.rightHand.update();
@@ -852,7 +859,6 @@ module.exports.App = function() {
         callback();
       }
     });
-  
   };
 
   this.initPlayControls = function(container, app) {
@@ -863,41 +869,6 @@ module.exports.App = function() {
     fingeringAlgo(_this.player.data);
   };
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 },{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./PlayControls.js":9,"./Visuals/Hands/Left/LeftHand.js":14,"./Visuals/Hands/Right/RightHand.js":20,"./Visuals/Piano/Keyboard.js":26,"./Visuals/Piano/KeyboardDesign.js":27,"./Visuals/Scene.js":29}],8:[function(require,module,exports){
 var App = require('./App.js').App;
@@ -911,7 +882,8 @@ $(document).on('ready', function() {
       success: function(data) {
         app.preComputed = data;
         app.initPlayControls($('.main-container'), app);
-        //triggers a click for first song.
+        
+        //Triggers a click for first song.
         $($('.player-songList > li')[0]).trigger('click');
       }
     });
@@ -977,7 +949,7 @@ module.exports.PlayControls = function(container, app) {
   this.resume = function() {
     $playBtn.hide();
     $pauseBtn.show();
-    app.player.currentTime += 1e-6; //fixed bug in MIDI.js
+    app.player.currentTime += 1e-6; // Bug fix in MIDI.js
     _this.playing = true;
     app.player.resume();
   };
@@ -1040,7 +1012,7 @@ module.exports.PlayControls = function(container, app) {
   $tempoChanger.on('click', _this.tempoHandler);
 };
 },{}],10:[function(require,module,exports){
-//this is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.
+// This is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.
 var Dummy = module.exports.Dummy = function() {
   var Geometry = new THREE.CubeGeometry(1,1,1);
   var Material = new THREE.MeshLambertMaterial({color: 0x0000});
@@ -1055,7 +1027,7 @@ var params = require('./FingerMoveParams.js').params;
 
 module.exports.Finger = function(Keyboard) {
   var pressAmount = 0.6;
-  this.originalY = 0.2; // this is just a default. each finger will actually overwrite this as necessary.
+  this.originalY = 0.2; // This is just a default. each finger will actually overwrite this as necessary.
   this.pressedY = this.originalY - pressAmount;
   this.releaseSpeed = 0.05;
   this.moveSpeed = 0.1;
@@ -1076,7 +1048,7 @@ module.exports.Finger = function(Keyboard) {
     this.currentPos.y = this.model.position.y;
     this.currentPos.z = this.model.position.z;
     
-    //logic about checking to see if neighbor is already on the note you want to play. 
+    // Logic about checking to see if neighbor is already on the note you want to play. 
     var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
     var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
     if (noteNum > this.model.currentNote) {
@@ -1105,7 +1077,7 @@ module.exports.Finger = function(Keyboard) {
     }
   };
 
-  //just initializing values here. They'll get overwritten immediately;
+  // Just initializing values here. They'll get overwritten immediately;
   this.currentPos = {
     x: 0,
     y: 0,
@@ -1145,77 +1117,45 @@ module.exports.Finger = function(Keyboard) {
   };
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 },{"./FingerMoveParams.js":12}],12:[function(require,module,exports){
 module.exports.params = function(keyboard) {
-  //should contain distance from one note to another, in half steps;
+  // Should contain distance from one note to another, in half steps;
   var distances = {};
   distances.get = function(note1, note2) {
-    //we add in the +21 to offset the fact that the notes got stripped to an 88 key keyboard, and yet, MIDI notes act as if note 0 on the keyboard
-    //is note no. 21
+    // We add in the +21 to offset the fact that the notes got stripped to an 88 key keyboard, and yet, MIDI notes act as if note 0 on the keyboard
+    // is note no. 21
     return keyboard.model.children[note2-21].position.x - keyboard.model.children[note1-21].position.x;
   };
   return distances;
 };
 
-module.exports.distances = function(note1, note2) {
-}
 },{}],13:[function(require,module,exports){
 module.exports.HandDesign = function(keyboard) {
-  //pinky specs
+  // Pinky specs
   this.pinkyWidth = 0.14;
   this.pinkyHeight = 0.1;
   this.pinkyLength = 0.57;
   this.pinkyColor = 0xFF0000;
 
-  //ring finger specs
+  // Ring finger specs
   this.ringFingerWidth = 0.18;
   this.ringFingerHeight = 0.1;
   this.ringFingerLength = 0.61;
   this.ringFingerColor = 0x006600;
 
-  //middle finger specs
+  // Middle finger specs
   this.middleFingerWidth = 0.185;
   this.middleFingerHeight = 0.1;
   this.middleFingerLength = 0.7;
   this.middleFingerColor = 0x0033FF;
 
-  //index finger specs
+  // Index finger specs
   this.indexFingerWidth = 0.188;
   this.indexFingerHeight = 0.1;
   this.indexFingerLength = 0.60;
   this.indexFingerColor = 0xFFFF00;
 
-  //thumb specs
+  // Thumb specs
   this.thumbWidth = 0.175;
   this.thumbHeight = 0.1;
   this.thumbLength = 0.5;
@@ -1235,7 +1175,7 @@ var Dummy          = require('../Dummy.js').Dummy;
 
 module.exports.LeftHand = function(keyboard) {
   var _this = this;
-  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
+  // We're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
   var handDesign = new HandDesign(keyboard);
   var pinky = new LeftPinky(handDesign, 'left');
   var ring = new LeftRing(handDesign, 'left');
@@ -1248,8 +1188,8 @@ module.exports.LeftHand = function(keyboard) {
   this.fingers = [];
   this.model = new THREE.Object3D();
 
-  //add fingers to hand model
-  this.fingers.push(undefined); // these are here to make off by 1 errors go away. We want finger 1 to be thumb so that semantically it makes sense)
+  // Add fingers to hand model
+  this.fingers.push(undefined); // These are here to make off by 1 errors go away. We want finger 1 to be thumb so that semantically it makes sense)
   this.model.add(dummy1.model)
   dummy1.model.currentNote = -1;
 
@@ -1294,7 +1234,6 @@ module.exports.LeftHand = function(keyboard) {
 
   this.press = function(finger, noteNum) {
     finger = Math.abs(finger);
-    // console.log('the left ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
@@ -1369,9 +1308,9 @@ var LeftIndex = module.exports.LeftIndex = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote-8) && delta <= dist.get(curNote, curNote-4)) { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote-8) && delta <= dist.get(curNote, curNote-4)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote + 5);
     }
   };
@@ -1439,9 +1378,9 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote-5) && delta < dist.get(curNote, curNote-3) ) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote-5) && delta < dist.get(curNote, curNote-3) ) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote+3);
     }
   };
@@ -1462,9 +1401,9 @@ var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
   this.thumbRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta < dist.get(curNote, curNote+6) ) {
       return;
-    } else if (delta > dist.get(curNote, curNote-4) && delta < 0) {    //this is the thumb crossing under
+    } else if (delta > dist.get(curNote, curNote-4) && delta < 0) {    // This is the thumb crossing under
       var _this = this;
-      setTimeout(_this.moveToNote(newNote-3), 100); //this is so you have some delay before the fingers move back over the thumb. A tad more realistic
+      setTimeout(_this.moveToNote(newNote-3), 100); // This is so you have some delay before the fingers move back over the thumb. A tad more realistic
     }
     else {
       this.moveToNote(newNote-3);
@@ -1509,9 +1448,9 @@ var LeftPinky = module.exports.LeftPinky = function(handInfo) {
   };
 
   this.ringRules = function(delta, curX, curNote, newNote) {
-    if ( delta > 0 && delta <= dist.get(curNote, curNote+3)) { //this is like the 'stretch' zone
+    if ( delta > 0 && delta <= dist.get(curNote, curNote+3)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote - 2);
     }
   };
@@ -1595,9 +1534,9 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote -3) && delta < dist.get(curNote, curNote-2)) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote -3) && delta < dist.get(curNote, curNote-2)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote + 2);
     }
   };
@@ -1618,7 +1557,7 @@ var LeftRing = module.exports.LeftRing = function(handInfo) {
   this.thumbRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta < dist.get(curNote, curNote + 8) ) {
       return;
-    } else if (delta > dist.get(curNote, curNote -2) && delta < 0) {             //this is thumb crossing under
+    } else if (delta > dist.get(curNote, curNote -2) && delta < 0) { //this is thumb crossing under
       var _this = this;
       setTimeout(_this.moveToNote(newNote - 5), 100);
     }
@@ -1665,19 +1604,19 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote-12) && delta <= dist.get(curNote, curNote-5) )  { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote-12) && delta <= dist.get(curNote, curNote-5) )  { // This is like the 'stretch' zone
       return;
-    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) { //this is when the pinky crosses over thumb
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) { // This is when the pinky crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 7), 100);
-    }else { //definitely move
+    }else { // Definitely move
       this.moveToNote(newNote + 7);
     }
   };
   this.ringRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote-9) && delta <= dist.get(curNote, curNote-4)) {
       return;
-    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { //this is when the ring crosses over thumb
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { // This is when the ring crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 5), 100);
     }else {
@@ -1687,7 +1626,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   this.middleRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote-7) && delta <= dist.get(curNote, curNote-2)) {
       return;
-    }else if (delta > 0 && delta < dist.get(curNote, curNote+4)) { //this is when the middle crosses over thumb
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+4)) { // This is when the middle crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 4), 100);
     }else {
@@ -1697,7 +1636,7 @@ var LeftThumb = module.exports.LeftThumb = function(handInfo) {
   this.indexRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote-4) && delta < 0 ) {
       return;
-    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { //this is when the index crosses over thumb
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { // This is when the index crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote + 2), 100);
     }else {
@@ -1736,7 +1675,7 @@ var Dummy         = require('../Dummy.js').Dummy;
 
 module.exports.RightHand = function(keyboard) {
   var _this = this;
-  //we're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
+  // We're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
   var handDesign = new HandDesign(keyboard); 
   var pinky = new RightPinky(handDesign, 'right');
   var ring = new RightRing(handDesign, 'right');
@@ -1749,9 +1688,9 @@ module.exports.RightHand = function(keyboard) {
   this.fingers = [];
   this.model = new THREE.Object3D();
 
-  //add fingers to hand model
+  // Add fingers to hand model
 
-  this.fingers.push(undefined); // these are here to make the off by 1 errors go away. (We want finger 1 to be thumb so that semantically it makes sense)
+  this.fingers.push(undefined); // These are here to make the off by 1 errors go away. (We want finger 1 to be thumb so that semantically it makes sense)
   this.model.add(dummy1.model)
   dummy1.model.currentNote = -1;
 
@@ -1778,19 +1717,19 @@ module.exports.RightHand = function(keyboard) {
   this.model.add(dummy2.model);
   dummy2.model.currentNote = 110;
 
+  // Initializes fingers to middle C position so they have somewhere to go. Ideally change this to know starting position of current song
   thumb.moveToNote(60);
   index.moveToNote(62);
   middle.moveToNote(64);
   ring.moveToNote(65);
   pinky.moveToNote(67);
 
-  this.model.position.y -= 0.22 / 2; // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.position.y -= 0.22 / 2; // The 0.22 is the keyboard height (defined in KeyboardDesign.js)
   this.model.traverse(function(object) {
     object.position.x -= 4.45;
   });
 
   this.press = function(finger, noteNum) {
-    // console.log('the right ' + finger + ' finger is trying to press');
     var newPosition = keyboard.keys[noteNum].model.position.x;
     for (var i = 1; i <= 5; i++) {
       if (i === finger) {
@@ -1846,9 +1785,9 @@ var RightIndex = module.exports.RightIndex = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote+4) && delta < dist.get(curNote, curNote+8)) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote+4) && delta < dist.get(curNote, curNote+8)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote - 5);
     }
   };
@@ -1916,9 +1855,9 @@ var RightMiddle = module.exports.RightMiddle = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote+3) && delta <= dist.get(curNote, curNote+5)) { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote+3) && delta <= dist.get(curNote, curNote+5)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote - 3);
     }
   };
@@ -1986,9 +1925,9 @@ var RightPinky = module.exports.RightPinky = function(handInfo) {
   };
 
   this.ringRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote-3) && delta < 0) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote + 2);
     }
   };
@@ -2072,9 +2011,9 @@ var RightRing = module.exports.RightRing = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta > dist.get(curNote, curNote+2) && delta < dist.get(curNote, curNote+3)) { //this is like the 'stretch' zone
+    if ( delta > dist.get(curNote, curNote+2) && delta < dist.get(curNote, curNote+3)) { // This is like the 'stretch' zone
       return;
-    } else { //definitely move
+    } else { // Definitely move
       this.moveToNote(newNote - 2);
     }
   };
@@ -2142,19 +2081,19 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   };
 
   this.pinkyRules = function(delta, curX, curNote, newNote) {
-    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { //this is like the 'stretch' zone
+    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { // This is like the 'stretch' zone
       return;
-    }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-7), 100);
-    }else { //definitely move
+    }else { // Definitely move
       this.moveToNote(newNote - 7);
     }
   };
   this.ringRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote+4) && delta <= dist.get(curNote, curNote+9)) {
       return;
-    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-5), 100);
     }else {
@@ -2164,7 +2103,7 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.middleRules = function(delta, curX, curNote, newNote) {
     if ( delta >= dist.get(curNote, curNote+2) && delta <= dist.get(curNote, curNote+7)) {
       return;
-    }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-4), 100);
     }else {
@@ -2174,7 +2113,7 @@ var RightThumb = module.exports.RightThumb = function(handInfo) {
   this.indexRules = function(delta, curX, curNote, newNote) {
     if ( delta > 0 && delta <= dist.get(curNote, curNote+4) ) {
       return;
-    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { //this is when the index lightly crosses over thumb
+    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
       var _this = this;
       setTimeout(_this.moveToNote(newNote-2), 100);
     }else {
@@ -2206,22 +2145,21 @@ RightThumb.prototype.constructor = RightThumb;
 var PianoKey = require("./PianoKey.js").PianoKey;
 
 module.exports.Keyboard = function(keyboardDesign) {
-  //keyboard design is a completed object where we've filled it out with note types and parameters. See keyboardDesign.js file for more.
+  // Keyboard design is a completed object where we've filled it out with note types and parameters. See keyboardDesign.js file for more.
   this.model = new THREE.Object3D();
   this.keys = [];
   var _this = this;
 
-  //build the actual keyboard
+  // Build the actual keyboard
   for (var note = 0; note < keyboardDesign.keyInfo.length; note++) {
     var key = new PianoKey(keyboardDesign, note);
     _this.keys.push(key);
-    if (note > 20 && note < 109) { //strips to 88 keys
+    if (note > 20 && note < 109) { // Strips to 88 keys
       this.model.add(key.model);
     }
   }
   this.model.position.y -= keyboardDesign.whiteKeyHeight / 2;
-  // this.model.translateX(-2.1);
-  //this centers the keyboard infront of the camera.
+  // This centers the keyboard infront of the camera.
   this.model.traverse(function(object) {
     object.position.x -= 4.45;
   });
@@ -2246,36 +2184,36 @@ module.exports.Keyboard = function(keyboardDesign) {
 module.exports.KeyboardDesign = function() {
   this.KeyType = {
     WhiteC:  0,
-    WhiteD: 1,
+    WhiteD:  1,
     WhiteE:  2,
     WhiteF:  3,
-    WhiteG: 4,
-    WhiteA: 5,
-    WhiteB: 6,
+    WhiteG:  4,
+    WhiteA:  5,
+    WhiteB:  6,
     Black:   7
   };
 
-  this.whiteKeyStep                  = 0.236;
-  this.whiteKeyWidth                = 0.226;
-  this.whiteKeyHeight               = 0.22;
-  this.whiteKeyLength               = 1.50;
-  this.blackKeyWidth                 =0.10;
-  this.blackKeyHeight               = 0.24;
-  this.blackKeyLength               = 1.00;
-  this.blackKeyShiftCDE            = 0.0216;
-  this.blackKeyShiftFGAB           = 0.0340;
-  this.blackKeyPosY                   = 0.10;
-  this.blackKeyPosZ                   = -0.24;
-  this.noteDropPosZ4WhiteKey  = 0.25;
-  this.noteDropPosZ4BlackKey  = 0.75;
-  this.whiteKeyColor                  = 0xf0ffff;
-  this.blackKeyColor                  = 0x000000;
-  this.keyDip                             = 0.08;
-  this.keyUpSpeed                     = 0.03;
-  this.keyInfo                            = [] ;// an array holding each key's type and position
+  this.whiteKeyStep             = 0.236;
+  this.whiteKeyWidth            = 0.226;
+  this.whiteKeyHeight           = 0.22;
+  this.whiteKeyLength           = 1.50;
+  this.blackKeyWidth            = 0.10;
+  this.blackKeyHeight           = 0.24;
+  this.blackKeyLength           = 1.00;
+  this.blackKeyShiftCDE         = 0.0216;
+  this.blackKeyShiftFGAB        = 0.0340;
+  this.blackKeyPosY             = 0.10;
+  this.blackKeyPosZ             = -0.24;
+  this.noteDropPosZ4WhiteKey    = 0.25;
+  this.noteDropPosZ4BlackKey    = 0.75;
+  this.whiteKeyColor            = 0xf0ffff;
+  this.blackKeyColor            = 0x000000;
+  this.keyDip                   = 0.08;
+  this.keyUpSpeed               = 0.03;
+  this.keyInfo                  = []; // An array holding each key's type and position
 
   var _this = this;
-  //essentially an initialization function
+  // Essentially an initialization function
   var createBoardInfo = function() {
     makeNoteObjects();
     initKeyType();
@@ -2310,21 +2248,19 @@ module.exports.KeyboardDesign = function() {
   };
 
   var initKeyPos = function() {
-    //setting up convenience vars
-    var keyInfo         = _this.keyInfo;
+    // Setting up convenience vars
+    var keyInfo        = _this.keyInfo;
     var KeyType        = _this.KeyType;
-    var prevKeyType = KeyType.WhiteB;
+    var prevKeyType    = KeyType.WhiteB;
     var noteNo         = 0;
-    var posX             = 0.0;
-    var shift             = 0.0;
-    var Black            = KeyType.Black;
+    var posX           = 0.0;
+    var Black          = KeyType.Black;
 
-    //setting position of first note;
+    // Setting position of first note;
     keyInfo[noteNo].keyCenterPosX = posX;
     prevKeyType = keyInfo[noteNo].keyType;
 
-    //set position of all the rest of the notes.
-
+    // Set position of all the rest of the notes.
     for ( noteNo = 1; noteNo< keyInfo.length; noteNo++) {
       if (prevKeyType === Black) {
         posX += _this.whiteKeyStep / 2.0;
@@ -2341,7 +2277,7 @@ module.exports.KeyboardDesign = function() {
 
   };
 
-  //calling initialization function
+  // Calling initialization function
   createBoardInfo();
 };
 
@@ -2375,13 +2311,13 @@ module.exports.KeyboardDesign = function() {
 
 },{}],28:[function(require,module,exports){
 var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
-  //set up some convenience vars
-  var Black                    = boardInfo.KeyType.Black;
-  var keyType               = boardInfo.keyInfo[note].keyType;
-  var keyCenterPosX     = boardInfo.keyInfo[note].keyCenterPosX;
+  // Set up some convenience vars
+  var Black              = boardInfo.KeyType.Black;
+  var keyType            = boardInfo.keyInfo[note].keyType;
+  var keyCenterPosX      = boardInfo.keyInfo[note].keyCenterPosX;
   var keyUpSpeed         = boardInfo.keyUpSpeed;
 
-  //set up necessary components for making a Mesh.
+  // Set up necessary components for making a Mesh.
   var geometry, material, position;
   if (keyType === Black) {
     geometry = new THREE.CubeGeometry(boardInfo.blackKeyWidth, boardInfo.blackKeyHeight, boardInfo.blackKeyLength);
@@ -2395,11 +2331,11 @@ var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
     this.originalColor = {r: 0.941, g: 1, b: 1};
   }
 
-  //make the key Mesh
+  // Make the key Mesh
   this.model = new THREE.Mesh(geometry, material);
   this.model.position.copy(position);
 
-  //set helper properties
+  // Set helper properties
   this.keyUpSpeed = boardInfo.keyUpSpeed;
   this.originalY = position.y;
   this.pressedY = this.originalY - boardInfo.keyDip;
@@ -2421,9 +2357,9 @@ PianoKey.prototype.release = function() {
 };
 
 PianoKey.prototype.update = function() {
-  //this is really about making released notes edge up slowly, rather than quickly
+  // This is really about making released notes edge up slowly, rather than quickly
   if (this.model.position.y < this.originalY && this.isPressed === false) {
-    //offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
+    // Offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
     var offset = this.originalY - this.model.position.y;
     this.model.position.y += Math.min(offset, this.keyUpSpeed);
   }
@@ -2435,7 +2371,6 @@ PianoKey.prototype.setUpNewTween = function() {
     _this.model.material.color.setRGB(_this.currentColor.r, _this.currentColor.g, _this.currentColor.b);
   };
   var easing = TWEEN.Easing.Quadratic.Out;
-
   var tween = new TWEEN.Tween(this.currentColor)
     .to(this.newColor, 150)
     .easing(easing)
@@ -2450,10 +2385,10 @@ module.exports.Scene = function(container) {
   var height = $container.height();
   var _this = this;
 
-  //create scene
+  // Create scene
   var scene = new THREE.Scene();
 
-  //create camera
+  // Create camera
   var view_angle = 85;
   var aspect = width/height;
   var near = 0.001;
@@ -2475,14 +2410,14 @@ module.exports.Scene = function(container) {
 
   controls.keys = [ 65, 83, 68 ];
 
-  //create and append renderer
+  // Create and append renderer
   var renderer = Detector.webgl ? new THREE.WebGLRenderer({antialias: true}) : new THREE.CanvasRenderer();
   renderer.setSize(width, height);
   renderer.setClearColor(0x000000, 1);
   renderer.autoClear = false;
   $container.append(renderer.domElement);
 
-  //create lights
+  // Create lights
   var ambientLight = new THREE.AmbientLight(0x222222);
 
   var mainLight = new THREE.DirectionalLight(0xffffff, 0.8)
@@ -2491,13 +2426,13 @@ module.exports.Scene = function(container) {
   var auxLight = new THREE.DirectionalLight(0xffffff, 0.3);
   auxLight.position.set(-4,-1,-2).normalize;
 
-  //add everything to the scene
+  // Add everything to the scene
   scene.add(ambientLight);
   scene.add(mainLight);
   scene.add(auxLight);
   scene.add(camera);
 
-  //set props for return object
+  // Set props for return object
   this.camera =   camera;
   this.renderer = renderer;
   this.scene =     scene;

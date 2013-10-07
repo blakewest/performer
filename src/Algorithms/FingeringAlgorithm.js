@@ -1,9 +1,11 @@
 var helpers = require('./FingeringAlgorithmHelpers.js');
 
 module.exports.FingeringAlgorithm = function(midiData) {
- //this whole thing is an example of Viterbi's algorithm, if you're curious.
+ // This whole thing is an example of Viterbi's algorithm, if you're curious.
+
   var dataWithStarts = helpers.addStartTimes(midiData);
-  //this checks if we already have the best path data for that song on the client.
+  // This checks if we already have the best path data for that song on the client.
+  // Well aware this is a janky way to do it. Didn't have time to implement better back-end data response obj.
   for (var i = 0; i < app.preComputed.length; i++) {
     if (app.preComputed[i].title === app.currentSong) {
       var bestPath = app.preComputed[i].BestPathObj;
@@ -13,11 +15,11 @@ module.exports.FingeringAlgorithm = function(midiData) {
   }
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
-  //traversing forward, computing costs and leaving our best path trail
-  for (var layer = 1; layer < noteTrellis.length; layer++) {   //go through each layer (starting at 2nd, because first is just endCap)
-    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               //go through each node in each layer
+  // Traversing forward, computing costs and leaving our best path trail
+  for (var layer = 1; layer < noteTrellis.length; layer++) {   // Go through each layer (starting at 2nd, because first is just endCap)
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               // Go through each node in each layer
       var min = Infinity;
-      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               //go through each node in prev layer.
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               // Go through each node in prev layer.
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
@@ -26,8 +28,8 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
         var curRH = curData.right;
         var prevRH = prevData.right;
-        //if you have something in a given hand, we have to compare it with the last thing in that hand. 
-        //So if the layer directly previous has nothing, we keep tracing back till we find it.
+        // If you have something in a given hand, we have to compare it with the last thing in that hand. 
+        // So if the layer directly previous has nothing, we keep tracing back till we find it.
         if (curRH.notes.length > 0) {
           var counter = 2;
           var tempPrevNode = prevNode;
@@ -68,14 +70,15 @@ module.exports.FingeringAlgorithm = function(midiData) {
       
     }
   }
-  /*Now we need to go backwards and collect the best path.
+  /* Now we need to go backwards and collect the best path.
   the currentNode variable is initialized to be the lowest score of the final layer.*/
   var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
 
-  /*From this point, we put the finger for that node in the array, then we track back to it's
+  /* From this point, we put the finger for that node in the array, then we track back to it's
   best previous node, record it's finger, and repeat till we get to the end.
   We set the continuation condition to be greater than zero, because we don't actually want zero, 
   since zero is just our start object.*/
+  
   var bestPathObj = {};
   for (var j = noteTrellis.length-1; j > 0; j--) {
     var nodeObj = noteTrellis[j][currentNode];
@@ -90,7 +93,10 @@ module.exports.FingeringAlgorithm = function(midiData) {
     }
     currentNode = nodeObj.bestPrev;
   }
-    
+  
+  // Was using this as simple way post songs to our Database. Didn't want to write a whole form yet.
+  // and don't want to allow arbitrary songs to get posted.
+
   // $.post('http://localhost:3000/upload',
   // {
   //   title: 'Yesterday',
