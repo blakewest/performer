@@ -909,7 +909,6 @@ $(document).on('ready', function() {
       url: '/getAllPaths',
       dataType: 'json',
       success: function(data) {
-        console.log('successfully got all path objs');
         app.preComputed = data;
         app.initPlayControls($('.main-container'), app);
         //triggers a click for first song.
@@ -934,10 +933,8 @@ module.exports.PlayControls = function(container, app) {
   var $songList = $('.player-songList');
   var $song = $('.song');
   var $tempoChanger = $('.tempo-changer');
-
   var $playBtn = $('.player-playBtn');
   var $pauseBtn = $('.player-pauseBtn');
-
   var $currentSong = $('.current-song')
 
   var _this = this;
@@ -963,7 +960,6 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.songListHandler = function(event) {
-    console.log('event in songList handler ', event);
     var $target = $(event.target);
     var trackName = $target.text();
     $currentSong.text(trackName);
@@ -992,9 +988,7 @@ module.exports.PlayControls = function(container, app) {
   };
 
   this.progressHandler = function(event){
-    console.log(event);
     var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
-    console.log(progressPercent);
     _this.setCurrentTime(progressPercent);
   };
 
