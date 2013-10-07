@@ -1,34 +1,44 @@
 module.exports.PlayControls = function(container, app) {
   var $container = $(container);
-  var $songListContainer = $('.player-songListContainer', this.$container);
-  var $controlsContainer = $('.player-controls', this.$container);
-  var $progressContainer = $('.player-progress-container', this.$container);
+  var $songListContainer = $('.player-songListContainer');
+  var $controlsContainer = $('.player-controls');
+  var $progressContainer = $('.player-progress-container');
 
-  var $progressBar = $('.player-progress-bar', this.$container);
-  var $progressText = $('.player-progress-text', this.$container);
-  var $songList = $('.player-songList', this.$container);
-  var $song = $('.song', this.$container);
-  var $tempoChanger = $('.tempo-changer', this.$container);
+  var $progressBar = $('.player-progress-bar');
+  var $progressText = $('.player-progress-text');
+  var $songList = $('.player-songList');
+  var $song = $('.song');
+  var $tempoChanger = $('.tempo-changer');
 
-  var $playBtn = $('.player-playBtn', this.$container);
-  var $pauseBtn = $('.player-pauseBtn', this.$container);
+  var $playBtn = $('.player-playBtn');
+  var $pauseBtn = $('.player-pauseBtn');
 
   var $currentSong = $('.current-song')
 
   var _this = this;
 
-  $playBtn.click(function() {
+  //Set up all helper functions
+  this.play = function() {
+    $playBtn.hide();
+    $pauseBtn.show();
+    _this.playing = true;
+    app.player.resume();
+  };
+
+  this.playHandler = function() {
     if (_this.playing === false) {
       _this.resume();
     }else {
       _this.play();
     }
-  });
-  $pauseBtn.click(function() {
-    _this.pause();
-  });
+  };
 
-  $songList.on('click', function(event) {
+  this.pauseHandler = function() {
+    _this.pause();
+  };
+
+  this.songListHandler = function(event) {
+    console.log('event in songList handler ', event);
     var $target = $(event.target);
     var trackName = $target.text();
     $currentSong.text(trackName);
@@ -41,35 +51,6 @@ module.exports.PlayControls = function(container, app) {
         app.loadMidiFile(data, 0);
       }
     });
-  });
-
-  $progressContainer.click(function(event){
-    var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
-    console.log(progressPercent);
-    _this.setCurrentTIme(progressPercent);
-  });
-
-  $tempoChanger.click(function(event) {
-    var $target = $(event.target);
-    var timeWarp = $target.find('input').attr('data-timeWarp');
-    console.log(timeWarp);
-    app.player.timeWarp = timeWarp;
-    var trackName = app.currentSong;
-    $.ajax({
-      url: '/songs/'+trackName,
-      dataType: 'text',
-      success: function(data) {
-        var currentProgress = $progressBar.width()/$progressContainer.width();
-        app.loadMidiFile(data,  currentProgress);
-      }
-    });
-  })
-
-  this.play = function() {
-    $playBtn.hide();
-    $pauseBtn.show();
-    _this.playing = true;
-    app.player.resume();
   };
 
   this.resume = function() {
@@ -83,6 +64,28 @@ module.exports.PlayControls = function(container, app) {
   this.stop = function() {
     app.player.stop();
     _this.playing = false;
+  };
+
+  this.progressHandler = function(event){
+    console.log(event);
+    var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
+    console.log(progressPercent);
+    _this.setCurrentTime(progressPercent);
+  };
+
+  this.tempoHandler = function(event) {
+    var $target = $(event.target);
+    var timeWarp = $target.find('input').attr('data-timeWarp');
+    app.player.timeWarp = timeWarp;
+    var trackName = app.currentSong;
+    $.ajax({
+      url: '/songs/'+trackName,
+      dataType: 'text',
+      success: function(data) {
+        var currentProgress = $progressBar.width()/$progressContainer.width();
+        app.loadMidiFile(data,  currentProgress);
+      }
+    });
   };
 
   this.pause = function() {
@@ -103,10 +106,17 @@ module.exports.PlayControls = function(container, app) {
     $progressBar.width(newWidth);
   };
 
-  this.setCurrentTIme = function(progressPercent) {
+  this.setCurrentTime = function(progressPercent) {
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
     setTimeout(_this.resume, 10);
     app.player.pause();
   };
+
+  //Set up all click handlers
+  $playBtn.on('click', _this.playHandler);
+  $pauseBtn.on('click', _this.pauseHandler);
+  $songList.on('click', _this.songListHandler);
+  $progressContainer.on('click', _this.progressHandler);
+  $tempoChanger.on('click', _this.tempoHandler);
 };
