@@ -907,14 +907,10 @@ $(document).on('ready', function() {
     app.initScene();
     $.ajax({
       url: '/getAllPaths',
+      dataType: 'json',
       success: function(data) {
-        var allPaths = JSON.parse(data);
-        app.preComputed = allPaths;
+        app.preComputed = data;
         app.initPlayControls($('.main-container'), app);
-        //Sound takes a while to load, so we use the setTimeout to ensure it's ready.
-        // setTimeout(function() {
-        //   $($('.player-songList > li')[0]).trigger('click');
-        // }, 500);
         $($('.player-songList > li')[0]).trigger('click');
       }
     });
