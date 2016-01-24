@@ -1,8 +1,6 @@
 Performer
 =========
 
-See it in action at http://www.performer.io/
-
 ##What it does
 Performer takes any MIDI file and determines the best piano fingering to use for that particular song. It then visualizes two virtual hands performing the piece in 3D.
 
