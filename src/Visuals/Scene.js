@@ -8,11 +8,13 @@ module.exports.Scene = function(container) {
   var scene = new THREE.Scene();
 
   // Create camera
-  var view_angle = 85;
-  var aspect = width/height;
+  var left = width / -200;
+  var right = width / 200;
+  var top = height / 200;
+  var bottom = height / -200;
   var near = 0.001;
   var far = 1000;
-  var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
+  var camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
   camera.position.set(0, 3.0, 1.2);
   camera.lookAt(new THREE.Vector3(10,50,5));
 

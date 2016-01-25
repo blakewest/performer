@@ -1,4 +1,4 @@
-;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var params = require('./CostAlgorithmParameters.js');
 var helpers = require('./CostAlgorithmHelpers.js');
 
@@ -338,7 +338,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
   var dataWithStarts = helpers.addStartTimes(midiData);
   // This checks if we already have the best path data for that song on the client.
-  // Well aware this is a janky way to do it. Didn't have time to implement better back-end data response obj.
+  // TODO: Refactor into better response object that wouldn't need iteration
   for (var i = 0; i < app.preComputed.length; i++) {
     if (app.preComputed[i].title === app.currentSong) {
       var bestPath = app.preComputed[i].BestPathObj;
@@ -349,10 +349,13 @@ module.exports.FingeringAlgorithm = function(midiData) {
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
   // Traversing forward, computing costs and leaving our best path trail
-  for (var layer = 1; layer < noteTrellis.length; layer++) {   // Go through each layer (starting at 2nd, because first is just endCap)
-    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               // Go through each node in each layer
+  // Go through each layer (starting at 2nd, because first is just endCap)
+  for (var layer = 1; layer < noteTrellis.length; layer++) {
+    // Go through each node in each layer
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {       
       var min = Infinity;
-      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               // Go through each node in prev layer.
+      // Go through each node in prev layer.
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {    
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
@@ -2389,11 +2392,13 @@ module.exports.Scene = function(container) {
   var scene = new THREE.Scene();
 
   // Create camera
-  var view_angle = 85;
-  var aspect = width/height;
+  var left = width / -200;
+  var right = width / 200;
+  var top = height / 200;
+  var bottom = height / -200;
   var near = 0.001;
   var far = 1000;
-  var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
+  var camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
   camera.position.set(0, 3.0, 1.2);
   camera.lookAt(new THREE.Vector3(10,50,5));
 
@@ -2452,4 +2457,3 @@ module.exports.Scene = function(container) {
   };
 };
 },{}]},{},[8])
-;
