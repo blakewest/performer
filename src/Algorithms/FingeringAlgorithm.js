@@ -5,7 +5,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
   var dataWithStarts = helpers.addStartTimes(midiData);
   // This checks if we already have the best path data for that song on the client.
-  // Well aware this is a janky way to do it. Didn't have time to implement better back-end data response obj.
+  // TODO: Refactor into better response object that wouldn't need iteration
   for (var i = 0; i < app.preComputed.length; i++) {
     if (app.preComputed[i].title === app.currentSong) {
       var bestPath = app.preComputed[i].BestPathObj;
@@ -16,10 +16,13 @@ module.exports.FingeringAlgorithm = function(midiData) {
   var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
 
   // Traversing forward, computing costs and leaving our best path trail
-  for (var layer = 1; layer < noteTrellis.length; layer++) {   // Go through each layer (starting at 2nd, because first is just endCap)
-    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {               // Go through each node in each layer
+  // Go through each layer (starting at 2nd, because first is just endCap)
+  for (var layer = 1; layer < noteTrellis.length; layer++) {
+    // Go through each node in each layer
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {       
       var min = Infinity;
-      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {               // Go through each node in prev layer.
+      // Go through each node in prev layer.
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {    
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
