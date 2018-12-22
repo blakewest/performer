@@ -1011,6 +1011,7 @@ module.exports.PlayControls = function(container, app) {
   $progressContainer.on('click', _this.progressHandler);
   $tempoChanger.on('click', _this.tempoHandler);
 };
+
 },{}],10:[function(require,module,exports){
 // This is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.
 var Dummy = module.exports.Dummy = function() {
