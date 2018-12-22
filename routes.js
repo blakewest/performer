@@ -23,15 +23,19 @@ module.exports.routes = function(server, config) {
     });
   });
 
-  //send back all best path objs we have in one request, so we don't need to make multiple requests as we get new songs. 
+  //send back all best path objs we have in one request, so we don't need to make multiple requests as we get new songs.
   server.get('/getAllPaths', function(req,res) {
     collection.find(function(err, docs) {
-      res.json(docs);
+      if (err) {
+        res.json([]);
+      } else {
+        res.json(docs);
+      }
     });
   });
 
-  //hand back requested song name, so the XHTTP object on client can use that to request the real file. 
-  //We don't just send back the file straight up because the XHTTP has special functions it uses 
+  //hand back requested song name, so the XHTTP object on client can use that to request the real file.
+  //We don't just send back the file straight up because the XHTTP has special functions it uses
   server.get('/songs/:song', function(req,res) {
     res.writeHead(200, {
       'Content-Type' : 'text/plain'
