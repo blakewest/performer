@@ -1248,8 +1248,2472 @@ var Detector = {
   }
 
 };
-!function a(b,c,d){function e(g,h){if(!c[g]){if(!b[g]){var i="function"==typeof require&&require;if(!h&&i)return i(g,!0);if(f)return f(g,!0);throw new Error("Cannot find module '"+g+"'")}var j=c[g]={exports:{}};b[g][0].call(j.exports,function(a){var c=b[g][1][a];return e(c?c:a)},j,j.exports,a,b,c,d)}return c[g].exports}for(var f="function"==typeof require&&require,g=0;g<d.length;g++)e(d[g]);return e}({1:[function(a,b){var c=a("./CostAlgorithmParameters.js"),d=a("./CostAlgorithmHelpers.js"),e=function(a,b,e,f,g){var h=a.toString()+","+b.toString()+","+e.toString()+","+f.toString(),i=Math.abs(b-a),j=d.fingerDistance(e,f);if(Math.abs(b-a)>0&&0===f-e)g[h]=d.ascMoveFormula(i,j,a,b);else if(b-a>=0&&0>f-e&&1!==f)g[h]=d.ascMoveFormula(i,j,a,b,e,f);else if(0>b-a&&f-e>0&&1!==e)g[h]=d.ascMoveFormula(i,j,a,b,e,f);else if(b-a>=0&&0>f-e&&1===f)g[h]=d.ascThumbCost(i,j,a,b,e,f);else if(0>b-a&&1===e&&1!==f)g[h]=d.descThumbCost(i,j,a,b,e,f);else{var k=d.fingerStretch(e,f),l=Math.abs(i-j)/k;g[h]=l>c.moveCutoff?d.descMoveFormula(i,j,a,b,e,f):d.ascDescNoCrossCost(i,j,l,a,b,e,f)}};b.exports.createCostDatabase=function(){for(var a={},b=1;5>=b;b++)for(var c=21;109>c;c++)for(var d=1;5>=d;d++)for(var f=21;109>f;f++)e(c,f,b,d,a);return a}},{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],2:[function(a,b){var c=a("./CostAlgorithmParameters.js"),d=b.exports,e=function(a){return.0002185873295*Math.pow(a,7)-.008611946279*Math.pow(a,6)+.1323250066*Math.pow(a,5)-1.002729677*Math.pow(a,4)+3.884106308*Math.pow(a,3)-6.723075747*Math.pow(a,2)+1.581196785*a+7.711241722},f=function(a,b,d,e,f){if("White"===c.color[a%12]&&"Black"===c.color[b%12]){if(5===e||1===e)return 4;if(0===f)return 4}if("Black"===c.color[a%12]&&"White"===c.color[b%12]){if(5===d||1===d)return 4;if(0===f)return-1}return 0},g=d.ascMoveFormula=function(a,b,d,e,g,h){var i,j=Math.ceil(a+b);return j>24?c.moveHash[24]+(j-24)/5:(i=c.moveHash[j],i+=f(d,e,g,h,b))};d.descMoveFormula=function(a,b,d,e,g,h){var i,j=Math.ceil(a-b);return j>24?c.moveHash[24]+(j-24)/5:(i=c.moveHash[j],i+=f(d,e,g,h,b))},d.fingerDistance=function(a,b){var d=a.toString()+","+b.toString();return c.fingDistance[d]},d.ascThumbCost=function(a,b,d,f,h,j){var k=i(h,j),l=(a+b)/k;if(l>10)return g(a,b);var m=e(l);return"White"===c.color[d%12]&&"Black"===c.color[f%12]&&(m+=8),m},d.descThumbCost=function(a,b,d,f,i,j){var k=h(i,j),l=(a+b)/k;if(l>10)return g(a,b);var m=e(l);return"Black"===c.color[d%12]&&"White"===c.color[f%12]&&(m+=8),m};var h=d.descThumbStretch=function(a,b){var d=a.toString()+","+b.toString();return c.descThumbStretchVals[d]},i=d.ascThumbStretch=function(a,b){var d=a.toString()+","+b.toString();return c.ascThumbStretchVals[d]};d.fingerStretch=function(a,b){var d=a.toString()+","+b.toString();return c.fingStretch[d]},d.ascDescNoCrossCost=function(a,b,d,e,g,h,i){var j,k=function(a){return-6.589793725e-7*Math.pow(a,10)-2336381414e-15*Math.pow(a,9)+9925769823e-14*Math.pow(a,8)+.0001763353131*Math.pow(a,7)-.004660305277*Math.pow(a,6)-.004290746384*Math.pow(a,5)+.06855725903*Math.pow(a,4)+.03719817227*Math.pow(a,3)+.4554696705*Math.pow(a,2)-.08305450359*a+.3020594956};return d>6.8&&d<=c.moveCutoff?k(6.8)+3*(d-6.8):(j=k(d),j+=f(e,g,h,i))}},{"./CostAlgorithmParameters.js":3}],3:[function(a,b){var c=b.exports;c.moveCutoff=7.5,c.color={0:"White",1:"Black",2:"White",3:"Black",4:"White",5:"White",6:"Black",7:"White",8:"Black",9:"White",10:"Black",11:"White"},c.fingDistance={"1,1":0,"1,2":2,"1,3":3.5,"1,4":5,"1,5":7,"2,1":2,"2,2":0,"2,3":2,"2,4":3.5,"2,5":5,"3,1":3.5,"3,2":2,"3,3":0,"3,4":2,"3,5":3.5,"4,1":5,"4,2":3.5,"4,3":2,"4,4":0,"4,5":2,"5,1":7,"5,2":5,"5,3":3.5,"5,4":2,"5,5":0};var d=c.makeMoveHash=function(a){var b={1:0,2:.5,3:1.8,4:3,5:5,6:7,7:8,8:8.9,9:9.7,10:10.5,11:11,12:11.4,13:11.8,14:12.2,15:12.5,16:12.8,17:13.1,18:13.4,19:13.7,20:14,21:14.3,22:14.6,23:14.9,24:15.2};for(var c in b)b[c]+=a;return b};c.moveHash=d(4),c.descThumbStretchVals={"1,2":1,"1,3":1,"1,4":.9,"1,5":.95},c.ascThumbStretchVals={"2,1":.95,"3,1":1,"4,1":.95,"5,1":.95},c.fingStretch={"1,1":.8,"1,2":1.15,"1,3":1.4,"1,4":1.45,"1,5":1.6,"2,1":1.15,"2,2":.6,"2,3":.9,"2,4":1.15,"2,5":1.3,"3,1":1.4,"3,2":.9,"3,3":.6,"3,4":.9,"3,5":1.15,"4,1":1.45,"4,2":1.15,"4,3":.9,"4,4":.7,"4,5":.7,"5,1":1.6,"5,2":1.3,"5,3":1.15,"5,4":.8,"5,5":.6}},{}],4:[function(a,b){var c=a("./FingeringAlgorithmHelpers.js");b.exports.FingeringAlgorithm=function(a){for(var b=c.addStartTimes(a),d=0;d<app.preComputed.length;d++)if(app.preComputed[d].title===app.currentSong){var e=app.preComputed[d].BestPathObj;return c.distributePath(e,b),void 0}for(var f=c.makeNoteTrellis(b),g=1;g<f.length;g++)for(var h=0;h<f[g].length;h++)for(var i=1/0,j=0;j<f[g-1].length;j++){var k=f[g][h],l=f[g-1][j],m=l.nodeScore||0,n=c.getSplitData(k),o=c.getSplitData(l),p=n.right,q=o.right;if(p.notes.length>0)for(var r=2,s=l;0===q.notes.length;){var t=s.bestPrev,u=f[g-r][t];q=c.getSplitData(u).right,r++,s=u}var v=n.left,w=o.left;if(v.notes.length>0)for(var r=2,s=l;0===w.notes.length;){var t=s.bestPrev,u=f[g-r][t];w=c.getSplitData(u).left,r++,s=u}var x=c.calcCost(p,q,v,"RH"),y=c.calcCost(v,w,p,"LH");m+=x+y,i>m&&(i=m,k.nodeScore=m,k.bestPrev=j)}for(var z=c.findMin(f[f.length-1]),A={},B=f.length-1;B>0;B--){for(var C=f[B][z],D=C.fingers,E=C.notes,F=0;F<E.length;F++){var G=E[F][0],H=E[F][1],I=D[F],J=G+","+H;A[J]=I}z=C.bestPrev}c.distributePath(A,b)}},{"./FingeringAlgorithmHelpers.js":5}],5:[function(a,b){var c=a("./CostAlgorithm.js").createCostDatabase(),d=a("./LHCostAlgorithm.js").createLHCostDatabase(),e=b.exports;e.notes={0:"C",1:"C#",2:"D",3:"Eb",4:"E",5:"F",6:"F#",7:"G",8:"G#",9:"A",10:"Bb",11:"B"};for(var f=function(a){var b=[],c=[-5,-4,-3,-2,-1,1,2,3,4,5],d=function(a,c,e){if(c.length===a)return b.push(c.slice()),void 0;for(var f=0;f<e.length;f++){c.push(e[f]);var g=c,h=e.slice();h.splice(0,f+1),d(a,g,h),c.pop()}};return d(a,[],c),b},g={},h=1;10>=h;h++)g[h]=f(h);var i=[{notes:["e","e"],fingers:[1,-1]}],j=function(a,b){this.notes=a,this.fingers=b,this.nodeScore=0,this.bestPrev=void 0},k=function(a){for(var b=a.sort(function(a,b){return a[0]-b[0]}),c=[],d=g[b.length],e=0;e<d.length;e++){var f=d[e],h=new j(b,f);c.push(h)}return c},l=function(a,b){for(var c=0;c<a.length;c++)if(a[c][0]===b)return c};e.makeNoteTrellis=function(a){var b=[],c=!1,d=[];d.push(i);for(var e=0;e<a.length;e++){var f,g,h=a[e][0].event,j=h.noteNumber;if("noteOn"===h.subtype){var m=h.startTime;b.push([j,m]),c=!0}"noteOff"===h.subtype&&(c?(f=k(b.slice()),d.push(f),g=l(b,j),b.splice(g,1),c=!1):(g=l(b,j),b.splice(g,1),c=!1))}return d};var m=function(a,b,d,e){if("e"===a||"e"===b)return 0;var f=a+","+b+","+d+","+e,g=c[f],h=60-b;return g+=h>0?h:0},n=function(a,b,c,e){if("e"===a||"e"===b)return 0;c=Math.abs(c),e=Math.abs(e);var f=a+","+b+","+c+","+e,g=d[f],h=b-60;return g+=h>0?h:0};e.findMin=function(a){for(var b,c=1/0,d=0;d<a.length;d++)a[d].nodeScore<c&&(c=a[d].nodeScore,b=d);return b},e.distributePath=function(a,b){var c={};for(var d in a)a[d]=+a[d];for(var e=0;e<b.length;e++){var f=b[e][0].event,g=f.noteNumber;if("noteOn"===f.subtype){var h=f.startTime,i=g+","+h,j=a[i];f.finger=j,c[g]=j}"noteOff"===f.subtype&&(f.finger=c[g])}},e.addStartTimes=function(a){for(var b=0,c=0;c<a.length;c++){var d=a[c][0].event;"noteOff"===d.subtype?b+=d.deltaTime:"noteOn"===d.subtype&&(d.startTime=b,b+=d.deltaTime)}return a},e.getSplitData=function(a){for(var b={right:{notes:[],fingers:[]},left:{notes:[],fingers:[]}},c=0;c<a.fingers.length;c++)a.fingers[c]>0?(b.right.fingers.push(a.fingers[c]),b.right.notes.push(a.notes[c])):(b.left.fingers.push(a.fingers[c]),b.left.notes.push(a.notes[c]));return b},e.calcCost=function(a,b,c,d){for(var e="RH"===d?m:n,f=0,g=0;g<a.notes.length;g++){var h=a.notes[g][0],i=a.fingers[g],j=a.notes[g+1]||!1,k=a.fingers[g+1];f+=j?e(h,j[0],i,k):"RH"===d?60-h:h-60;for(var l=0;l<b.notes.length;l++){var o=b.notes[l][0],p=b.fingers[l],q=e(o,h,p,i);f+=q}}return f}},{"./CostAlgorithm.js":1,"./LHCostAlgorithm.js":6}],6:[function(a,b){var c=a("./CostAlgorithmParameters.js"),d=a("./CostAlgorithmHelpers.js"),e=function(a,b,e,f,g){var h=a.toString()+","+b.toString()+","+e.toString()+","+f.toString(),i=Math.abs(b-a),j=d.fingerDistance(e,f);if(i>0&&0===f-e)g[h]=d.ascMoveFormula(i,j,a,b);else if(0>=b-a&&0>f-e&&1!==f)g[h]=d.ascMoveFormula(i,j);else if(b-a>0&&f-e>0&&1!==e)g[h]=d.ascMoveFormula(i,j);else if(0>=b-a&&0>f-e&&1===f)g[h]=d.ascThumbCost(i,j,a,b,e,f);else if(b-a>=0&&1===e&&1!==f)g[h]=d.descThumbCost(i,j,a,b,e,f);else{var k=d.fingerStretch(e,f),l=Math.abs(i-j)/k;g[h]=l>c.moveCutoff?d.descMoveFormula(i,j):d.ascDescNoCrossCost(i,j,l,a,b,e,f)}};b.exports.createLHCostDatabase=function(){for(var a={},b=1;5>=b;b++)for(var c=21;109>c;c++)for(var d=1;5>=d;d++)for(var f=21;109>f;f++)e(c,f,b,d,a);return a}},{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],7:[function(a,b){var c=a("./Visuals/Piano/KeyboardDesign.js").KeyboardDesign,d=a("./Visuals/Piano/Keyboard.js").Keyboard,e=a("./Visuals/Hands/Right/RightHand.js").RightHand,f=a("./Visuals/Hands/Left/LeftHand.js").LeftHand,g=a("./Visuals/Scene.js").Scene;a("./Algorithms/CostAlgorithm").createCostDatabase;var h=a("./Algorithms/FingeringAlgorithm.js").FingeringAlgorithm,i=a("./PlayControls.js").PlayControls;b.exports.App=function(){this.keyboardDesign=new c,this.keyboard=new d(this.keyboardDesign),this.rightHand=new e(this.keyboard),this.leftHand=new f(this.keyboard),this.player=MIDI.Player;var a=this;this.player.addListener(function(b){var c=a.rightHand,d=a.leftHand,e=144,f=128,g=b.note,h=b.message,i=b.finger;h===e?(a.keyboard.press(g),i>0?c.press(i,g):d.press(i,g)):h===f&&(a.keyboard.release(g),i>0?c.release(i):d.release(i))}),this.player.setAnimation({delay:20,callback:function(b){var c=b.now,d=b.end;a.playControls.displayProgress(c,d)}}),this.loadMidiFile=function(a,b){var c=this;this.player.loadFile(a,function(){c.playControls.setCurrentTime(b)})},this.upload=function(a){var b=this,c=new FileReader;c.onload=function(a){var c=a.target.result;b.loadMidiFile(c)},c.readAsDataURL(a)},this.initScene=function(){var a=this;this.scene=new g("#canvas"),this.scene.add(this.keyboard.model),this.scene.add(this.rightHand.model),this.scene.add(this.leftHand.model),this.scene.animate(function(){a.keyboard.update(),a.rightHand.update(),a.leftHand.update(),TWEEN.update()})},this.initMIDI=function(a){MIDI.loadPlugin(function(){MIDI.channels[9].mute=!0,"function"==typeof a&&a()})},this.initPlayControls=function(b,c){a.playControls=new i(b,c)},this.fingeringAlgorithm=function(){h(a.player.data)}}},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./PlayControls.js":9,"./Visuals/Hands/Left/LeftHand.js":14,"./Visuals/Hands/Right/RightHand.js":20,"./Visuals/Piano/Keyboard.js":26,"./Visuals/Piano/KeyboardDesign.js":27,"./Visuals/Scene.js":29}],8:[function(a){var b=a("./App.js").App;$(document).on("ready",function(){var a=window.app=new b;a.initMIDI(function(){a.initScene(),$.ajax({url:"/getAllPaths",dataType:"json",success:function(b){a.preComputed=b,a.initPlayControls($(".main-container"),a),$($(".player-songList > li")[0]).trigger("click")}})})})},{"./App.js":7}],9:[function(a,b){b.exports.PlayControls=function(a,b){$(a),$(".player-songListContainer"),$(".player-controls");var c=$(".player-progress-container"),d=$(".player-progress-bar");$(".player-progress-text");var e=$(".player-songList");$(".song");var f=$(".tempo-changer"),g=$(".player-playBtn"),h=$(".player-pauseBtn"),i=$(".current-song"),j=this;this.play=function(){g.hide(),h.show(),j.playing=!0,b.player.resume()},this.playHandler=function(){j.playing===!1?j.resume():j.play()},this.pauseHandler=function(){j.pause()},this.songListHandler=function(a){var c=$(a.target),d=c.text();i.text(d),j.playing=!1,b.currentSong=d,$.ajax({url:"/songs/"+d,dataType:"text",success:function(a){b.loadMidiFile(a,0)}})},this.resume=function(){g.hide(),h.show(),b.player.currentTime+=1e-6,j.playing=!0,b.player.resume()},this.stop=function(){b.player.stop(),j.playing=!1},this.progressHandler=function(a){var b=(a.clientX-c.offset().left)/c.width();j.setCurrentTime(b)},this.tempoHandler=function(a){var e=$(a.target),f=e.find("input").attr("data-timeWarp");b.player.timeWarp=f;var g=b.currentSong;$.ajax({url:"/songs/"+g,dataType:"text",success:function(a){var e=d.width()/c.width();b.loadMidiFile(a,e)}})},this.pause=function(){j.playing=!1,g.show(),h.hide(),b.player.pause(),j.resume()},this.getEndTime=function(){return b.player.endTime},this.displayProgress=function(a,b){var e=a/b,f=Math.floor(e*c.width());d.width(f)},this.setCurrentTime=function(a){var c=b.player.endTime*a;b.player.currentTime=c,setTimeout(j.resume,10),b.player.pause()},g.on("click",j.playHandler),h.on("click",j.pauseHandler),e.on("click",j.songListHandler),c.on("click",j.progressHandler),f.on("click",j.tempoHandler)}},{}],10:[function(a,b){b.exports.Dummy=function(){var a=new THREE.CubeGeometry(1,1,1),b=new THREE.MeshLambertMaterial({color:0}),c=new THREE.Vector3(0,0,0);this.model=new THREE.Mesh(a,b),this.model.position.copy(c),this.model.visible=!1}},{}],11:[function(a,b){var c=a("./FingerMoveParams.js").params;b.exports.Finger=function(a){var b=.6;this.originalY=.2,this.pressedY=this.originalY-b,this.releaseSpeed=.05,this.moveSpeed=.1;var d=a;this.distances=c(d),this.press=function(a){this.moveToNote(a),this.model.position.y=this.pressedY,this.isPressed=!0},this.release=function(){this.isPressed=!1},this.moveToNote=function(a){this.currentPos.x=this.model.position.x,this.currentPos.y=this.model.position.y,this.currentPos.z=this.model.position.z;var b=this.model.parent.children[this.number+1].currentNote,c=this.model.parent.children[this.number-1].currentNote;a>this.model.currentNote?this.model.currentNote=b===a?a-1:a:a<this.model.currentNote&&(this.model.currentNote=c===a?a+1:a),this.setNewPos(this.model.currentNote),this.setUpNewTween()},this.update=function(){if(this.model.position.y<this.originalY&&this.isPressed===!1){var a=this.originalY-this.model.position.y;this.model.position.y+=Math.min(a,this.releaseSpeed)}},this.currentPos={x:0,y:0,z:0},this.newPos={x:0,y:0,z:0},this.setNewPos=function(a){this.newPos.x=d.model.children[a-21].position.x,this.newPos.y=d.keys[a].model.position.y+this.originalY,this.newPos.z=d.keys[a].model.position.z+.5},this.setUpNewTween=function(){var a=this,b=function(){a.model.position.x=a.currentPos.x,a.model.position.y=a.currentPos.y+.1,a.model.position.z=a.currentPos.z},c=TWEEN.Easing.Quadratic.Out,d=new TWEEN.Tween(this.currentPos).to(this.newPos,150).easing(c).onUpdate(b);d.start()},this.setUpPressReleaseTween=function(){}}},{"./FingerMoveParams.js":12}],12:[function(a,b){b.exports.params=function(a){var b={};return b.get=function(b,c){return a.model.children[c-21].position.x-a.model.children[b-21].position.x},b}},{}],13:[function(a,b){b.exports.HandDesign=function(a){this.pinkyWidth=.14,this.pinkyHeight=.1,this.pinkyLength=.57,this.pinkyColor=16711680,this.ringFingerWidth=.18,this.ringFingerHeight=.1,this.ringFingerLength=.61,this.ringFingerColor=26112,this.middleFingerWidth=.185,this.middleFingerHeight=.1,this.middleFingerLength=.7,this.middleFingerColor=13311,this.indexFingerWidth=.188,this.indexFingerHeight=.1,this.indexFingerLength=.6,this.indexFingerColor=16776960,this.thumbWidth=.175,this.thumbHeight=.1,this.thumbLength=.5,this.thumbColor=16724991,this.keyboard=a,this.keyboardHeight=.22}},{}],14:[function(a,b){var c=a("./LeftPinky.js").LeftPinky,d=a("./LeftRing.js").LeftRing,e=a("./LeftMiddle.js").LeftMiddle,f=a("./LeftIndex.js").LeftIndex,g=a("./LeftThumb.js").LeftThumb,h=a("../HandDesign.js").HandDesign,i=a("../Dummy.js").Dummy;b.exports.LeftHand=function(a){var b=this,j=new h(a),k=new c(j,"left"),l=new d(j,"left"),m=new e(j,"left"),n=new f(j,"left"),o=new g(j,"left"),p=new i,q=new i;this.fingers=[],this.model=new THREE.Object3D,this.fingers.push(void 0),this.model.add(p.model),p.model.currentNote=-1,this.model.add(o.model),this.fingers.push(o),o.model.currentNote=1,this.model.add(n.model),this.fingers.push(n),n.model.currentNote=1,this.model.add(m.model),this.fingers.push(m),m.model.currentNote=1,this.model.add(l.model),this.fingers.push(l),l.model.currentNote=1,this.model.add(k.model),this.fingers.push(k),k.model.currentNote=1,this.model.add(q.model),q.model.currentNote=110,o.moveToNote(55),n.moveToNote(53),m.moveToNote(52),l.moveToNote(50),k.moveToNote(48),this.model.position.y-=.11,this.model.traverse(function(a){a.position.x-=4.45}),this.offSet=.2222,this.press=function(c,d){c=Math.abs(c);for(var e=a.keys[d].model.position.x,f=1;5>=f;f++)f===c?b.fingers[f].press(d):b.fingers[f].moveAsNeeded(c,e,d)},this.release=function(a){a=Math.abs(a),b.fingers[a].release()},this.update=function(){for(var a=b.fingers,c=1;c<a.length;c++)a[c].update()}}},{"../Dummy.js":10,"../HandDesign.js":13,"./LeftIndex.js":15,"./LeftMiddle.js":16,"./LeftPinky.js":17,"./LeftRing.js":18,"./LeftThumb.js":19}],15:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.LeftIndex=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.indexFingerWidth,a.indexFingerHeight,a.indexFingerLength),d=new THREE.MeshLambertMaterial({color:a.indexFingerColor}),e=new THREE.Vector3(0,.2,.4);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=2;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 4:this.ringRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){a>=f.get(c,c-8)&&a<=f.get(c,c-4)||this.moveToNote(d+5)},this.ringRules=function(a,b,c,d){a>=f.get(c,c-6)&&a<=f.get(c,c-4)||this.moveToNote(d+3)},this.middleRules=function(a,b,c,d){a>=f.get(c,c-5)&&a<=f.get(c,c-1)||this.moveToNote(d+4)},this.thumbRules=function(a,b,c,d){if(!(a>0&&a<=f.get(c,c+4)))if(a>f.get(c,c-3)&&0>a){var e=this;setTimeout(e.moveToNote(d-2),100)}else this.moveToNote(d-2)}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],16:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.LeftMiddle=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.middleFingerWidth,a.middleFingerHeight,a.middleFingerLength),d=new THREE.MeshLambertMaterial({color:a.middleFingerColor}),e=new THREE.Vector3(0,.2,.4);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=3;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 4:this.ringRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){a>f.get(c,c-5)&&a<f.get(c,c-3)||this.moveToNote(d+3)},this.ringRules=function(a,b,c,d){a>f.get(c,c-4)&&a<f.get(c,c-1)||this.moveToNote(d+2)},this.indexRules=function(a,b,c,d){a>0&&a<f.get(c,c+3)||this.moveToNote(d-2)},this.thumbRules=function(a,b,c,d){if(!(a>0&&a<f.get(c,c+6)))if(a>f.get(c,c-4)&&0>a){var e=this;setTimeout(e.moveToNote(d-3),100)}else this.moveToNote(d-3)}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],17:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.LeftPinky=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.pinkyWidth,a.pinkyHeight,a.pinkyLength),d=new THREE.MeshLambertMaterial({color:a.pinkyColor}),e=new THREE.Vector3(0,.2,.54);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=5;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 4:this.ringRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.ringRules=function(a,b,c,d){a>0&&a<=f.get(c,c+3)||this.moveToNote(d-2)},this.middleRules=function(a,b,c,d){a>0&&a<=f.get(c,c+5)||this.moveToNote(d-3)},this.indexRules=function(a,b,c,d){a>0&&a<=f.get(c,c+7)||this.moveToNote(d-5)},this.thumbRules=function(a,b,c,d){if(!(a>0&&a<=f.get(c,c+12)))if(a>0&&a<=f.get(c,c+1)){var e=this;setTimeout(e.moveToNote(d-7),100)}else this.moveToNote(d-7)},this.setUpNewTween=function(){var a=this,b=function(){a.model.position.x=a.currentPos.x,a.model.position.y=a.currentPos.y+.1,a.model.position.z=a.currentPos.z+.1},c=TWEEN.Easing.Quadratic.Out,d=new TWEEN.Tween(this.currentPos).to(this.newPos,150).easing(c).onUpdate(b);d.start()}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],18:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.LeftRing=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.ringFingerWidth,a.ringFingerHeight,a.ringFingerLength),d=new THREE.MeshLambertMaterial({color:a.ringFingerColor}),e=new THREE.Vector3(0,.2,.45);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=4;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){a>f.get(c,c-3)&&a<f.get(c,c-2)||this.moveToNote(d+2)},this.middleRules=function(a,b,c,d){a>0&&a<f.get(c,c+3)||this.moveToNote(d-2)},this.indexRules=function(a,b,c,d){a>0&&a<f.get(c,c+5)||this.moveToNote(d-3)},this.thumbRules=function(a,b,c,d){if(!(a>0&&a<f.get(c,c+8)))if(a>f.get(c,c-2)&&0>a){var e=this;setTimeout(e.moveToNote(d-5),100)}else this.moveToNote(d-5)}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],19:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.LeftThumb=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.thumbWidth,a.thumbHeight,a.thumbLength),d=new THREE.MeshLambertMaterial({color:a.thumbColor}),e=new THREE.Vector3(0,.3,.6);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=1;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 4:this.ringRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){if(!(a>=f.get(c,c-12)&&a<=f.get(c,c-5)))if(a>0&&a<f.get(c,c+1)){var e=this;setTimeout(e.moveToNote(d+7),100)}else this.moveToNote(d+7)},this.ringRules=function(a,b,c,d){if(!(a>=f.get(c,c-9)&&a<=f.get(c,c-4)))if(a>0&&a<f.get(c,c+2)){var e=this;setTimeout(e.moveToNote(d+5),100)}else this.moveToNote(d+5)},this.middleRules=function(a,b,c,d){if(!(a>=f.get(c,c-7)&&a<=f.get(c,c-2)))if(a>0&&a<f.get(c,c+4)){var e=this;setTimeout(e.moveToNote(d+4),100)}else this.moveToNote(d+4)},this.indexRules=function(a,b,c,d){if(!(a>=f.get(c,c-4)&&0>a))if(a>0&&a<f.get(c,c+2)){var e=this;setTimeout(e.moveToNote(d+2),100)}else this.moveToNote(d+2)},this.setUpNewTween=function(){var a=this,b=function(){a.model.position.x=a.currentPos.x,a.model.position.y=a.currentPos.y+.1,a.model.position.z=a.currentPos.z+.2},c=TWEEN.Easing.Quadratic.Out,d=new TWEEN.Tween(this.currentPos).to(this.newPos,150).easing(c).onUpdate(b);d.start()}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],20:[function(a,b){var c=a("./RightPinky.js").RightPinky,d=a("./RightRing.js").RightRing,e=a("./RightMiddle.js").RightMiddle,f=a("./RightIndex.js").RightIndex,g=a("./RightThumb.js").RightThumb,h=a("../HandDesign.js").HandDesign,i=a("../Dummy.js").Dummy;b.exports.RightHand=function(a){var b=this,j=new h(a),k=new c(j,"right"),l=new d(j,"right"),m=new e(j,"right"),n=new f(j,"right"),o=new g(j,"right"),p=new i,q=new i;this.fingers=[],this.model=new THREE.Object3D,this.fingers.push(void 0),this.model.add(p.model),p.model.currentNote=-1,this.model.add(o.model),this.fingers.push(o),o.model.currentNote=5,this.model.add(n.model),this.fingers.push(n),n.model.currentNote=1,this.model.add(m.model),this.fingers.push(m),m.model.currentNote=1,this.model.add(l.model),this.fingers.push(l),l.model.currentNote=1,this.model.add(k.model),this.fingers.push(k),k.model.currentNote=1,this.model.add(q.model),q.model.currentNote=110,o.moveToNote(60),n.moveToNote(62),m.moveToNote(64),l.moveToNote(65),k.moveToNote(67),this.model.position.y-=.11,this.model.traverse(function(a){a.position.x-=4.45}),this.press=function(c,d){for(var e=a.keys[d].model.position.x,f=1;5>=f;f++)f===c?b.fingers[f].press(d):b.fingers[f].moveAsNeeded(c,e,d)},this.release=function(a){b.fingers[a].release()},this.update=function(){for(var a=b.fingers,c=1;c<a.length;c++)a[c].update()}}},{"../Dummy.js":10,"../HandDesign.js":13,"./RightIndex.js":21,"./RightMiddle.js":22,"./RightPinky.js":23,"./RightRing.js":24,"./RightThumb.js":25}],21:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.RightIndex=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.indexFingerWidth,a.indexFingerHeight,a.indexFingerLength),d=new THREE.MeshLambertMaterial({color:a.indexFingerColor}),e=new THREE.Vector3(0,.2,.4);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=2;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 4:this.ringRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){a>f.get(c,c+4)&&a<f.get(c,c+8)||this.moveToNote(d-5)},this.ringRules=function(a,b,c,d){a>f.get(c,c+3)&&a<f.get(c,c+7)||this.moveToNote(d-3)},this.middleRules=function(a,b,c,d){a>f.get(c,c+2)&&a<f.get(c,c+5)||this.moveToNote(d-2)},this.thumbRules=function(a,b,c,d){if(!(a>f.get(c,c-3)&&0>a))if(a>0&&a<f.get(c,c+3)){var e=this;setTimeout(e.moveToNote(d+2),100)}else this.moveToNote(d+2)}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],22:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.RightMiddle=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.middleFingerWidth,a.middleFingerHeight,a.middleFingerLength),d=new THREE.MeshLambertMaterial({color:a.middleFingerColor}),e=new THREE.Vector3(0,.2,.4);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=3;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 4:this.ringRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){a>=f.get(c,c+3)&&a<=f.get(c,c+5)||this.moveToNote(d-3)},this.ringRules=function(a,b,c,d){a>=f.get(c,c+1)&&a<=f.get(c,c+4)||this.moveToNote(d-2)},this.indexRules=function(a,b,c,d){a>=f.get(c,c-3)&&a<=f.get(c,c-1)||this.moveToNote(d+2)},this.thumbRules=function(a,b,c,d){if(!(a>=f.get(c,c-6)&&0>a))if(a>0&&a<f.get(c,c+4)){var e=this;setTimeout(e.moveToNote(d+3),100)}else this.moveToNote(d+3)}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],23:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.RightPinky=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.pinkyWidth,a.pinkyHeight,a.pinkyLength),d=new THREE.MeshLambertMaterial({color:a.pinkyColor}),e=new THREE.Vector3(0,.2,.54);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=5;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.ringRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.ringRules=function(a,b,c,d){a>f.get(c,c-3)&&0>a||this.moveToNote(d+2)},this.middleRules=function(a,b,c,d){a>f.get(c,c-5)&&0>a||this.moveToNote(d+3)},this.indexRules=function(a,b,c,d){a>f.get(c,c-7)&&0>a||this.moveToNote(d+5)},this.thumbRules=function(a,b,c,d){if(!(a>f.get(c,c-12)&&0>a))if(a>0&&a<f.get(c,c+1)){var e=this;setTimeout(e.moveToNote(d+7),100)}else this.moveToNote(d+7)},this.setUpNewTween=function(){var a=this,b=function(){a.model.position.x=a.currentPos.x,a.model.position.y=a.currentPos.y+.1,a.model.position.z=a.currentPos.z+.1},c=TWEEN.Easing.Quadratic.Out,d=new TWEEN.Tween(this.currentPos).to(this.newPos,150).easing(c).onUpdate(b);d.start()}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],24:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.RightRing=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.ringFingerWidth,a.ringFingerHeight,a.ringFingerLength),d=new THREE.MeshLambertMaterial({color:a.ringFingerColor}),e=new THREE.Vector3(0,.2,.45);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=4;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c);break;case 1:this.thumbRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){a>f.get(c,c+2)&&a<f.get(c,c+3)||this.moveToNote(d-2)},this.middleRules=function(a,b,c,d){a>f.get(c,c-3)&&0>a||this.moveToNote(d+2)},this.indexRules=function(a,b,c,d){a>f.get(c,c-5)&&0>a||this.moveToNote(d+3)},this.thumbRules=function(a,b,c,d){if(!(a>f.get(c,c-8)&&0>a))if(a>0&&a<f.get(c,c+2)){var e=this;setTimeout(e.moveToNote(d+5),100)}else this.moveToNote(d+5)}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],25:[function(a,b){var c=a("../Finger.js").Finger,d=b.exports.RightThumb=function(a){c.call(this,a.keyboard);var b=new THREE.CubeGeometry(a.thumbWidth,a.thumbHeight,a.thumbLength),d=new THREE.MeshLambertMaterial({color:a.thumbColor}),e=new THREE.Vector3(0,.3,.6);this.model=new THREE.Mesh(b,d),this.model.position.copy(e),this.originalY=e.y,this.number=1;var f=this.distances;this.moveAsNeeded=function(a,b,c){var d=this.currentPos.x,e=b-d,f=this.model.currentNote;switch(a){case 5:this.pinkyRules(e,d,f,c);break;case 4:this.ringRules(e,d,f,c);break;case 3:this.middleRules(e,d,f,c);break;case 2:this.indexRules(e,d,f,c)}},this.pinkyRules=function(a,b,c,d){if(!(a>=f.get(c,c+5)&&a<f.get(c,c+12)))if(a>=f.get(c,c-2)&&0>a){var e=this;setTimeout(e.moveToNote(d-7),100)}else this.moveToNote(d-7)},this.ringRules=function(a,b,c,d){if(!(a>=f.get(c,c+4)&&a<=f.get(c,c+9)))if(a>f.get(c,c-2)&&0>a){var e=this;setTimeout(e.moveToNote(d-5),100)}else this.moveToNote(d-5)},this.middleRules=function(a,b,c,d){if(!(a>=f.get(c,c+2)&&a<=f.get(c,c+7)))if(a>f.get(c,c-3)&&0>a){var e=this;setTimeout(e.moveToNote(d-4),100)}else this.moveToNote(d-4)},this.indexRules=function(a,b,c,d){if(!(a>0&&a<=f.get(c,c+4)))if(a>f.get(c,c-2)&&0>a){var e=this;setTimeout(e.moveToNote(d-2),100)}else this.moveToNote(d-2)},this.setUpNewTween=function(){var a=this,b=function(){a.model.position.x=a.currentPos.x,a.model.position.y=a.currentPos.y+.1,a.model.position.z=a.currentPos.z+.2},c=TWEEN.Easing.Quadratic.Out,d=new TWEEN.Tween(this.currentPos).to(this.newPos,150).easing(c).onUpdate(b);d.start()}};d.prototype=Object.create(c.prototype),d.prototype.constructor=d},{"../Finger.js":11}],26:[function(a,b){var c=a("./PianoKey.js").PianoKey;b.exports.Keyboard=function(a){this.model=new THREE.Object3D,this.keys=[];for(var b=this,d=0;d<a.keyInfo.length;d++){var e=new c(a,d);b.keys.push(e),d>20&&109>d&&this.model.add(e.model)}this.model.position.y-=a.whiteKeyHeight/2,this.model.traverse(function(a){a.position.x-=4.45}),this.press=function(a){b.keys[a].press()},this.release=function(a){b.keys[a].release()},this.update=function(){for(var a=this,b=a.keys,c=0;c<b.length;c++)b[c].update()}}},{"./PianoKey.js":28}],27:[function(a,b){b.exports.KeyboardDesign=function(){this.KeyType={WhiteC:0,WhiteD:1,WhiteE:2,WhiteF:3,WhiteG:4,WhiteA:5,WhiteB:6,Black:7},this.whiteKeyStep=.236,this.whiteKeyWidth=.226,this.whiteKeyHeight=.22,this.whiteKeyLength=1.5,this.blackKeyWidth=.1,this.blackKeyHeight=.24,this.blackKeyLength=1,this.blackKeyShiftCDE=.0216,this.blackKeyShiftFGAB=.034,this.blackKeyPosY=.1,this.blackKeyPosZ=-.24,this.noteDropPosZ4WhiteKey=.25,this.noteDropPosZ4BlackKey=.75,this.whiteKeyColor=15794175,this.blackKeyColor=0,this.keyDip=.08,this.keyUpSpeed=.03,this.keyInfo=[];
-var a=this,b=function(){c(),d(),e()},c=function(){for(var b=0;120>b;b++){var c={};a.keyInfo.push(c)}},d=function(){for(var b=a.KeyType,c=a.keyInfo,d=0;10>d;d++){var e=12*d;c[e+0].keyType=b.WhiteC,c[e+1].keyType=b.Black,c[e+2].keyType=b.WhiteD,c[e+3].keyType=b.Black,c[e+4].keyType=b.WhiteE,c[e+5].keyType=b.WhiteF,c[e+6].keyType=b.Black,c[e+7].keyType=b.WhiteG,c[e+8].keyType=b.Black,c[e+9].keyType=b.WhiteA,c[e+10].keyType=b.Black,c[e+11].keyType=b.WhiteD}},e=function(){var b=a.keyInfo,c=a.KeyType,d=c.WhiteB,e=0,f=0,g=c.Black;for(b[e].keyCenterPosX=f,d=b[e].keyType,e=1;e<b.length;e++)f+=d===g?a.whiteKeyStep/2:b[e].keyType===g?a.whiteKeyStep/2:a.whiteKeyStep,b[e].keyCenterPosX=f,d=b[e].keyType};b()}},{}],28:[function(a,b){var c=b.exports.PianoKey=function(a,b){var c=a.KeyType.Black,d=a.keyInfo[b].keyType,e=a.keyInfo[b].keyCenterPosX;a.keyUpSpeed;var f,g,h;d===c?(f=new THREE.CubeGeometry(a.blackKeyWidth,a.blackKeyHeight,a.blackKeyLength),g=new THREE.MeshPhongMaterial({color:a.blackKeyColor}),h=new THREE.Vector3(e,a.blackKeyPosY,a.blackKeyPosZ),this.originalColor={r:0,g:0,b:0}):(f=new THREE.CubeGeometry(a.whiteKeyWidth,a.whiteKeyHeight,a.whiteKeyLength),g=new THREE.MeshPhongMaterial({color:a.whiteKeyColor,emissive:1118481}),h=new THREE.Vector3(e,a.whiteKeyPosY,a.whiteKeyPosZ),this.originalColor={r:.941,g:1,b:1}),this.model=new THREE.Mesh(f,g),this.model.position.copy(h),this.keyUpSpeed=a.keyUpSpeed,this.originalY=h.y,this.pressedY=this.originalY-a.keyDip,this.newColor={r:0,g:0,b:0},this.currentColor={r:this.originalColor.r,g:this.originalColor.g,b:this.originalColor.b}};c.prototype.press=function(){this.model.position.y=this.pressedY,this.newColor={r:.145,g:.749,b:.854},this.setUpNewTween(),this.isPressed=!0},c.prototype.release=function(){this.isPressed=!1,this.newColor=this.originalColor,this.setUpNewTween()},c.prototype.update=function(){if(this.model.position.y<this.originalY&&this.isPressed===!1){var a=this.originalY-this.model.position.y;this.model.position.y+=Math.min(a,this.keyUpSpeed)}},c.prototype.setUpNewTween=function(){var a=this,b=function(){a.model.material.color.setRGB(a.currentColor.r,a.currentColor.g,a.currentColor.b)},c=TWEEN.Easing.Quadratic.Out,d=new TWEEN.Tween(this.currentColor).to(this.newColor,150).easing(c).onUpdate(b);d.start()}},{}],29:[function(a,b){b.exports.Scene=function(a){var b=$(a),c=b.width(),d=b.height(),e=this,f=new THREE.Scene,g=85,h=c/d,i=.001,j=1e3,k=new THREE.PerspectiveCamera(g,h,i,j);k.position.set(0,3,1.2),k.lookAt(new THREE.Vector3(10,50,5));var l=new THREE.TrackballControls(k);l.rotateSpeed=1,l.zoomSpeed=1.2,l.panSpeed=.8,l.noZoom=!1,l.noPan=!1,l.staticMoving=!0,l.dynamicDampingFactor=.3,l.keys=[65,83,68];var m=Detector.webgl?new THREE.WebGLRenderer({antialias:!0}):new THREE.CanvasRenderer;m.setSize(c,d),m.setClearColor(0,1),m.autoClear=!1,b.append(m.domElement);var n=new THREE.AmbientLight(2236962),o=new THREE.DirectionalLight(16777215,.8);o.position.set(1,2,4).normalize();var p=new THREE.DirectionalLight(16777215,.3);p.position.set(-4,-1,-2).normalize,f.add(n),f.add(o),f.add(p),f.add(k),this.camera=k,this.renderer=m,this.scene=f,this.add=function(a){f.add(a)},this.animate=function(a){requestAnimationFrame(function(){e.animate(a)}),"function"==typeof a&&a(),l.update(),e.renderer.render(e.scene,e.camera)}}},{}]},{},[8]);
+;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var params = require('./CostAlgorithmParameters.js');
+var helpers = require('./CostAlgorithmHelpers.js');
+
+var costAlgorithmRouter = function(n1, n2, f1, f2, costDatabase) {
+  var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
+  var noteD = Math.abs(n2-n1);
+  var fingD = helpers.fingerDistance(f1, f2);
+
+  // Handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  // it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
+  if (Math.abs(n2 - n1) > 0 && f2-f1 === 0) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2);
+  }
+  // Handles ascending notes and descending fingers, but f2 isn't thumb
+  // means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
+  else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 !== 1) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2, f1, f2);
+  }
+  // This handles descending notes with ascending fingers where f1 isn't thumb
+  // means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
+  else if (n2 - n1 < 0 && f2-f1 > 0 && f1 !== 1){
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2, f1, f2);
+  }
+  // This handles ascending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
+  // thus bringing your thumb under. 
+  else if (n2 - n1 >= 0 && f2-f1 < 0 && f2 === 1) {
+    costDatabase[key] = helpers.ascThumbCost(noteD, fingD, n1, n2, f1, f2);
+  }
+  // This handles descending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  else if (n2 - n1 < 0 && f1 === 1 && f2 !== 1) {
+    costDatabase[key] = helpers.descThumbCost(noteD, fingD, n1, n2, f1, f2);
+  }
+  // This handles ascending or same note, with ascending or same finger
+  // To be clear... only remaining options are (n2-n1 >= 0 && f2-f1 > 0 || n2-n1 <= 0 && f2-f1 < 0)
+  else {
+    var stretch = helpers.fingerStretch(f1, f2);
+    var x = Math.abs(noteD - fingD) / stretch;
+    if (x > params.moveCutoff) {
+      costDatabase[key] = helpers.descMoveFormula(noteD, fingD, n1, n2, f1, f2);
+    }else{
+      costDatabase[key] = helpers.ascDescNoCrossCost(noteD, fingD, x, n1, n2, f1, f2);
+    }
+  }
+
+};
+
+var createCostDatabase = module.exports.createCostDatabase = function() {
+var RHcostDatabase = {};
+  for (var finger1 = 1; finger1 <=5; finger1++) {
+    for (var note1 = 21; note1 < 109; note1++) { // in MIDI land, note 21 is actually the lowest note on the piano, and 109 is the highest.
+      for (var finger2 = 1; finger2 <= 5; finger2++) {
+        for (var note2 = 21; note2 < 109; note2++) {
+          costAlgorithmRouter(note1, note2, finger1, finger2, RHcostDatabase);
+        }
+      }
+    }
+  }
+  return RHcostDatabase;
+};
+
+},{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],2:[function(require,module,exports){
+var params = require('./CostAlgorithmParameters.js')
+var mod = module.exports;
+
+// Got this crazy function from regressing values I wanted at about 15 points along the graph. 
+var ThumbCrossCostFunc = function(x) {
+ return 0.0002185873295*Math.pow(x,7) - 0.008611946279*Math.pow(x,6) + 0.1323250066*Math.pow(x,5) - 1.002729677*Math.pow(x,4)+
+ 3.884106308*Math.pow(x,3) - 6.723075747*Math.pow(x,2) + 1.581196785*x + 7.711241722;
+};
+
+var colorRules = function(n1,n2,f1,f2, fingD) {
+  // If you're moving up from white to black with pinky or thumb, that's much harder than white-to-white would be. So we're adding some amount.
+  if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
+    if (f2 === 5 || f2 === 1) {return 4;} // Using thumb or pinky on black is extra expensive
+    if (fingD === 0) {return 4;} // Using same finger is extra expensive
+  }
+  if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
+    if (f1 === 5 || f1 === 1) {return 4;} // Moving from thumb or pinky that's already on black is extra expensive
+    if (fingD === 0) {return -1;} // Moving black to white with same finger is a slide. That's easy and common. reduce slightly.
+  }
+  return 0; // If none of the rules apply, then don't add or subtract anything
+};
+
+var ascMoveFormula = mod.ascMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
+  // This is for situations where direction of notes and fingers are opposite, because either way, you want to add the distance between the fingers.
+
+  // The Math.ceil part is so it def hits a value in our moveHash. This could be fixed if I put more resolution into the moveHash
+  var totalD = Math.ceil(noteD + fingD);
+  var cost;
+
+  // This adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
+  if (totalD > 24) {
+    return params.moveHash[24] + ( (totalD - 24) / 5);
+  }else {
+    cost = params.moveHash[totalD];
+    cost += colorRules(n1,n2,f1,f2,fingD);
+    return cost;
+  }
+};
+
+mod.descMoveFormula = function(noteD,fingD,n1,n2,f1,f2) {
+  // This is for situations where direction of notes and fingers is the same. You want to subtract finger distance in that case.
+  var totalD = Math.ceil(noteD - fingD);
+  var cost;
+
+  // This adds a small amount for every additional halfstep over 24. Fairly representative of what it should be. 
+  if (totalD > 24) {
+    return params.moveHash[24] + ( (totalD - 24) / 5);
+  }else {
+    cost = params.moveHash[totalD];
+    cost += colorRules(n1,n2,f1,f2,fingD);
+    return cost;
+  }
+};
+
+// Currently assumes your on Middle C. Could potentially take into account n1 as a way to know how to handle the irregularities. Such as E-F being 1 half step, but G-A being 2.
+mod.fingerDistance = function(f1,f2) {
+  var key = f1.toString() + ',' + f2.toString();
+  return params.fingDistance[key];
+};
+
+mod.ascThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
+  var stretch = ascThumbStretch(f1,f2);
+  var x = (noteD + fingD) / stretch;
+
+  // If it's over 10, again use the move formula
+  if (x > 10) {
+    return ascMoveFormula(noteD, fingD);
+  }else {
+    var cost = ThumbCrossCostFunc(x);
+    if (params.color[n1%12] === 'White' && params.color[n2%12] === 'Black') {
+      cost += 8;
+    }
+    return cost;
+  }
+};
+
+mod.descThumbCost = function(noteD,fingD,n1,n2,f1,f2) {
+  var stretch = descThumbStretch(f1,f2);
+  var x = (noteD + fingD) / stretch;
+
+  if (x > 10) {
+    return ascMoveFormula(noteD, fingD);
+  }else {
+    var cost = ThumbCrossCostFunc(x);
+    if (params.color[n1%12] === 'Black' && params.color[n2%12] === 'White') {
+      cost += 8;
+    }
+    return cost;
+  }
+};
+
+var descThumbStretch = mod.descThumbStretch = function(f1,f2) {
+  var key = f1.toString() + ',' + f2.toString();
+  return params.descThumbStretchVals[key];
+};
+
+var ascThumbStretch = mod.ascThumbStretch = function(f1,f2) {
+  var key = f1.toString() + ',' + f2.toString();
+  return params.ascThumbStretchVals[key];
+};
+
+mod.fingerStretch = function(f1,f2) {
+  var key = f1.toString() + ',' + f2.toString();
+  return params.fingStretch[key];
+};
+
+mod.ascDescNoCrossCost = function(noteD,fingD,x,n1,n2,f1,f2) {
+  var costFunc = function(x) {
+    return  -0.0000006589793725*Math.pow(x,10) -0.000002336381414*Math.pow(x,9) +0.00009925769823*Math.pow(x,8)+
+  0.0001763353131*Math.pow(x,7)-0.004660305277*Math.pow(x,6)-0.004290746384*Math.pow(x,5)+0.06855725903*Math.pow(x,4)+
+  0.03719817227*Math.pow(x,3)+0.4554696705*Math.pow(x,2)-0.08305450359*x+0.3020594956;
+  };
+  var cost;
+
+  /* If it's above 6.8, but below moveCutoff, then we use an additional formula because the current one
+  has an odd shape to it where it goes sharply negative after 6.8  I know this appears janky, but after messing with other potential 
+  regression formulas, I can't get any single one to match both the overall shape, and certainly specific Y values I want. So this seems like best option.
+  */
+  if (x > 6.8 && x <= params.moveCutoff) {
+    return costFunc(6.8) + ((x-6.8) *3 );
+  }else{
+    cost = costFunc(x);
+    cost += colorRules(n1,n2,f1,f2);
+    return cost;
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+},{"./CostAlgorithmParameters.js":3}],3:[function(require,module,exports){
+var mod = module.exports;
+
+mod.moveCutoff = 7.5;
+
+mod.color = {
+  0: 'White',
+  1: 'Black',
+  2: 'White',
+  3: 'Black',
+  4: 'White',
+  5: 'White',
+  6: 'Black',
+  7: 'White',
+  8: 'Black',
+  9: 'White',
+  10: 'Black',
+  11: 'White'
+};
+
+mod.fingDistance = {
+  '1,1': 0,
+  '1,2': 2,
+  '1,3': 3.5, // Making an allowance since this seriously is either 3 or 4 about half the time.
+  '1,4': 5,
+  '1,5': 7,
+  '2,1': 2,
+  '2,2': 0,
+  '2,3': 2,
+  '2,4': 3.5,  // Same
+  '2,5': 5,
+  '3,1': 3.5, // Same
+  '3,2': 2,
+  '3,3': 0,
+  '3,4': 2,
+  '3,5': 3.5, // Same
+  '4,1': 5,
+  '4,2': 3.5, // Same
+  '4,3': 2,
+  '4,4': 0,
+  '4,5': 2,
+  '5,1': 7,
+  '5,2': 5,
+  '5,3': 3.5, // Same
+  '5,4': 2,
+  '5,5': 0
+};
+
+var makeMoveHash = mod.makeMoveHash = function(fixedCost) {
+  var moveHash = {
+    1 : 0,
+    2 : 0.5,
+    3 : 1.8,
+    4 : 3,
+    5 : 5,
+    6 : 7,
+    7 : 8,
+    8 : 8.9,
+    9 : 9.7,
+    10 : 10.5,
+    11 : 11,
+    12 : 11.4,
+    13 : 11.8,
+    14 : 12.2,
+    15 : 12.5,
+    16 : 12.8,
+    17 : 13.1,
+    18 : 13.4,
+    19 : 13.7,
+    20 : 14,
+    21 : 14.3,
+    22 : 14.6,
+    23 : 14.9,
+    24 : 15.2,
+  };
+  for (var each in moveHash) {
+    moveHash[each] += fixedCost;
+  }
+  return moveHash;
+};
+mod.moveHash = makeMoveHash(4);
+
+mod.descThumbStretchVals = {
+  '1,2' : 1,
+  '1,3' : 1,
+  '1,4' : 0.9,
+  '1,5' : 0.95
+};
+
+mod.ascThumbStretchVals = {
+  '2,1' : 0.95,
+  '3,1' : 1,
+  '4,1' : 0.95,
+  '5,1' : 0.95
+};
+
+mod.fingStretch = {
+  '1,1' : 0.8,
+  '1,2' : 1.15,
+  '1,3' : 1.4,
+  '1,4' : 1.45,
+  '1,5' : 1.6,
+  '2,1' : 1.15,
+  '2,2' : 0.6,
+  '2,3' : 0.9,
+  '2,4' : 1.15,
+  '2,5' : 1.3,
+  '3,1' : 1.4,
+  '3,2' : 0.9,
+  '3,3' : 0.6,
+  '3,4' : 0.9,
+  '3,5' : 1.15,
+  '4,1' : 1.45,
+  '4,2' : 1.15,
+  '4,3' : 0.9,
+  '4,4' : 0.7,
+  '4,5' : 0.7,
+  '5,1' : 1.6,
+  '5,2' : 1.3,
+  '5,3' : 1.15,
+  '5,4' : 0.8,
+  '5,5' : 0.6
+};
+
+},{}],4:[function(require,module,exports){
+var helpers = require('./FingeringAlgorithmHelpers.js');
+
+module.exports.FingeringAlgorithm = function(midiData) {
+ // This whole thing is an example of Viterbi's algorithm, if you're curious.
+
+  var dataWithStarts = helpers.addStartTimes(midiData);
+  // This checks if we already have the best path data for that song on the client.
+  // TODO: Refactor into better response object that wouldn't need iteration
+  app.preComputed = app.preComputed || [];
+  for (var i = 0; i < app.preComputed.length; i++) {
+    if (app.preComputed[i].title === app.currentSong) {
+      var bestPath = app.preComputed[i].BestPathObj;
+      helpers.distributePath(bestPath, dataWithStarts);
+      return;
+    }
+  }
+  var noteTrellis = helpers.makeNoteTrellis(dataWithStarts);
+
+  // Traversing forward, computing costs and leaving our best path trail
+  // Go through each layer (starting at 2nd, because first is just endCap)
+  for (var layer = 1; layer < noteTrellis.length; layer++) {
+    // Go through each node in each layer
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {
+      var min = Infinity;
+      // Go through each node in prev layer.
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {
+        var curNode = noteTrellis[layer][node1];
+        var prevNode = noteTrellis[layer-1][node2];
+        var totalCost = prevNode.nodeScore || 0;
+        var curData = helpers.getSplitData(curNode);
+        var prevData = helpers.getSplitData(prevNode);
+
+        var curRH = curData.right;
+        var prevRH = prevData.right;
+        // If you have something in a given hand, we have to compare it with the last thing in that hand.
+        // So if the layer directly previous has nothing, we keep tracing back till we find it.
+        if (curRH.notes.length > 0) {
+          var counter = 2;
+          var tempPrevNode = prevNode;
+          while (prevRH.notes.length === 0) {
+            var bestPrevious = tempPrevNode.bestPrev;
+            var prevBestNode = noteTrellis[layer-counter][bestPrevious];
+            prevRH = helpers.getSplitData(prevBestNode).right;
+            counter++;
+            tempPrevNode = prevBestNode;
+          }
+        }
+        var curLH = curData.left;
+        var prevLH = prevData.left;
+        if (curLH.notes.length > 0) {
+          var counter = 2;
+          var tempPrevNode = prevNode;
+          while (prevLH.notes.length === 0) {
+            var bestPrevious = tempPrevNode.bestPrev;
+            var prevBestNode = noteTrellis[layer-counter][bestPrevious];
+            prevLH = helpers.getSplitData(prevBestNode).left;
+            counter++;
+            tempPrevNode = prevBestNode;
+          }
+        }
+
+        var RHCost = helpers.calcCost(curRH, prevRH, curLH, 'RH');
+        var LHCost = helpers.calcCost(curLH, prevLH, curRH, 'LH');
+
+        totalCost += RHCost + LHCost;
+
+
+        if (totalCost < min) {
+          min = totalCost;
+          curNode.nodeScore = totalCost;
+          curNode.bestPrev = node2;
+        }
+      }
+
+    }
+  }
+  /* Now we need to go backwards and collect the best path.
+  the currentNode variable is initialized to be the lowest score of the final layer.*/
+  var currentNode = helpers.findMin(noteTrellis[noteTrellis.length-1]);
+
+  /* From this point, we put the finger for that node in the array, then we track back to it's
+  best previous node, record it's finger, and repeat till we get to the end.
+  We set the continuation condition to be greater than zero, because we don't actually want zero,
+  since zero is just our start object.*/
+
+  var bestPathObj = {};
+  for (var j = noteTrellis.length-1; j > 0; j--) {
+    var nodeObj = noteTrellis[j][currentNode];
+    var fingers = nodeObj.fingers;
+    var notes = nodeObj.notes;
+    for (var k = 0; k < notes.length; k++) {
+      var note = notes[k][0];
+      var startTime = notes[k][1];
+      var finger = fingers[k];
+      var key = note + ',' + startTime;
+      bestPathObj[key] = finger;
+    }
+    currentNode = nodeObj.bestPrev;
+  }
+
+  // Was using this as simple way post songs to our Database. Didn't want to write a whole form yet.
+  // and don't want to allow arbitrary songs to get posted.
+
+  // $.post('http://localhost:3000/upload',
+  // {
+  //   title: 'Yesterday',
+  //   artist: 'The Beatles',
+  //   BestPathObj: bestPathObj,
+  // });
+
+  helpers.distributePath(bestPathObj, dataWithStarts);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+},{"./FingeringAlgorithmHelpers.js":5}],5:[function(require,module,exports){
+var RHcostDb = require('./CostAlgorithm.js').createCostDatabase();
+var LHcostDb = require('./LHCostAlgorithm.js').createLHCostDatabase();
+
+var mod = module.exports;
+
+mod.notes = {0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F', 6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'};
+
+var getAllFingerOptions = function(numFingers) {
+  var results = [];
+  var fingOptions = [-5,-4,-3,-2,-1,1,2,3,4,5];
+
+  var walker = function(numFingers, currentFingers, fingerOptions) {
+    if (currentFingers.length === numFingers) {
+      results.push(currentFingers.slice());
+      return;
+    }
+
+    for (var i = 0; i < fingerOptions.length; i++) {
+      currentFingers.push(fingerOptions[i]);
+      var current = currentFingers;
+      var temp = fingerOptions.slice();
+      temp.splice(0,i+1);
+      walker(numFingers,current, temp);
+      currentFingers.pop();
+    }
+  };
+  walker(numFingers, [], fingOptions);
+  return results;
+};
+//initialize finger options object
+var allFingerOptions = {};
+for (var i = 1; i <=10; i++) {
+  allFingerOptions[i] = getAllFingerOptions(i);
+}
+
+var endCap = [
+  {notes: ['e','e'], fingers: [1,-1]}
+];
+
+var makeNoteNode = function(notes, fingers) {
+  //the notes and fingers property can have either one or multiple notes. 
+  this.notes = notes;     //this is an array of array pairs, with notes and startTimes.
+  this.fingers = fingers; // this is an array of finger options. 
+  this.nodeScore = 0;
+  this.bestPrev = undefined;
+};
+
+var makeLayer = function(notes) {
+  var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
+  var layer = [];
+  var options = allFingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
+  for (var i = 0; i < options.length; i++) {
+    var fingerChoice = options[i];
+    var node = new makeNoteNode(sortedNotes, fingerChoice);
+    layer.push(node);
+  }
+  return layer;
+};
+
+var makeLHLayer = function(notes) {
+  var sortedNotes = notes.sort(function(a,b) {return a[0]-b[0]});
+  var layer = [];
+  var options = LHfingerOptions[sortedNotes.length]; // this grabs the appropriate list of options. 
+  for (var i = 0; i < options.length; i++) {
+    var fingerChoice = options[i];
+    var node = new makeNoteNode(sortedNotes, fingerChoice);
+    layer.push(node);
+  }
+  return layer;
+};
+
+var findNoteHolder = function(curPlaying, note) {
+  for (var i = 0; i < curPlaying.length; i++) {
+    if (curPlaying[i][0] === note) {
+      return i;
+    }
+  }
+};
+
+mod.makeNoteTrellis = function(midiData) {
+  // debugger;
+  var curPlaying = [];
+  var lastWasOn = false;
+  var trellis = [];
+  trellis.push(endCap); //this is convenience so we don't have to have special conditions for the traversal loop
+
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    var note = eventData.noteNumber;
+    var newLayer, notePlace; 
+    if (eventData.subtype === 'noteOn') {
+      var startTime = eventData.startTime;
+      curPlaying.push([note, startTime]);
+      lastWasOn = true;
+    }
+    if (eventData.subtype === 'noteOff') {
+      if (lastWasOn) {
+        //must pass it a copy of curPlaying, or else everythang gits all messed up
+        newLayer = makeLayer(curPlaying.slice());
+        trellis.push(newLayer);
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }else {
+        notePlace = findNoteHolder(curPlaying, note);
+        curPlaying.splice(notePlace, 1);
+        lastWasOn = false;
+      }
+    }
+  }
+  return trellis;
+};
+
+var computeRHCost = function(n1, n2, f1, f2) {
+  if (n1 === 'e' || n2 === 'e') {
+    return 0;
+  }
+  var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
+  var cost = RHcostDb[key];
+  var distBelowC = 60-n2;
+  cost += distBelowC > 0 ? distBelowC : 0; //this is for giving a slight tax to the left hand being above middle c.
+  return cost;
+};
+
+var computeLHCost = function(n1, n2, f1, f2) {
+  if (n1 === 'e' || n2 === 'e') {
+    return 0;
+  }
+  f1 = Math.abs(f1);
+  f2 = Math.abs(f2);
+  var key = n1 + ',' + n2 + ',' + f1 + ',' + f2;
+  var cost = LHcostDb[key];
+  var distAboveC = n2 - 60; 
+  cost += distAboveC > 0 ? distAboveC : 0; //this is for giving a slight tax to the left hand being above middle c.
+  return cost;
+};
+
+mod.findMin = function(layer) {
+  var minNode;
+  var minScore = Infinity;
+  for (var node = 0; node < layer.length; node++) {
+    if (layer[node].nodeScore < minScore) {
+      minScore = layer[node].nodeScore;
+      minNode = node;
+    }
+  }
+  return minNode;
+};
+
+mod.distributePath = function(bestPathObj, midiData) {
+  var nowPlaying = {};
+  for (var each in bestPathObj) {
+    bestPathObj[each] = +bestPathObj[each];
+  }
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    var note = eventData.noteNumber;
+    if (eventData.subtype === 'noteOn') {
+      var startTime = eventData.startTime;
+      var key = note + ',' + startTime;
+      var finger = bestPathObj[key];
+      eventData.finger = finger;
+      nowPlaying[note] = finger;// Adding current note to nowPlaying object. Will overwrite previous fingering of same note, which is what we want.
+    }
+    if (eventData.subtype === 'noteOff') {
+      eventData.finger = nowPlaying[note]; // This gets the same finger from the noteOn event that 'caused' this noteOff event.
+    }
+  }
+};
+
+mod.addStartTimes = function(midiData) {
+  var curStartTime = 0;
+  for (var pair = 0; pair < midiData.length; pair++) {
+    var eventData = midiData[pair][0].event;
+    if (eventData.subtype === 'noteOff') {
+      curStartTime += eventData.deltaTime;  //deltaTime is really 'ticksToNextEvent'
+    }else if(eventData.subtype === 'noteOn') {
+      eventData.startTime = curStartTime;
+      curStartTime += eventData.deltaTime;
+    }
+  }
+  return midiData;
+};
+
+mod.getSplitData = function(node) {
+  var result = {
+    right: {
+      notes: [],
+      fingers:[]
+    },
+    left: {
+      notes: [],
+      fingers:[]
+    }
+  };
+  for (var i = 0; i < node.fingers.length; i++) {
+    if (node.fingers[i] > 0) {
+      result.right.fingers.push(node.fingers[i]);
+      result.right.notes.push(node.notes[i]);
+    }else {
+      result.left.fingers.push(node.fingers[i]);
+      result.left.notes.push(node.notes[i]);
+    }
+  }
+  return result;
+};
+
+mod.calcCost = function(curNode, prevNode, otherHandCurNode, whichHand) {
+  var costFunction = whichHand === 'RH' ? computeRHCost : computeLHCost;
+  var totalCost = 0;
+  // If curNode has nothing, then that means there are no immediate notes to try out for that same hand. Thus it's temporarily only right or only left.
+  // We need to return what the cost would be to move to that other note. (ie. if your left hand doens't need to play anything,
+  // but your right hand is playing a note 2 octaves up, we should return that cost of the left hand jumping up to play that right hand note.)
+
+  for (var i = 0; i < curNode.notes.length; i++) {       // Go through each note in the current Node
+    var curNote = curNode.notes[i][0];  // This grabs just the note, because the notes property has pairs of values. First is note, second is starTime.
+    var curFinger = curNode.fingers[i];
+    var hasNextNote = curNode.notes[i+1] || false;
+    var nextFinger = curNode.fingers[i+1];
+    if(hasNextNote) {
+      // This helps add the "state" cost of actually using those fingers for that chord. This isn't captured by the transition costs 
+      totalCost += costFunction(curNote, hasNextNote[0], curFinger, nextFinger);
+    }else {
+      totalCost += whichHand === 'RH' ? 60 - curNote : curNote - 60; // This adds a 'stateCost' for one note that helps seperate the hands where they should be.
+    }
+    for (var j = 0; j < prevNode.notes.length; j++) {   // Add up scores for each of the previous nodes notes trying to get to current node note.
+      var prevNote = prevNode.notes[j][0];
+      var prevFinger = prevNode.fingers[j];
+
+      var transCost = costFunction(prevNote, curNote, prevFinger, curFinger);
+      totalCost += transCost;
+    }
+  }
+  return totalCost;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+},{"./CostAlgorithm.js":1,"./LHCostAlgorithm.js":6}],6:[function(require,module,exports){
+var params = require('./CostAlgorithmParameters.js');
+var helpers = require('./CostAlgorithmHelpers.js');
+
+var LHcostAlgorithmRouter = function(n1, n2, f1, f2, costDatabase) {
+  var key = n1.toString() + ',' + n2.toString() + ',' + f1.toString() + ',' + f2.toString();
+  var noteD = Math.abs(n2-n1);
+  var fingD = helpers.fingerDistance(f1,f2);
+
+  // Handles cases where the note is ascending or descending and you're using the same finger. That's move formula
+  // it doesn't matter whether we send it to ascMoveFormula or descMoveFormula, since in either case, FingD is zero.
+  if (noteD > 0 && f2-f1 === 0) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD, n1, n2);
+  }
+  // Handles descending notes and descending fingers, but f2 isn't thumb
+  // means you're crossing over. Bad idea. Only plausible way to do this is picking your hand up. Thus move formula
+  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 !== 1) {
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD);
+  }
+  // This handles ascending notes with ascending fingers where f1 isn't thumb
+  // means your crossing over. Same as above. Only plausible way is picking hand up, so move formula.
+  else if (n2 - n1 > 0 && f2-f1 > 0 && f1 !== 1){
+    costDatabase[key] = helpers.ascMoveFormula(noteD, fingD);
+  }
+  // This handles descending notes, where you start on a finger that isn't your thumb, but you land on your thumb. 
+  // thus bringing your thumb under. 
+  else if (n2 - n1 <= 0 && f2-f1 < 0 && f2 === 1) {
+    costDatabase[key] = helpers.ascThumbCost(noteD, fingD, n1, n2, f1, f2);
+  }
+  // This handles ascending notes, where you start on your thumb, but don't end with it. Thus your crossing over your thumb.
+  else if (n2 - n1 >= 0 && f1 === 1 && f2 !== 1) {
+    costDatabase[key] = helpers.descThumbCost(noteD, fingD, n1, n2, f1, f2);
+  }
+  // This handles ascending or same note, with descending fingers or it takes descending notes with ascending fingers
+  // to be clear... only remaining options are (n2-n1 >= 0 && f2-f1 < 0 || n2-n1 <= 0 && f2-f1 > 0)
+  else {
+    var stretch = helpers.fingerStretch(f1,f2);
+    var x = Math.abs(noteD - fingD) / stretch;
+    if (x > params.moveCutoff) {
+      costDatabase[key] = helpers.descMoveFormula(noteD, fingD);
+    }else{
+      costDatabase[key] = helpers.ascDescNoCrossCost(noteD,fingD,x,n1,n2,f1,f2);
+    }
+  }
+};
+
+var createLHCostDatabase = module.exports.createLHCostDatabase = function() {
+  var LHcostDatabase = {};
+  for (var finger1 = 1; finger1 <=5; finger1++) {
+    for (var note1 = 21; note1 < 109; note1++) { // in MIDI land, note 21 is actually the lowest note on the piano, and 109 is the highest.
+      for (var finger2 = 1; finger2 <= 5; finger2++) {
+        for (var note2 = 21; note2 < 109; note2++) {
+          LHcostAlgorithmRouter(note1, note2, finger1, finger2, LHcostDatabase);
+        }
+      }
+    }
+  }
+  return LHcostDatabase;
+};
+},{"./CostAlgorithmHelpers.js":2,"./CostAlgorithmParameters.js":3}],7:[function(require,module,exports){
+var KeyboardDesign = require('./Visuals/Piano/KeyboardDesign.js').KeyboardDesign;
+var Keyboard = require('./Visuals/Piano/Keyboard.js').Keyboard;
+var RightHand = require('./Visuals/Hands/Right/RightHand.js').RightHand;
+var LeftHand = require('./Visuals/Hands/Left/LeftHand.js').LeftHand;
+var Scene = require('./Visuals/Scene.js').Scene;
+var createDb = require('./Algorithms/CostAlgorithm').createCostDatabase;
+var fingeringAlgo = require('./Algorithms/FingeringAlgorithm.js').FingeringAlgorithm;
+var PlayControls = require('./PlayControls.js').PlayControls;
+
+module.exports.App = function() {
+  // Instantiate piano and hand
+  this.keyboardDesign = new KeyboardDesign();
+  this.keyboard = new Keyboard(this.keyboardDesign);
+  this.rightHand = new RightHand(this.keyboard);
+  this.leftHand = new LeftHand(this.keyboard);
+  this.player = MIDI.Player;
+
+  // Maintains proper binding if later function gets called outside this scope
+  var _this = this;
+
+  // This callback fires every time the MIDI.js library 'player' object registers a MIDI event of any kind.
+  this.player.addListener(function(data) {
+    var rightHand = _this.rightHand;
+    var leftHand = _this.leftHand;
+    var NOTE_ON = 144;
+    var NOTE_OFF = 128;
+    var note = data.note;
+    var message = data.message;
+    var finger = data.finger;
+
+    if (message === NOTE_ON) {
+      _this.keyboard.press(note);
+      if (finger > 0) {
+        rightHand.press(finger, note);
+      }else {
+        leftHand.press(finger, note);
+      }
+    }else if(message === NOTE_OFF) {
+      _this.keyboard.release(note);
+      if (finger > 0) {
+        rightHand.release(finger);
+      }else {
+        leftHand.release(finger);
+      }
+    }
+  });
+
+  this.player.setAnimation({
+    delay: 20,
+    callback: function(data) {
+      var current = data.now;
+      var total = data.end;
+      _this.playControls.displayProgress(current, total);
+    }
+  });
+
+  this.loadMidiFile = function(midiFile, newStartPercent) {
+    // Just calls loadFile from the MIDI.js library, which kicks off a few calls to parse the MIDI data.
+    var _this = this;
+    this.player.loadFile(midiFile, function() {
+      _this.playControls.setCurrentTime(newStartPercent);
+    });
+  };
+
+  this.upload = function(file) {
+    var _this = this;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var midiFile = e.target.result;
+      _this.loadMidiFile(midiFile);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  this.initScene = function() {
+    var _this = this;
+    this.scene = new Scene('#canvas');
+    this.scene.add(this.keyboard.model);
+    this.scene.add(this.rightHand.model);
+    this.scene.add(this.leftHand.model);
+    this.scene.animate(function() {
+      _this.keyboard.update();
+      _this.rightHand.update();
+      _this.leftHand.update();
+      TWEEN.update();
+    });
+  };
+
+  this.initMIDI = function(callback) {
+    MIDI.loadPlugin(function() {
+      MIDI.channels[9].mute = true;
+      if (typeof callback === 'function') {
+        callback();
+      }
+    });
+  };
+
+  this.initPlayControls = function(container, app) {
+    _this.playControls = new PlayControls(container, app);
+  };
+
+  this.fingeringAlgorithm = function() {
+    fingeringAlgo(_this.player.data);
+  };
+};
+
+},{"./Algorithms/CostAlgorithm":1,"./Algorithms/FingeringAlgorithm.js":4,"./PlayControls.js":9,"./Visuals/Hands/Left/LeftHand.js":14,"./Visuals/Hands/Right/RightHand.js":20,"./Visuals/Piano/Keyboard.js":26,"./Visuals/Piano/KeyboardDesign.js":27,"./Visuals/Scene.js":29}],8:[function(require,module,exports){
+var App = require('./App.js').App;
+$(document).on('ready', function() {
+  var app = window.app = new App();
+  console.log("Hey trying to init!!!")
+  app.initMIDI(function() {
+    app.initScene();
+    $.ajax({
+      url: '/getAllPaths',
+      dataType: 'json',
+      success: function(data) {
+        app.preComputed = data;
+        app.initPlayControls($('.main-container'), app);
+
+        //Triggers a click for first song.
+        $($('.player-songList > li')[0]).trigger('click');
+      },
+      error: function(error) {
+        // Initialize the app anyway. This route is just for getting cached values.
+        app.initPlayControls($('.main-container'), app);
+
+        //Triggers a click for first song.
+        $($('.player-songList > li')[0]).trigger('click');
+      }
+    });
+
+  });
+});
+
+
+
+},{"./App.js":7}],9:[function(require,module,exports){
+module.exports.PlayControls = function(container, app) {
+  var $container = $(container);
+  var $songListContainer = $('.player-songListContainer');
+  var $controlsContainer = $('.player-controls');
+  var $progressContainer = $('.player-progress-container');
+
+  var $progressBar = $('.player-progress-bar');
+  var $progressText = $('.player-progress-text');
+  var $songList = $('.player-songList');
+  var $song = $('.song');
+  var $tempoChanger = $('.tempo-changer');
+  var $playBtn = $('.player-playBtn');
+  var $pauseBtn = $('.player-pauseBtn');
+  var $currentSong = $('.current-song')
+
+  var _this = this;
+
+  //Set up all helper functions
+  this.play = function() {
+    $playBtn.hide();
+    $pauseBtn.show();
+    _this.playing = true;
+    app.player.resume();
+  };
+
+  this.playHandler = function() {
+    if (_this.playing === false) {
+      _this.resume();
+    }else {
+      _this.play();
+    }
+  };
+
+  this.pauseHandler = function() {
+    _this.pause();
+  };
+
+  this.songListHandler = function(event) {
+    var $target = $(event.target);
+    var trackName = $target.text();
+    $currentSong.text(trackName);
+    _this.playing = false;
+    app.currentSong = trackName;
+    $.ajax({
+      url: '/songs/'+trackName,
+      dataType: 'text',
+      success: function(data) {
+        app.loadMidiFile(data, 0);
+      }
+    });
+  };
+
+  this.resume = function() {
+    $playBtn.hide();
+    $pauseBtn.show();
+    app.player.currentTime += 1e-6; // Bug fix in MIDI.js
+    _this.playing = true;
+    app.player.resume();
+  };
+
+  this.stop = function() {
+    app.player.stop();
+    _this.playing = false;
+  };
+
+  this.progressHandler = function(event){
+    var progressPercent = (event.clientX - $progressContainer.offset().left) / $progressContainer.width();
+    _this.setCurrentTime(progressPercent);
+  };
+
+  this.tempoHandler = function(event) {
+    var $target = $(event.target);
+    var timeWarp = $target.find('input').attr('data-timeWarp');
+    app.player.timeWarp = timeWarp;
+    var trackName = app.currentSong;
+    $.ajax({
+      url: '/songs/'+trackName,
+      dataType: 'text',
+      success: function(data) {
+        var currentProgress = $progressBar.width()/$progressContainer.width();
+        app.loadMidiFile(data,  currentProgress);
+      }
+    });
+  };
+
+  this.pause = function() {
+    _this.playing = false;
+    $playBtn.show();
+    $pauseBtn.hide();
+    app.player.pause();
+    _this.resume();
+  };
+
+  this.getEndTime = function() {
+    return app.player.endTime;
+  };
+
+  this.displayProgress = function(current, total) {
+    var percent = current/total;
+    var newWidth = Math.floor(percent*$progressContainer.width());
+    $progressBar.width(newWidth);
+  };
+
+  this.setCurrentTime = function(progressPercent) {
+    var currentTime = app.player.endTime * progressPercent;
+    app.player.currentTime = currentTime;
+  };
+
+  //Set up all click handlers
+  $playBtn.on('click', _this.playHandler);
+  $pauseBtn.on('click', _this.pauseHandler);
+  $songList.on('click', _this.songListHandler);
+  $progressContainer.on('click', _this.progressHandler);
+  $tempoChanger.on('click', _this.tempoHandler);
+};
+
+},{}],10:[function(require,module,exports){
+// This is our 'Dummy' finger, so that we can book-end the Hand 'children' arrays, and not have to write janky neighbor note code.
+var Dummy = module.exports.Dummy = function() {
+  var Geometry = new THREE.CubeGeometry(1,1,1);
+  var Material = new THREE.MeshLambertMaterial({color: 0x0000});
+  var Position = new THREE.Vector3(0, 0, 0);
+  this.model = new THREE.Mesh(Geometry, Material);
+  this.model.position.copy(Position);
+  this.model.visible = false;
+};
+
+},{}],11:[function(require,module,exports){
+var params = require('./FingerMoveParams.js').params;
+
+module.exports.Finger = function(Keyboard) {
+  var pressAmount = 0.6;
+  this.originalY = 0.2; // This is just a default. each finger will actually overwrite this as necessary.
+  this.pressedY = this.originalY - pressAmount;
+  this.releaseSpeed = 0.05;
+  this.moveSpeed = 0.1;
+  var keyboard = Keyboard;
+  this.distances = params(keyboard);
+
+  this.press = function(note) {
+    this.moveToNote(note);
+    this.model.position.y = this.pressedY;
+    this.isPressed = true;
+  };
+  this.release = function() {
+    this.isPressed = false;
+  };
+
+  this.moveToNote = function(noteNum) {
+    this.currentPos.x = this.model.position.x;
+    this.currentPos.y = this.model.position.y;
+    this.currentPos.z = this.model.position.z;
+    
+    // Logic about checking to see if neighbor is already on the note you want to play. 
+    var aboveNeighbor = this.model.parent.children[this.number+1].currentNote;
+    var belowNeighbor = this.model.parent.children[this.number-1].currentNote;
+    if (noteNum > this.model.currentNote) {
+      if (aboveNeighbor === noteNum) {
+        this.model.currentNote = noteNum-1;
+      }else {
+        this.model.currentNote = noteNum;
+      }
+    }
+    else if (noteNum < this.model.currentNote) {
+      if(belowNeighbor === noteNum) {
+        this.model.currentNote = noteNum+1;
+      }else {
+        this.model.currentNote = noteNum;
+      }
+    }
+
+    this.setNewPos(this.model.currentNote);
+    this.setUpNewTween();
+  };
+
+  this.update = function() {
+    if (this.model.position.y < this.originalY && this.isPressed === false) {
+      var offset = this.originalY - this.model.position.y;
+      this.model.position.y += Math.min(offset, this.releaseSpeed);
+    }
+  };
+
+  // Just initializing values here. They'll get overwritten immediately;
+  this.currentPos = {
+    x: 0,
+    y: 0,
+    z: 0
+  };
+
+  this.newPos = {
+    x: 0,
+    y: 0,
+    z: 0
+  };
+
+  this.setNewPos = function(noteNum) {
+    this.newPos.x = keyboard.model.children[noteNum-21].position.x;
+    this.newPos.y = keyboard.keys[noteNum].model.position.y + this.originalY;
+    this.newPos.z = keyboard.keys[noteNum].model.position.z + 0.5;
+  };
+
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y+0.1;
+      _this.model.position.z = _this.currentPos.z;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+  this.setUpPressReleaseTween = function() {
+    //TO DO
+  };
+};
+
+},{"./FingerMoveParams.js":12}],12:[function(require,module,exports){
+module.exports.params = function(keyboard) {
+  // Should contain distance from one note to another, in half steps;
+  var distances = {};
+  distances.get = function(note1, note2) {
+    // We add in the +21 to offset the fact that the notes got stripped to an 88 key keyboard, and yet, MIDI notes act as if note 0 on the keyboard
+    // is note no. 21
+    return keyboard.model.children[note2-21].position.x - keyboard.model.children[note1-21].position.x;
+  };
+  return distances;
+};
+
+},{}],13:[function(require,module,exports){
+module.exports.HandDesign = function(keyboard) {
+  // Pinky specs
+  this.pinkyWidth = 0.14;
+  this.pinkyHeight = 0.1;
+  this.pinkyLength = 0.57;
+  this.pinkyColor = 0xFF0000;
+
+  // Ring finger specs
+  this.ringFingerWidth = 0.18;
+  this.ringFingerHeight = 0.1;
+  this.ringFingerLength = 0.61;
+  this.ringFingerColor = 0x006600;
+
+  // Middle finger specs
+  this.middleFingerWidth = 0.185;
+  this.middleFingerHeight = 0.1;
+  this.middleFingerLength = 0.7;
+  this.middleFingerColor = 0x0033FF;
+
+  // Index finger specs
+  this.indexFingerWidth = 0.188;
+  this.indexFingerHeight = 0.1;
+  this.indexFingerLength = 0.60;
+  this.indexFingerColor = 0xFFFF00;
+
+  // Thumb specs
+  this.thumbWidth = 0.175;
+  this.thumbHeight = 0.1;
+  this.thumbLength = 0.5;
+  this.thumbColor = 0xFF33FF;
+
+  this.keyboard = keyboard;
+  this.keyboardHeight = 0.22;
+};
+},{}],14:[function(require,module,exports){
+var LeftPinky        = require('./LeftPinky.js').LeftPinky;
+var LeftRing         = require('./LeftRing.js').LeftRing;
+var LeftMiddle     = require('./LeftMiddle.js').LeftMiddle;
+var LeftIndex       = require('./LeftIndex.js').LeftIndex;
+var LeftThumb    = require('./LeftThumb.js').LeftThumb;
+var HandDesign  = require('../HandDesign.js').HandDesign;
+var Dummy          = require('../Dummy.js').Dummy;
+
+module.exports.LeftHand = function(keyboard) {
+  var _this = this;
+  // We're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60", wherever it is.
+  var handDesign = new HandDesign(keyboard);
+  var pinky = new LeftPinky(handDesign, 'left');
+  var ring = new LeftRing(handDesign, 'left');
+  var middle = new LeftMiddle(handDesign, 'left');
+  var index = new LeftIndex(handDesign, 'left');
+  var thumb = new LeftThumb(handDesign, 'left');
+  var dummy1 = new Dummy();
+  var dummy2 = new Dummy();
+
+  this.fingers = [];
+  this.model = new THREE.Object3D();
+
+  // Add fingers to hand model
+  this.fingers.push(undefined); // These are here to make off by 1 errors go away. We want finger 1 to be thumb so that semantically it makes sense)
+  this.model.add(dummy1.model)
+  dummy1.model.currentNote = -1;
+
+  this.model.add(thumb.model);
+  this.fingers.push(thumb);
+  thumb.model.currentNote = 1;
+
+  this.model.add(index.model);
+  this.fingers.push(index);
+  index.model.currentNote = 1;
+
+  this.model.add(middle.model);
+  this.fingers.push(middle);
+  middle.model.currentNote = 1;
+
+  this.model.add(ring.model);
+  this.fingers.push(ring);
+  ring.model.currentNote = 1;
+
+  this.model.add(pinky.model);
+  this.fingers.push(pinky);
+  pinky.model.currentNote = 1;
+
+  this.model.add(dummy2.model);
+  dummy2.model.currentNote = 110;
+
+  thumb.moveToNote(55);
+  index.moveToNote(53);
+  middle.moveToNote(52);
+  ring.moveToNote(50);
+  pinky.moveToNote(48);
+
+  //set position of hand
+  this.model.position.y -= 0.22 / 2;  // the 0.22 is the keyboard height (defined in KeyboardDesign.js)
+
+  this.model.traverse(function(object) {
+    object.position.x -= 4.45;
+  });
+
+
+  this.offSet = 0.2222;
+
+  this.press = function(finger, noteNum) {
+    finger = Math.abs(finger);
+    var newPosition = keyboard.keys[noteNum].model.position.x;
+    for (var i = 1; i <= 5; i++) {
+      if (i === finger) {
+        _this.fingers[i].press(noteNum);
+      }else{
+        _this.fingers[i].moveAsNeeded(finger, newPosition, noteNum);
+      }
+    }
+  };
+
+  this.release = function(finger) {
+    finger = Math.abs(finger);
+      _this.fingers[finger].release();
+  };
+
+  this.update = function() {
+    var fingers = _this.fingers;
+    for (var i = 1; i < fingers.length; i++) {
+      fingers[i].update();
+    }
+  };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+},{"../Dummy.js":10,"../HandDesign.js":13,"./LeftIndex.js":15,"./LeftMiddle.js":16,"./LeftPinky.js":17,"./LeftRing.js":18,"./LeftThumb.js":19}],15:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var LeftIndex = module.exports.LeftIndex = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
+  var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
+  var indexFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
+  this.model.position.copy(indexFingerPosition);
+  this.originalY = indexFingerPosition.y;
+  this.number = 2;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 4:
+      this.ringRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta, curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta, curX, curNote, newNote);
+      break;
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-8) && delta <= dist.get(curNote, curNote-4)) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote + 5);
+    }
+  };
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-6) && delta <= dist.get(curNote, curNote-4) ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-5) && delta <= dist.get(curNote, curNote-1) ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 4);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 4) ) {
+      return;
+    }else if (delta > dist.get(curNote, curNote-3) && delta < 0) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote - 2), 100);
+    }
+    else {
+      this.moveToNote(newNote - 2);
+    }
+  };
+};
+
+LeftIndex.prototype = Object.create(Finger.prototype);
+LeftIndex.prototype.constructor = LeftIndex;
+
+},{"../Finger.js":11}],16:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var LeftMiddle = module.exports.LeftMiddle = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
+  var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
+  var middleFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
+  this.model.position.copy(middleFingerPosition);
+  this.originalY = middleFingerPosition.y;
+  this.number = 3;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 4:
+      this.ringRules(delta, curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta, curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta, curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-5) && delta < dist.get(curNote, curNote-3) ) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote+3);
+    }
+  };
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-4) && delta < dist.get(curNote, curNote-1) ) {
+      return;
+    }else {
+      this.moveToNote(newNote+2);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote+3) ) {
+      return;
+    }else {
+      this.moveToNote(newNote-2);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote+6) ) {
+      return;
+    } else if (delta > dist.get(curNote, curNote-4) && delta < 0) {    // This is the thumb crossing under
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-3), 100); // This is so you have some delay before the fingers move back over the thumb. A tad more realistic
+    }
+    else {
+      this.moveToNote(newNote-3);
+    }
+  };
+};
+
+LeftMiddle.prototype = Object.create(Finger.prototype);
+LeftMiddle.prototype.constructor = LeftMiddle;
+
+},{"../Finger.js":11}],17:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var LeftPinky = module.exports.LeftPinky = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
+  var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
+  var pinkyPosition = new THREE.Vector3(0, 0.20, 0.54);
+  this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
+  this.model.position.copy(pinkyPosition);
+  this.originalY = pinkyPosition.y;
+  this.number = 5;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 4:
+      this.ringRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX, curNote, newNote);
+    }
+  };
+
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote+3)) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 5) ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 7) ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote + 12) ) {
+      return;
+    } else if (delta > 0 && delta <= dist.get(curNote, curNote + 1) ) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-7), 100);
+    }
+    else {
+      this.moveToNote(newNote-7);
+    }
+  };
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y +0.1;
+      _this.model.position.z = _this.currentPos.z + 0.1;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+};
+
+LeftPinky.prototype = Object.create(Finger.prototype);
+LeftPinky.prototype.constructor = LeftPinky;
+
+},{"../Finger.js":11}],18:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var LeftRing = module.exports.LeftRing = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
+  var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});
+  var ringFingerPosition = new THREE.Vector3(0, 0.20, 0.45);
+  this.model = new THREE.Mesh(ringFingerGeometry, ringFingerMaterial);
+  this.model.position.copy(ringFingerPosition);
+  this.originalY = ringFingerPosition.y;
+  this.number = 4;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta, curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta, curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta, curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote -3) && delta < dist.get(curNote, curNote-2)) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote + 3) ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote + 5) ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta < dist.get(curNote, curNote + 8) ) {
+      return;
+    } else if (delta > dist.get(curNote, curNote -2) && delta < 0) { //this is thumb crossing under
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote - 5), 100);
+    }
+    else {
+      this.moveToNote(newNote - 5);
+    }
+  };
+};
+
+LeftRing.prototype = Object.create(Finger.prototype);
+LeftRing.prototype.constructor = LeftRing;
+
+},{"../Finger.js":11}],19:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var LeftThumb = module.exports.LeftThumb = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
+  var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
+  var thumbPosition = new THREE.Vector3(0, 0.30, 0.6);
+  this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
+  this.model.position.copy(thumbPosition);
+  this.originalY = thumbPosition.y;
+  this.number = 1;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 4:
+      this.ringRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta, curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta, curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-12) && delta <= dist.get(curNote, curNote-5) )  { // This is like the 'stretch' zone
+      return;
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) { // This is when the pinky crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 7), 100);
+    }else { // Definitely move
+      this.moveToNote(newNote + 7);
+    }
+  };
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-9) && delta <= dist.get(curNote, curNote-4)) {
+      return;
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { // This is when the ring crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 5), 100);
+    }else {
+      this.moveToNote(newNote + 5);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-7) && delta <= dist.get(curNote, curNote-2)) {
+      return;
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+4)) { // This is when the middle crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 4), 100);
+    }else {
+      this.moveToNote(newNote + 4);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-4) && delta < 0 ) {
+      return;
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+2)) { // This is when the index crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote + 2), 100);
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y + 0.1
+      _this.model.position.z = _this.currentPos.z + 0.2;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+};
+
+LeftThumb.prototype = Object.create(Finger.prototype);
+LeftThumb.prototype.constructor = LeftThumb;
+
+},{"../Finger.js":11}],20:[function(require,module,exports){
+var RightPinky = require('./RightPinky.js').RightPinky;
+var RightRing = require('./RightRing.js').RightRing;
+var RightMiddle = require('./RightMiddle.js').RightMiddle;
+var RightIndex = require('./RightIndex.js').RightIndex;
+var RightThumb = require('./RightThumb.js').RightThumb;
+var HandDesign = require('../HandDesign.js').HandDesign;
+var Dummy         = require('../Dummy.js').Dummy;
+
+module.exports.RightHand = function(keyboard) {
+  var _this = this;
+  // We're passing in the keyboard to the hand design. That way, the design/layout of the keyboard can be arbitrary, and each finger will know where to play a "C60" or whatever.
+  var handDesign = new HandDesign(keyboard); 
+  var pinky = new RightPinky(handDesign, 'right');
+  var ring = new RightRing(handDesign, 'right');
+  var middle = new RightMiddle(handDesign, 'right');
+  var index = new RightIndex(handDesign, 'right');
+  var thumb = new RightThumb(handDesign, 'right');
+  var dummy1 = new Dummy();
+  var dummy2 = new Dummy();
+
+  this.fingers = [];
+  this.model = new THREE.Object3D();
+
+  // Add fingers to hand model
+
+  this.fingers.push(undefined); // These are here to make the off by 1 errors go away. (We want finger 1 to be thumb so that semantically it makes sense)
+  this.model.add(dummy1.model)
+  dummy1.model.currentNote = -1;
+
+  this.model.add(thumb.model);
+  this.fingers.push(thumb);
+  thumb.model.currentNote = 5;
+
+  this.model.add(index.model);
+  this.fingers.push(index);
+  index.model.currentNote = 1;
+
+  this.model.add(middle.model);
+  this.fingers.push(middle);
+  middle.model.currentNote = 1;
+
+  this.model.add(ring.model);
+  this.fingers.push(ring);
+  ring.model.currentNote = 1;
+
+  this.model.add(pinky.model);
+  this.fingers.push(pinky);
+  pinky.model.currentNote = 1;
+
+  this.model.add(dummy2.model);
+  dummy2.model.currentNote = 110;
+
+  // Initializes fingers to middle C position so they have somewhere to go. Ideally change this to know starting position of current song
+  thumb.moveToNote(60);
+  index.moveToNote(62);
+  middle.moveToNote(64);
+  ring.moveToNote(65);
+  pinky.moveToNote(67);
+
+  this.model.position.y -= 0.22 / 2; // The 0.22 is the keyboard height (defined in KeyboardDesign.js)
+  this.model.traverse(function(object) {
+    object.position.x -= 4.45;
+  });
+
+  this.press = function(finger, noteNum) {
+    var newPosition = keyboard.keys[noteNum].model.position.x;
+    for (var i = 1; i <= 5; i++) {
+      if (i === finger) {
+        _this.fingers[i].press(noteNum);
+      }else{
+        _this.fingers[i].moveAsNeeded(finger,newPosition, noteNum);
+      }
+    }
+  };
+
+  this.release = function(finger) {
+    _this.fingers[finger].release();
+  };
+
+  this.update = function() {
+    var fingers = _this.fingers;
+    for (var i = 1; i < fingers.length; i++) {
+      fingers[i].update();
+    }
+  };
+};
+},{"../Dummy.js":10,"../HandDesign.js":13,"./RightIndex.js":21,"./RightMiddle.js":22,"./RightPinky.js":23,"./RightRing.js":24,"./RightThumb.js":25}],21:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var RightIndex = module.exports.RightIndex = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var indexFingerGeometry = new THREE.CubeGeometry(handInfo.indexFingerWidth, handInfo.indexFingerHeight, handInfo.indexFingerLength);
+  var indexFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.indexFingerColor});
+  var indexFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(indexFingerGeometry, indexFingerMaterial);
+  this.model.position.copy(indexFingerPosition);
+  this.originalY = indexFingerPosition.y;
+  this.number = 2;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+4) && delta < dist.get(curNote, curNote+8)) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+3) && delta < dist.get(curNote, curNote+7) ) {
+      return;
+    }else {
+      this.moveToNote(newNote-3);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+2) && delta < dist.get(curNote, curNote+5) ) {
+      return;
+    }else {
+      this.moveToNote(newNote-2);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0) {
+      return;
+    }else if (delta > 0 && delta < dist.get(curNote, curNote+3)) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+2), 100);
+    }
+    else {
+      this.moveToNote(newNote+2);
+    }
+  };
+};
+
+RightIndex.prototype = Object.create(Finger.prototype);
+RightIndex.prototype.constructor = RightIndex;
+
+},{"../Finger.js":11}],22:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var RightMiddle = module.exports.RightMiddle = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var middleFingerGeometry = new THREE.CubeGeometry(handInfo.middleFingerWidth, handInfo.middleFingerHeight, handInfo.middleFingerLength);
+  var middleFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.middleFingerColor});
+  var middleFingerPosition = new THREE.Vector3(0, 0.20, 0.4);
+  this.model = new THREE.Mesh(middleFingerGeometry, middleFingerMaterial);
+  this.model.position.copy(middleFingerPosition);
+  this.originalY = middleFingerPosition.y;
+  this.number = 3;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 4:
+      this.ringRules(delta,curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+3) && delta <= dist.get(curNote, curNote+5)) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote - 3);
+    }
+  };
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+1) && delta <= dist.get(curNote, curNote+4) ) {
+      return;
+    }else {
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-3) && delta <= dist.get(curNote, curNote-1) ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote-6) && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+4)) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+3), 100);
+    }
+    else {
+      this.moveToNote(newNote+3);
+    }
+  };
+};
+
+RightMiddle.prototype = Object.create(Finger.prototype);
+RightMiddle.prototype.constructor = RightMiddle;
+
+},{"../Finger.js":11}],23:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var RightPinky = module.exports.RightPinky = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var pinkyGeometry = new THREE.CubeGeometry(handInfo.pinkyWidth, handInfo.pinkyHeight, handInfo.pinkyLength);
+  var pinkyMaterial = new THREE.MeshLambertMaterial({color: handInfo.pinkyColor})
+  var pinkyPosition = new THREE.Vector3(0, 0.20, 0.54);
+  this.model = new THREE.Mesh(pinkyGeometry, pinkyMaterial);
+  this.model.position.copy(pinkyPosition);
+  this.originalY = pinkyPosition.y;
+  this.number = 5;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.ringRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX, curNote, newNote);
+    }
+  };
+
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-5) && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-7) && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 5);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-12) && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+1)) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+7), 100);
+    }
+    else {
+      this.moveToNote(newNote+7);
+    }
+  };
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y +0.1;
+      _this.model.position.z = _this.currentPos.z + 0.1;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+};
+
+RightPinky.prototype = Object.create(Finger.prototype);
+RightPinky.prototype.constructor = RightPinky;
+
+},{"../Finger.js":11}],24:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var RightRing = module.exports.RightRing = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var ringFingerGeometry = new THREE.CubeGeometry(handInfo.ringFingerWidth, handInfo.ringFingerHeight, handInfo.ringFingerLength);
+  var ringFingerMaterial = new THREE.MeshLambertMaterial({color: handInfo.ringFingerColor});
+  var ringFingerPosition = new THREE.Vector3(0, 0.20, 0.45);
+  this.model = new THREE.Mesh(ringFingerGeometry, ringFingerMaterial);
+  this.model.position.copy(ringFingerPosition);
+  this.originalY = ringFingerPosition.y;
+  this.number = 4;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta,curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta,curX, curNote, newNote);
+      break;
+    case 1:
+      this.thumbRules(delta,curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote+2) && delta < dist.get(curNote, curNote+3)) { // This is like the 'stretch' zone
+      return;
+    } else { // Definitely move
+      this.moveToNote(newNote - 2);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-3) && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 2);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-5) && delta < 0 ) {
+      return;
+    }else {
+      this.moveToNote(newNote + 3);
+    }
+  };
+  this.thumbRules = function(delta, curX, curNote, newNote) {
+    if ( delta > dist.get(curNote, curNote-8) && delta < 0 ) {
+      return;
+    } else if (delta > 0 && delta < dist.get(curNote, curNote+2)) {
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote+5), 100);
+    }
+    else {
+      this.moveToNote(newNote+5);
+    }
+  };
+};
+
+RightRing.prototype = Object.create(Finger.prototype);
+RightRing.prototype.constructor = RightRing;
+
+},{"../Finger.js":11}],25:[function(require,module,exports){
+var Finger = require('../Finger.js').Finger;
+
+var RightThumb = module.exports.RightThumb = function(handInfo) {
+  Finger.call(this, handInfo.keyboard);
+  var thumbGeometry = new THREE.CubeGeometry(handInfo.thumbWidth, handInfo.thumbHeight, handInfo.thumbLength);
+  var thumbMaterial = new THREE.MeshLambertMaterial({color: handInfo.thumbColor});
+  var thumbPosition = new THREE.Vector3(0, 0.30, 0.6);
+  this.model = new THREE.Mesh(thumbGeometry, thumbMaterial);
+  this.model.position.copy(thumbPosition);
+  this.originalY = thumbPosition.y;
+  this.number = 1;
+  var dist = this.distances;
+
+  this.moveAsNeeded = function(finger, newPosition, newNote) {
+    var curX = this.currentPos.x;
+    var delta = newPosition - curX;
+    var curNote = this.model.currentNote;
+    switch (finger) {
+    case 5:
+      this.pinkyRules(delta, curX, curNote, newNote);
+      break;
+    case 4:
+      this.ringRules(delta, curX, curNote, newNote);
+      break;
+    case 3:
+      this.middleRules(delta, curX, curNote, newNote);
+      break;
+    case 2:
+      this.indexRules(delta, curX, curNote, newNote);
+    }
+  };
+
+  this.pinkyRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+5) && delta < dist.get(curNote, curNote+12) ) { // This is like the 'stretch' zone
+      return;
+    }else if (delta >= dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-7), 100);
+    }else { // Definitely move
+      this.moveToNote(newNote - 7);
+    }
+  };
+  this.ringRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+4) && delta <= dist.get(curNote, curNote+9)) {
+      return;
+    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-5), 100);
+    }else {
+      this.moveToNote(newNote - 5);
+    }
+  };
+  this.middleRules = function(delta, curX, curNote, newNote) {
+    if ( delta >= dist.get(curNote, curNote+2) && delta <= dist.get(curNote, curNote+7)) {
+      return;
+    }else if (delta > dist.get(curNote, curNote-3) && delta < 0) { // This is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-4), 100);
+    }else {
+      this.moveToNote(newNote - 4);
+    }
+  };
+  this.indexRules = function(delta, curX, curNote, newNote) {
+    if ( delta > 0 && delta <= dist.get(curNote, curNote+4) ) {
+      return;
+    }else if (delta > dist.get(curNote, curNote-2) && delta < 0) { // This is when the index lightly crosses over thumb
+      var _this = this;
+      setTimeout(_this.moveToNote(newNote-2), 100);
+    }else {
+      this.moveToNote(newNote-2);
+    }
+  };
+  this.setUpNewTween = function() {
+    var _this = this;
+    var update = function() {
+      _this.model.position.x = _this.currentPos.x;
+      _this.model.position.y = _this.currentPos.y + 0.1;
+      _this.model.position.z = _this.currentPos.z + 0.2;
+    };
+    var easing = TWEEN.Easing.Quadratic.Out;
+
+    var tween = new TWEEN.Tween(this.currentPos)
+      .to(this.newPos, 150)
+      .easing(easing)
+      .onUpdate(update);
+
+    tween.start();
+  };
+};
+
+RightThumb.prototype = Object.create(Finger.prototype);
+RightThumb.prototype.constructor = RightThumb;
+
+},{"../Finger.js":11}],26:[function(require,module,exports){
+var PianoKey = require("./PianoKey.js").PianoKey;
+
+module.exports.Keyboard = function(keyboardDesign) {
+  // Keyboard design is a completed object where we've filled it out with note types and parameters. See keyboardDesign.js file for more.
+  this.model = new THREE.Object3D();
+  this.keys = [];
+  var _this = this;
+
+  // Build the actual keyboard
+  for (var note = 0; note < keyboardDesign.keyInfo.length; note++) {
+    var key = new PianoKey(keyboardDesign, note);
+    _this.keys.push(key);
+    if (note > 20 && note < 109) { // Strips to 88 keys
+      this.model.add(key.model);
+    }
+  }
+  this.model.position.y -= keyboardDesign.whiteKeyHeight / 2;
+  // This centers the keyboard infront of the camera.
+  this.model.traverse(function(object) {
+    object.position.x -= 4.45;
+  });
+
+  this.press = function(note) {
+    _this.keys[note].press();
+  };
+
+  this.release = function(note) {
+    _this.keys[note].release();
+  };
+
+  this.update = function() {
+    var _this = this;
+    var allKeys = _this.keys;
+    for (var i = 0; i < allKeys.length; i++) {
+      allKeys[i].update();
+    }
+  };
+};
+},{"./PianoKey.js":28}],27:[function(require,module,exports){
+module.exports.KeyboardDesign = function() {
+  this.KeyType = {
+    WhiteC:  0,
+    WhiteD:  1,
+    WhiteE:  2,
+    WhiteF:  3,
+    WhiteG:  4,
+    WhiteA:  5,
+    WhiteB:  6,
+    Black:   7
+  };
+
+  this.whiteKeyStep             = 0.236;
+  this.whiteKeyWidth            = 0.226;
+  this.whiteKeyHeight           = 0.22;
+  this.whiteKeyLength           = 1.50;
+  this.blackKeyWidth            = 0.10;
+  this.blackKeyHeight           = 0.24;
+  this.blackKeyLength           = 1.00;
+  this.blackKeyShiftCDE         = 0.0216;
+  this.blackKeyShiftFGAB        = 0.0340;
+  this.blackKeyPosY             = 0.10;
+  this.blackKeyPosZ             = -0.24;
+  this.noteDropPosZ4WhiteKey    = 0.25;
+  this.noteDropPosZ4BlackKey    = 0.75;
+  this.whiteKeyColor            = 0xf0ffff;
+  this.blackKeyColor            = 0x000000;
+  this.keyDip                   = 0.08;
+  this.keyUpSpeed               = 0.03;
+  this.keyInfo                  = []; // An array holding each key's type and position
+
+  var _this = this;
+  // Essentially an initialization function
+  var createBoardInfo = function() {
+    makeNoteObjects();
+    initKeyType();
+    initKeyPos();
+  };
+
+  var makeNoteObjects = function() {
+    for (var i = 0; i < 120; i++) {
+      var noteObj = {};
+      _this.keyInfo.push(noteObj);
+    }
+  };
+
+  var initKeyType = function() {
+    var KeyType = _this.KeyType;
+    var keyInfo = _this.keyInfo;
+    for (var i = 0; i< 10; i++) {
+      var noteNo = 12*i;
+      keyInfo[noteNo + 0].keyType = KeyType.WhiteC;
+      keyInfo[noteNo + 1].keyType = KeyType.Black;
+      keyInfo[noteNo + 2].keyType = KeyType.WhiteD;
+      keyInfo[noteNo + 3].keyType = KeyType.Black;
+      keyInfo[noteNo + 4].keyType = KeyType.WhiteE;
+      keyInfo[noteNo + 5].keyType = KeyType.WhiteF;
+      keyInfo[noteNo + 6].keyType = KeyType.Black;
+      keyInfo[noteNo + 7].keyType = KeyType.WhiteG;
+      keyInfo[noteNo + 8].keyType = KeyType.Black;
+      keyInfo[noteNo + 9].keyType = KeyType.WhiteA;
+      keyInfo[noteNo + 10].keyType = KeyType.Black;
+      keyInfo[noteNo + 11].keyType = KeyType.WhiteD;
+    }
+  };
+
+  var initKeyPos = function() {
+    // Setting up convenience vars
+    var keyInfo        = _this.keyInfo;
+    var KeyType        = _this.KeyType;
+    var prevKeyType    = KeyType.WhiteB;
+    var noteNo         = 0;
+    var posX           = 0.0;
+    var Black          = KeyType.Black;
+
+    // Setting position of first note;
+    keyInfo[noteNo].keyCenterPosX = posX;
+    prevKeyType = keyInfo[noteNo].keyType;
+
+    // Set position of all the rest of the notes.
+    for ( noteNo = 1; noteNo< keyInfo.length; noteNo++) {
+      if (prevKeyType === Black) {
+        posX += _this.whiteKeyStep / 2.0;
+      }else {
+        if (keyInfo[noteNo].keyType === Black) {
+          posX += _this.whiteKeyStep / 2.0;
+        }else {
+          posX += _this.whiteKeyStep;
+        }
+      }
+      keyInfo[noteNo].keyCenterPosX = posX;
+      prevKeyType = keyInfo[noteNo].keyType;
+    }
+
+  };
+
+  // Calling initialization function
+  createBoardInfo();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+},{}],28:[function(require,module,exports){
+var PianoKey = module.exports.PianoKey = function(boardInfo, note) {
+  // Set up some convenience vars
+  var Black              = boardInfo.KeyType.Black;
+  var keyType            = boardInfo.keyInfo[note].keyType;
+  var keyCenterPosX      = boardInfo.keyInfo[note].keyCenterPosX;
+  var keyUpSpeed         = boardInfo.keyUpSpeed;
+
+  // Set up necessary components for making a Mesh.
+  var geometry, material, position;
+  if (keyType === Black) {
+    geometry = new THREE.CubeGeometry(boardInfo.blackKeyWidth, boardInfo.blackKeyHeight, boardInfo.blackKeyLength);
+    material   = new THREE.MeshPhongMaterial({color: boardInfo.blackKeyColor});
+    position   = new THREE.Vector3(keyCenterPosX, boardInfo.blackKeyPosY, boardInfo.blackKeyPosZ);
+    this.originalColor = {r: 0, g: 0, b: 0};
+  }else {
+    geometry = new THREE.CubeGeometry(boardInfo.whiteKeyWidth, boardInfo.whiteKeyHeight, boardInfo.whiteKeyLength);
+    material   = new THREE.MeshPhongMaterial( {color: boardInfo.whiteKeyColor, emissive: 0x111111} );
+    position   = new THREE.Vector3(keyCenterPosX, boardInfo.whiteKeyPosY, boardInfo.whiteKeyPosZ);
+    this.originalColor = {r: 0.941, g: 1, b: 1};
+  }
+
+  // Make the key Mesh
+  this.model = new THREE.Mesh(geometry, material);
+  this.model.position.copy(position);
+
+  // Set helper properties
+  this.keyUpSpeed = boardInfo.keyUpSpeed;
+  this.originalY = position.y;
+  this.pressedY = this.originalY - boardInfo.keyDip;
+  this.newColor = {r: 0, g: 0, b: 0};
+  this.currentColor = {r: this.originalColor.r, g: this.originalColor.g, b: this.originalColor.b}; //weird syntax here so original color never gets modified. 
+};
+
+PianoKey.prototype.press = function() {
+  this.model.position.y = this.pressedY;
+  this.newColor = {r: 0.145, g: 0.749, b: 0.854};
+  this.setUpNewTween();
+  this.isPressed = true;
+};
+
+PianoKey.prototype.release = function() {
+  this.isPressed = false;
+  this.newColor = this.originalColor;
+  this.setUpNewTween();
+};
+
+PianoKey.prototype.update = function() {
+  // This is really about making released notes edge up slowly, rather than quickly
+  if (this.model.position.y < this.originalY && this.isPressed === false) {
+    // Offset will keep getting smaller as the model's position gets raised by keyUpSpeed because update runs 60 times/second.
+    var offset = this.originalY - this.model.position.y;
+    this.model.position.y += Math.min(offset, this.keyUpSpeed);
+  }
+};
+
+PianoKey.prototype.setUpNewTween = function() {
+  var _this = this;
+  var update = function() {
+    _this.model.material.color.setRGB(_this.currentColor.r, _this.currentColor.g, _this.currentColor.b);
+  };
+  var easing = TWEEN.Easing.Quadratic.Out;
+  var tween = new TWEEN.Tween(this.currentColor)
+    .to(this.newColor, 150)
+    .easing(easing)
+    .onUpdate(update);
+
+  tween.start();
+};
+},{}],29:[function(require,module,exports){
+module.exports.Scene = function(container) {
+  var $container = $(container);
+  var width = $container.width();
+  var height = $container.height();
+  var _this = this;
+
+  // Create scene
+  var scene = new THREE.Scene();
+
+  // Create camera
+  var view_angle = 85;
+  var aspect = width/height;
+  var near = 0.001;
+  var far = 1000;
+  var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
+  camera.position.set(0, 3.0, 1.2);
+  camera.lookAt(new THREE.Vector3(10,50,5));
+
+  var controls = new THREE.TrackballControls(camera);
+  controls.rotateSpeed = 1.0;
+  controls.zoomSpeed = 1.2;
+  controls.panSpeed = 0.8;
+
+  controls.noZoom = false;
+  controls.noPan = false;
+
+  controls.staticMoving = true;
+  controls.dynamicDampingFactor = 0.3;
+
+  controls.keys = [ 65, 83, 68 ];
+
+  // Create and append renderer
+  var renderer = Detector.webgl ? new THREE.WebGLRenderer({antialias: true}) : new THREE.CanvasRenderer();
+  renderer.setSize(width, height);
+  renderer.setClearColor(0x000000, 1);
+  renderer.autoClear = false;
+  $container.append(renderer.domElement);
+
+  // Create lights
+  var ambientLight = new THREE.AmbientLight(0x222222);
+
+  var mainLight = new THREE.DirectionalLight(0xffffff, 0.8)
+  mainLight.position.set(1,2,4).normalize();
+
+  var auxLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  auxLight.position.set(-4,-1,-2).normalize;
+
+  // Add everything to the scene
+  scene.add(ambientLight);
+  scene.add(mainLight);
+  scene.add(auxLight);
+  scene.add(camera);
+
+  // Set props for return object
+  this.camera =   camera;
+  this.renderer = renderer;
+  this.scene =     scene;
+
+  this.add = function(object) {
+    scene.add(object);
+  };
+  this.animate = function(callback) {
+    requestAnimationFrame(function() {
+      _this.animate(callback);
+    });
+    if ( typeof callback === 'function') {
+      callback();
+    }
+    controls.update();
+    _this.renderer.render(_this.scene, _this.camera);
+  };
+};
+},{}]},{},[8])
+;
 // tween.js - http://github.com/sole/tween.js
 'use strict';void 0===Date.now&&(Date.now=function(){return(new Date).valueOf()});
 var TWEEN=TWEEN||function(){var a=[];return{REVISION:"11dev",getAll:function(){return a},removeAll:function(){a=[]},add:function(c){a.push(c)},remove:function(c){c=a.indexOf(c);-1!==c&&a.splice(c,1)},update:function(c){if(0===a.length)return!1;for(var b=0,d=a.length,c=void 0!==c?c:"undefined"!==typeof window&&void 0!==window.performance&&void 0!==window.performance.now?window.performance.now():Date.now();b<d;)a[b].update(c)?b++:(a.splice(b,1),d--);return!0}}}();

@@ -104,8 +104,6 @@ module.exports.PlayControls = function(container, app) {
   this.setCurrentTime = function(progressPercent) {
     var currentTime = app.player.endTime * progressPercent;
     app.player.currentTime = currentTime;
-    setTimeout(_this.resume, 10);
-    app.player.pause();
   };
 
   //Set up all click handlers

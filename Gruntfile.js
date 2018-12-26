@@ -18,7 +18,7 @@ module.exports = function(grunt) {
     watch: {
       scripts: {
         files: ['src/**/*.js'],
-        tasks: ['browserify']
+        tasks: ['browserify', 'concat']
       },
       css: {
         files: ['public/styles/style.styl'],
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
       dist: {
         src: ['public/lib/MIDI.js/build/MIDI.min.js', 'public/lib/MIDI.js/inc/base64binary.js', 'public/lib/MIDI.js/inc/jasmid/midifile.js', 'public/lib/MIDI.js/inc/jasmid/stream.js',
                 'public/lib/MIDI.js/inc/jasmid/replayer.js', 'public/lib/three.min.js', 'public/lib/Detector.js',
-                'public/bundle.min.js', 'public/lib/tween.min.js', 'public/lib/bootstrap.min.js', 'public/lib/TrackballControls.js'],
+                'public/bundle.js', 'public/lib/tween.min.js', 'public/lib/bootstrap.min.js', 'public/lib/TrackballControls.js'],
         dest: 'public/build.js'
       }
     }

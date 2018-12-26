@@ -6,6 +6,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
   var dataWithStarts = helpers.addStartTimes(midiData);
   // This checks if we already have the best path data for that song on the client.
   // TODO: Refactor into better response object that wouldn't need iteration
+  app.preComputed = app.preComputed || [];
   for (var i = 0; i < app.preComputed.length; i++) {
     if (app.preComputed[i].title === app.currentSong) {
       var bestPath = app.preComputed[i].BestPathObj;
@@ -19,10 +20,10 @@ module.exports.FingeringAlgorithm = function(midiData) {
   // Go through each layer (starting at 2nd, because first is just endCap)
   for (var layer = 1; layer < noteTrellis.length; layer++) {
     // Go through each node in each layer
-    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {       
+    for (var node1 = 0; node1 < noteTrellis[layer].length ; node1++) {
       var min = Infinity;
       // Go through each node in prev layer.
-      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {    
+      for (var node2 = 0; node2 < noteTrellis[layer-1].length; node2++) {
         var curNode = noteTrellis[layer][node1];
         var prevNode = noteTrellis[layer-1][node2];
         var totalCost = prevNode.nodeScore || 0;
@@ -31,7 +32,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
         var curRH = curData.right;
         var prevRH = prevData.right;
-        // If you have something in a given hand, we have to compare it with the last thing in that hand. 
+        // If you have something in a given hand, we have to compare it with the last thing in that hand.
         // So if the layer directly previous has nothing, we keep tracing back till we find it.
         if (curRH.notes.length > 0) {
           var counter = 2;
@@ -63,14 +64,14 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
         totalCost += RHCost + LHCost;
 
-       
+
         if (totalCost < min) {
           min = totalCost;
           curNode.nodeScore = totalCost;
           curNode.bestPrev = node2;
         }
       }
-      
+
     }
   }
   /* Now we need to go backwards and collect the best path.
@@ -79,9 +80,9 @@ module.exports.FingeringAlgorithm = function(midiData) {
 
   /* From this point, we put the finger for that node in the array, then we track back to it's
   best previous node, record it's finger, and repeat till we get to the end.
-  We set the continuation condition to be greater than zero, because we don't actually want zero, 
+  We set the continuation condition to be greater than zero, because we don't actually want zero,
   since zero is just our start object.*/
-  
+
   var bestPathObj = {};
   for (var j = noteTrellis.length-1; j > 0; j--) {
     var nodeObj = noteTrellis[j][currentNode];
@@ -96,7 +97,7 @@ module.exports.FingeringAlgorithm = function(midiData) {
     }
     currentNode = nodeObj.bestPrev;
   }
-  
+
   // Was using this as simple way post songs to our Database. Didn't want to write a whole form yet.
   // and don't want to allow arbitrary songs to get posted.
 
